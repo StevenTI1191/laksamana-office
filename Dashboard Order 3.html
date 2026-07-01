@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Laksamana Space - Kitchen Batch Input & Check-in</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Laksamana Kitchen">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Comfortaa:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            /* Pencegahan pull-to-refresh di mobile app */
+            overscroll-behavior-y: contain; 
+        }
+        .brand-font {
+            font-family: 'Comfortaa', cursive;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.75;
+        }
+        .btn-loading i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Smooth fade for autocomplete dropdown */
+        .fade-in-up {
+            animation: fadeInUp 0.15s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16">
+
+    <!-- Header Area -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center text-lg shadow-md shadow-emerald-500/20">
+                    <i class="fa-solid fa-kitchen-set text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-black tracking-tight leading-none brand-font">LAKSAMANA KITCHEN</h1>
+                    <p class="text-[10px] text-slate-400 font-bold mt-1">Batch Input & Check-in v8.2 PWA</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <!-- PWA Install Button (Hidden by default) -->
+                <button id="btn-install-pwa" class="hidden px-3 py-1.5 text-[10px] font-extrabold rounded-lg border border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/30 flex items-center gap-1.5 uppercase">
+                    <i class="fa-solid fa-download"></i> Install App
+                </button>
+
+                <!-- Network/Config Badge -->
+                <div id="connection-badge" class="px-2.5 py-1 text-[10px] font-bold rounded-lg border border-rose-500/30 bg-rose-50 text-rose-500 flex items-center gap-1.5 transition-all">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span id="connection-text">Offline</span>
+                </div>
+                <!-- Settings Button Toggle -->
+                <button onclick="toggleConfigPanel()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all relative animate-bounce" title="Pengaturan Sistem">
+                    <i class="fa-solid fa-gears"></i>
+                    <span id="settings-dot" class="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Navigation Bar (Menu Tab tersendiri) -->
+    <nav class="bg-white border-b border-slate-200 sticky top-[68px] z-30 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 flex space-x-6 overflow-x-auto">
+            <button id="tab-order" onclick="switchTab('order')" class="py-4 px-2 border-b-[3px] border-indigo-600 text-indigo-600 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap">
+                <i class="fa-solid fa-cart-plus text-sm"></i> 1. Form Order Belanja
+            </button>
+            <button id="tab-checkin" onclick="switchTab('checkin')" class="py-4 px-2 border-b-[3px] border-transparent text-slate-400 hover:text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap">
+                <i class="fa-solid fa-clipboard-check text-sm"></i> 2. Check-in Penerimaan
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN BODY CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+
+        <!-- Configuration Panel (Global Settings) -->
+        <div id="config-panel" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-md space-y-4 transition-all mb-6 hidden">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-indigo-500"></i> Pengaturan Sinkronisasi Server
+                </h3>
+                <button onclick="toggleConfigPanel()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Auto-Import Area -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider">1. Setup ID Kolom Google Form</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button onclick="copyDetectorScript()" class="bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-2 rounded-lg transition-all shrink-0">
+                        <i class="fa-solid fa-copy mr-1"></i> Copy Script Detektor
+                    </button>
+                    <input type="text" id="config-auto-import" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 bg-white" placeholder='Paste hasil detektor JSON disini...'>
+                    <button type="button" onclick="executeAutoImport()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] px-3 py-2 rounded-lg transition-all shrink-0">
+                        Impor ID
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-4 pt-2 border-t border-slate-100">
+                <!-- App Script URL Setup Database Item -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <i class="fa-solid fa-database text-emerald-500"></i> Link App Script: Database Item (Untuk Pencarian Bahan)
+                    </label>
+                    <input type="text" id="config-appscript-item-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                </div>
+
+                <!-- App Script URL Setup Riwayat Checkin -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <i class="fa-solid fa-server text-indigo-500"></i> Link App Script: Tabel Riwayat & Check-in (Sinkronisasi Orderan)
+                    </label>
+                    <input type="text" id="config-appscript-history-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Link / URL Google Form Belanja (POST Data)</label>
+                    <input type="text" id="config-form-url" oninput="extractFormId(this.value)" placeholder="https://docs.google.com/forms/d/e/.../viewform" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: Nama Item</label><input type="text" id="entry-item" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: QTY</label><input type="text" id="entry-qty" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: Satuan</label><input type="text" id="entry-unit" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: Catatan</label><input type="text" id="entry-note" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: Tanggal</label><input type="text" id="entry-date" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                    <div><label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">ID: PIC</label><input type="text" id="entry-pic" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-mono bg-slate-50"></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+                <button onclick="saveConfigurations()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm">
+                    Simpan & Tutup Pengaturan
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- HALAMAN 1: ORDER BATCH BUILDER                 -->
+        <!-- ============================================== -->
+        <div id="view-order" class="space-y-6 block">
+            <!-- General Batch Header Settings -->
+            <div class="bg-gradient-to-r from-slate-800 to-indigo-950 rounded-2xl p-5 text-white shadow-md space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <span class="text-[9px] font-bold tracking-widest text-indigo-300 uppercase block">Tahap 1</span>
+                        <h2 class="text-lg font-black brand-font">Pengajuan Order Barang Baru</h2>
+                    </div>
+                    <div class="inline-flex items-center gap-1 bg-white/10 px-3 py-1 rounded-xl text-xs font-semibold self-start sm:self-auto">
+                        <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i> Server Sinkron
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1.5">🧑‍🍳 PIC Kitchen</label>
+                        <select id="batch-pic-name" class="w-full bg-slate-700 border border-white/20 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold">
+                            <option value="Putra">Putra</option>
+                            <option value="Adit">Adit</option>
+                            <option value="Syahdan">Syahdan</option>
+                            <option value="Anggi">Anggi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1.5">🗓️ Tgl Rencana Kedatangan</label>
+                        <input type="date" id="batch-arrival-date" class="w-full bg-white/10 border border-white/20 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold cursor-pointer" onclick="this.showPicker()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Form -->
+            <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-visible">
+                <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between rounded-t-3xl">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Item Pesanan Belanja</span>
+                    <button type="button" onclick="addNewBatchRow()" class="bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-700 font-bold px-3.5 py-1.5 rounded-xl transition-all text-xs flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Tambah Baris Bahan
+                    </button>
+                </div>
+
+                <!-- Dynamic Input Rows (DIPERBAIKI: Hapus batasan max-h agar list bisa mendorong form ke bawah) -->
+                <div id="batch-rows-wrapper" class="divide-y divide-slate-100 pb-4"></div>
+
+                <!-- Form Controller Bar -->
+                <div class="p-5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-b-3xl">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 bg-indigo-600 rounded-full animate-ping"></div>
+                        <span id="batch-summary-text" class="text-xs font-extrabold text-slate-500">0 Item siap dikirim</span>
+                    </div>
+                    <button type="button" id="btn-submit-batch" onclick="submitBatchOrders()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Kirim Form Pesanan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- HALAMAN 2: CHECK-IN PENERIMAAN                 -->
+        <!-- ============================================== -->
+        <div id="view-checkin" class="hidden">
+            <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden mb-6">
+                <div class="p-5 bg-gradient-to-r from-emerald-800 to-teal-900 text-white flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-packing text-emerald-400"></i> Sistem Verifikasi Penerimaan
+                        </h3>
+                        <p class="text-[10px] text-teal-100 mt-1 opacity-90">Sistem akan menarik data langsung dari App Script.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                        <label class="text-[10px] uppercase font-black tracking-widest text-emerald-200 hidden md:block mr-2">Pilih Tgl:</label>
+                        <input type="date" id="history-date-filter" onchange="fetchHistoryData()" class="w-full md:w-auto bg-white/10 border border-white/20 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 font-semibold cursor-pointer" onclick="this.showPicker()">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-[10px] uppercase text-slate-500 tracking-wider">
+                                <th class="p-4 font-black">Detail Barang & Jumlah Order</th>
+                                <th class="p-4 font-black w-36 text-center">Centang Penerimaan</th>
+                                <th class="p-4 font-black w-1/3">Jumlah Kedatangan Aktual (Opsional)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-100 text-xs text-slate-700">
+                            <tr><td colspan="3" class="p-10 text-center text-slate-400 italic font-medium"><i class="fa-solid fa-inbox text-2xl block mb-2 opacity-50"></i>Data akan otomatis dimuat saat tanggal dipilih.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <button type="button" id="btn-save-checkin" onclick="saveCheckinData()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Status ke Server
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Konfirmasi Rekap Order -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeConfirmModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-200 pointer-events-auto" id="confirm-modal-content">
+                
+                <!-- Modal Header -->
+                <div class="bg-indigo-600 p-5 text-white flex justify-between items-center">
+                    <div>
+                        <h3 class="font-black text-lg">Konfirmasi Pesanan</h3>
+                        <p class="text-[10px] text-indigo-200 mt-1 font-medium">Mohon cek kembali rincian di bawah ini sebelum mengirim.</p>
+                    </div>
+                    <button onclick="closeConfirmModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body (Recap List) -->
+                <div class="p-5 max-h-[50vh] overflow-y-auto">
+                    <!-- Info Tambahan (PIC & Tgl) -->
+                    <div class="flex gap-4 mb-4 pb-4 border-b border-slate-100">
+                        <div class="flex-1">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">PIC Pemesan</span>
+                            <span id="recap-pic" class="text-sm font-black text-slate-800"></span>
+                        </div>
+                        <div class="flex-1">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Tgl Kedatangan</span>
+                            <span id="recap-date" class="text-sm font-black text-slate-800"></span>
+                        </div>
+                    </div>
+
+                    <ul id="recap-list" class="space-y-3">
+                        <!-- Items will be injected here -->
+                    </ul>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-5 bg-slate-50 border-t border-slate-100 flex gap-3">
+                    <button onclick="closeConfirmModal()" class="flex-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all">
+                        Kembali & Edit
+                    </button>
+                    <button id="btn-final-submit" onclick="executeFinalSubmit()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl text-xs shadow-lg shadow-indigo-500/30 transition-all flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-check-double"></i> Konfirmasi & Kirim
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // ==========================================
+        //  PWA SETUP: MANIFEST & SERVICE WORKER
+        // ==========================================
+        
+        // Base64 SVG Icon untuk Web App Manifest
+        const appIconBase64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IiMwZjE3MmEiLz48dGV4dCB4PSIyNTYiIHk9IjI3MCIgZm9udC1zaXplPSIyNTAiIGZpbGw9IiMxMGI5ODEiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+TEs8L3RleHQ+PC9zdmc+";
+
+        // Inject Web App Manifest dinamis
+        function injectPwaManifest() {
+            const manifestJSON = {
+                "name": "Laksamana Kitchen Batch",
+                "short_name": "Kitchen",
+                "description": "Sistem Input & Check-in Dapur Laksamana",
+                "start_url": window.location.href.split('?')[0],
+                "display": "standalone",
+                "background_color": "#f8fafc",
+                "theme_color": "#0f172a",
+                "icons": [{
+                    "src": appIconBase64,
+                    "sizes": "192x192 512x512",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                }]
+            };
+
+            const stringManifest = JSON.stringify(manifestJSON);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+        }
+
+        // Inject Service Worker dinamis
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'laksamana-kitchen-pwa-v1';
+                    const urlsToCache = [
+                        location.href.split('?')[0]
+                    ];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                        self.skipWaiting();
+                    });
+
+                    self.addEventListener('activate', event => {
+                        event.waitUntil(
+                            caches.keys().then(cacheNames => {
+                                return Promise.all(
+                                    cacheNames.map(cacheName => {
+                                        if (cacheName !== CACHE_NAME) {
+                                            return caches.delete(cacheName);
+                                        }
+                                    })
+                                );
+                            })
+                        );
+                        self.clients.claim();
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        // Jangan cache permintaan API Google Script/Forms
+                        if (event.request.url.includes('script.google.com') || event.request.url.includes('docs.google.com')) {
+                            event.respondWith(fetch(event.request));
+                            return;
+                        }
+
+                        // Stategi Network First, fallback to Cache
+                        event.respondWith(
+                            fetch(event.request).catch(() => {
+                                return caches.match(event.request);
+                            })
+                        );
+                    });
+                `;
+
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => console.log('PWA ServiceWorker terdaftar'))
+                    .catch(err => console.error('Gagal daftar ServiceWorker', err));
+            }
+        }
+
+        // Handle PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Tampilkan tombol instal
+            document.getElementById('btn-install-pwa').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-install-pwa').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User menerima instalasi PWA');
+                    document.getElementById('btn-install-pwa').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // ==========================================
+        //  GLOBAL VARIABLES & CORE LOGIC
+        // ==========================================
+        let globalItemsData = []; 
+        let debounceTimer;
+        let rowCount = 0;
+        
+        // Simpan data order sementara untuk dikirim setelah konfirmasi modal
+        let pendingOrdersToSubmit = []; 
+
+        let state = {
+            formId: "",
+            formUrl: "",
+            appScriptUrlItem: "",     
+            appScriptUrlHistory: "",  
+            entryIds: {
+                item: "", qty: "", unit: "", note: "", date: "", pic: ""
+            },
+            picName: "Putra"
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup PWA
+            injectPwaManifest();
+            registerServiceWorker();
+            setupNetworkListeners();
+
+            for (let i = 0; i < 3; i++) addNewBatchRow();
+
+            loadSettings();
+            setTomorrowAsDefaultDate();
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('history-date-filter').value = today;
+            
+            loadItemsFromAppScript();
+        });
+
+        // Logika Deteksi Online/Offline
+        function setupNetworkListeners() {
+            window.addEventListener('online', updateNetworkStatus);
+            window.addEventListener('offline', updateNetworkStatus);
+            updateNetworkStatus(); // Cek saat pertama load
+        }
+
+        function updateNetworkStatus() {
+            const badge = document.getElementById('connection-badge');
+            const text = document.getElementById('connection-text');
+            
+            if (navigator.onLine) {
+                // Jika online, kembalikan ke logika pengecekan config
+                checkConfigStatus();
+            } else {
+                badge.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg border border-amber-500/30 bg-amber-50 text-amber-600 flex items-center gap-1.5 transition-all";
+                text.innerHTML = '<i class="fa-solid fa-wifi-slash"></i> Offline (No Internet)';
+                showToast("Koneksi Terputus", "Anda sedang offline. Beberapa fitur mungkin tidak berfungsi.", "warning");
+            }
+        }
+
+        // ==========================================
+        //  TAB MENU NAVIGATION LOGIC
+        // ==========================================
+        function switchTab(tabId) {
+            document.getElementById('view-order').classList.add('hidden');
+            document.getElementById('view-checkin').classList.add('hidden');
+            
+            const btnOrder = document.getElementById('tab-order');
+            const btnCheckin = document.getElementById('tab-checkin');
+
+            btnOrder.className = "py-4 px-2 border-b-[3px] border-transparent text-slate-400 hover:text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap";
+            btnCheckin.className = "py-4 px-2 border-b-[3px] border-transparent text-slate-400 hover:text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap";
+
+            if(tabId === 'order') {
+                document.getElementById('view-order').classList.remove('hidden');
+                document.getElementById('view-order').classList.add('block');
+                btnOrder.className = "py-4 px-2 border-b-[3px] border-indigo-600 text-indigo-600 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap";
+            } else {
+                document.getElementById('view-checkin').classList.remove('hidden');
+                document.getElementById('view-checkin').classList.add('block');
+                btnCheckin.className = "py-4 px-2 border-b-[3px] border-emerald-500 text-emerald-600 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all whitespace-nowrap";
+                
+                const tbody = document.getElementById('history-table-body');
+                if (tbody.innerHTML.includes('otomatis dimuat') || tbody.innerHTML.includes('Tarik Data')) {
+                    fetchHistoryData();
+                }
+            }
+        }
+
+        function setTomorrowAsDefaultDate() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('batch-arrival-date').value = tomorrow.toISOString().split('T')[0];
+        }
+
+        function loadSettings() {
+            state.formUrl = localStorage.getItem('kitchen_form_url') || "";
+            state.formId = localStorage.getItem('kitchen_form_id') || "";
+            state.appScriptUrlItem = localStorage.getItem('kitchen_appscript_item_url') || "";
+            state.appScriptUrlHistory = localStorage.getItem('kitchen_appscript_history_url') || "";
+            
+            const savedEntries = localStorage.getItem('kitchen_entry_ids');
+            if (savedEntries) state.entryIds = JSON.parse(savedEntries);
+
+            state.picName = localStorage.getItem('kitchen_batch_picname') || "Putra";
+            document.getElementById('batch-pic-name').value = state.picName;
+
+            document.getElementById('config-appscript-item-url').value = state.appScriptUrlItem;
+            document.getElementById('config-appscript-history-url').value = state.appScriptUrlHistory;
+            document.getElementById('config-form-url').value = state.formUrl;
+            
+            document.getElementById('entry-item').value = state.entryIds.item || "";
+            document.getElementById('entry-qty').value = state.entryIds.qty || "";
+            document.getElementById('entry-unit').value = state.entryIds.unit || "";
+            document.getElementById('entry-note').value = state.entryIds.note || "";
+            document.getElementById('entry-date').value = state.entryIds.date || "";
+            document.getElementById('entry-pic').value = state.entryIds.pic || "";
+
+            if(navigator.onLine) checkConfigStatus();
+        }
+
+        async function loadItemsFromAppScript() {
+            if (!state.appScriptUrlItem) {
+                globalItemsData = [];
+                return;
+            }
+            if(!navigator.onLine) return; // Skip fetch jika offline
+            
+            try {
+                const response = await fetch(state.appScriptUrlItem);
+                if(response.ok) {
+                    const data = await response.json();
+                    if(data && data.products) {
+                        globalItemsData = Object.keys(data.products);
+                    } else if (Array.isArray(data)) {
+                        globalItemsData = data.map(i => i.nama || i.name || i.Item || i[1] || i);
+                    }
+                    // Simpan ke cache lokal (PWA fallback)
+                    localStorage.setItem('kitchen_cached_items', JSON.stringify(globalItemsData));
+                }
+            } catch(err) {
+                console.warn("Gagal fetch DB Item dari App Script. Mencoba memuat dari Cache Lokal.", err);
+                const cached = localStorage.getItem('kitchen_cached_items');
+                if(cached) globalItemsData = JSON.parse(cached);
+            }
+        }
+
+        function handleItemSearch(input, rowId) {
+            clearTimeout(debounceTimer);
+            const query = input.value.trim().toLowerCase();
+            const resultsContainer = document.getElementById(`autocomplete-results-${rowId}`);
+
+            if (query.length < 1) { 
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                const filtered = globalItemsData.filter(item => item.toLowerCase().includes(query));
+                
+                if (filtered.length === 0) {
+                    resultsContainer.innerHTML = `<div class="p-3 text-xs text-rose-500 font-bold italic text-center border-b-2 border-rose-100 bg-white">Bahan tidak ada di Database!</div>`;
+                } else {
+                    resultsContainer.innerHTML = filtered.map(item => `
+                        <div onmousedown="selectAutocompleteItem('${item.replace(/'/g, "\\'")}', ${rowId})" class="p-3 text-xs font-bold text-slate-700 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 bg-white transition-colors">
+                            ${item}
+                        </div>
+                    `).join('');
+                }
+                
+                resultsContainer.classList.remove('hidden');
+                resultsContainer.classList.add('fade-in-up');
+            }, 50); 
+        }
+
+        function selectAutocompleteItem(item, rowId) {
+            const input = document.getElementById(`batch-row-item-${rowId}`);
+            input.value = item;
+            document.getElementById(`autocomplete-results-${rowId}`).classList.add('hidden');
+        }
+
+        function enforceSelection(input) {
+            setTimeout(() => { 
+                const val = input.value.trim();
+                if (val && globalItemsData.length > 0 && !globalItemsData.includes(val)) {
+                    input.value = "";
+                    showToast("Input Ditolak", "Harus pilih bahan yang terdaftar dari opsi sistem!", "danger");
+                }
+            }, 150);
+        }
+
+        document.addEventListener('click', function(e) {
+            const results = document.querySelectorAll('[id^="autocomplete-results-"]');
+            results.forEach(res => {
+                if (!res.contains(e.target) && res.previousElementSibling !== e.target) {
+                    res.classList.add('hidden');
+                }
+            });
+        });
+
+        function checkConfigStatus() {
+            if(!navigator.onLine) return; // Jika offline, badge status diatur oleh fungsi updateNetworkStatus
+            const hasCompleteConfig = state.formId && state.entryIds.item;
+            const badge = document.getElementById('connection-badge');
+            const text = document.getElementById('connection-text');
+
+            if (!hasCompleteConfig) {
+                document.getElementById('settings-dot').classList.remove('hidden');
+                badge.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg border border-rose-500/30 bg-rose-50 text-rose-500 flex items-center gap-1.5 transition-all";
+                text.innerText = "Setup (Belum Lengkap)";
+            } else {
+                document.getElementById('settings-dot').classList.add('hidden');
+                badge.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center gap-1.5 transition-all";
+                text.innerText = "Online (Ready)";
+            }
+        }
+
+        function extractFormId(url) {
+            const match = url.match(/\/forms\/d\/e\/([a-zA-Z0-9-_]+)/);
+            if (match && match[1]) {
+                state.formId = match[1];
+                state.formUrl = url;
+            } else {
+                state.formId = "";
+            }
+        }
+
+        function toggleConfigPanel() {
+            const el = document.getElementById('config-panel');
+            el.classList.toggle('hidden');
+        }
+
+        function saveConfigurations() {
+            state.appScriptUrlItem = document.getElementById('config-appscript-item-url').value.trim();
+            state.appScriptUrlHistory = document.getElementById('config-appscript-history-url').value.trim();
+            const formUrlInput = document.getElementById('config-form-url').value.trim();
+            extractFormId(formUrlInput);
+
+            state.entryIds.item = document.getElementById('entry-item').value.trim();
+            state.entryIds.qty = document.getElementById('entry-qty').value.trim();
+            state.entryIds.unit = document.getElementById('entry-unit').value.trim();
+            state.entryIds.note = document.getElementById('entry-note').value.trim();
+            state.entryIds.date = document.getElementById('entry-date').value.trim();
+            state.entryIds.pic = document.getElementById('entry-pic').value.trim();
+
+            localStorage.setItem('kitchen_appscript_item_url', state.appScriptUrlItem);
+            localStorage.setItem('kitchen_appscript_history_url', state.appScriptUrlHistory);
+            localStorage.setItem('kitchen_form_url', state.formUrl);
+            localStorage.setItem('kitchen_form_id', state.formId);
+            localStorage.setItem('kitchen_entry_ids', JSON.stringify(state.entryIds));
+
+            checkConfigStatus();
+            toggleConfigPanel();
+            loadItemsFromAppScript();
+            showToast("Pengaturan Disimpan", "Sistem siap digunakan.", "success");
+        }
+
+        function addNewBatchRow() {
+            const wrapper = document.getElementById('batch-rows-wrapper');
+            const id = ++rowCount;
+
+            const row = document.createElement('div');
+            row.id = `batch-row-${id}`;
+            row.className = "p-4 md:p-3 hover:bg-slate-50/50 flex flex-col md:flex-row items-stretch md:items-center gap-3 transition-all relative";
+
+            row.innerHTML = `
+                <div class="relative flex-1 min-w-[200px]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 text-[10px]"></i>
+                    </div>
+                    <input type="text" id="batch-row-item-${id}" 
+                           onkeyup="handleItemSearch(this, ${id})" 
+                           onfocus="handleItemSearch(this, ${id})"
+                           onblur="enforceSelection(this)" 
+                           placeholder="Ketik min. 1 huruf..." 
+                           class="w-full border border-slate-200 rounded-xl pl-8 pr-3 py-2.5 md:py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" autocomplete="off">
+                    <div id="autocomplete-results-${id}" class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto"></div>
+                </div>
+
+                <div class="w-full md:w-[150px] flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="adjustQty(${id}, -1)" class="w-10 h-10 md:w-8 md:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold flex items-center justify-center transition-all shadow-sm active:scale-95 text-xs">-</button>
+                    <input type="number" id="batch-row-qty-${id}" value="5" min="1" step="1" class="w-16 border border-slate-200 rounded-xl text-center font-black text-xs py-2 md:py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white shadow-inner">
+                    <button type="button" onclick="adjustQty(${id}, 1)" class="w-10 h-10 md:w-8 md:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold flex items-center justify-center transition-all shadow-sm active:scale-95 text-xs">+</button>
+                </div>
+
+                <div class="w-full md:w-[120px]">
+                    <select id="batch-row-unit-${id}" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 md:py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        <option value="Kg">Kg</option>
+                        <option value="Gram">Gram</option>
+                        <option value="Pcs">Pcs</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Dus">Dus</option>
+                        <option value="Sack">Sack</option>
+						<option value="Ikat">Ikat</option>
+                    </select>
+                </div>
+
+                <div class="flex-grow">
+                    <input type="text" id="batch-row-note-${id}" placeholder="Catatan (opsional)" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 md:py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" onclick="deleteBatchRow(${id})" class="p-2 text-slate-400 hover:text-rose-600 rounded-xl transition-all self-end md:self-auto" title="Hapus Baris">
+                        <i class="fa-solid fa-trash text-sm"></i>
+                    </button>
+                </div>
+            `;
+
+            wrapper.appendChild(row);
+            updateSummaryText();
+        }
+
+        function deleteBatchRow(id) {
+            const wrapper = document.getElementById('batch-rows-wrapper');
+            const row = document.getElementById(`batch-row-${id}`);
+            
+            if (wrapper.children.length <= 1) {
+                showToast("Batas Minimum", "Anda wajib memiliki minimal satu baris item.", "warning");
+                return;
+            }
+
+            if (row) {
+                row.remove();
+                updateSummaryText();
+            }
+        }
+
+        function adjustQty(id, modifier) {
+            const input = document.getElementById(`batch-row-qty-${id}`);
+            if (input) {
+                let val = parseFloat(input.value) || 0;
+                val = Math.max(1, val + modifier);
+                input.value = Math.round(val);
+            }
+        }
+
+        function updateSummaryText() {
+            const wrapper = document.getElementById('batch-rows-wrapper');
+            const count = wrapper.children.length;
+            document.getElementById('batch-summary-text').innerText = `${count} Baris siap dikirim`;
+        }
+
+
+        // ==========================================
+        //  FUNGSI PENGIRIMAN & POP UP KONFIRMASI
+        // ==========================================
+        function submitBatchOrders() {
+            if(!navigator.onLine) {
+                return showToast("Tidak Ada Internet", "Gagal mengirim formulir saat offline.", "danger");
+            }
+
+            const wrapper = document.getElementById('batch-rows-wrapper');
+            const pic = document.getElementById('batch-pic-name').value;
+            const date = document.getElementById('batch-arrival-date').value;
+
+            if (!state.formId) {
+                showToast("Pengaturan Belum Lengkap", "Buka icon gear dan setting URL Google Form Anda.", "danger");
+                toggleConfigPanel();
+                return;
+            }
+
+            if (!pic || !date) {
+                showToast("Pengisian Kurang", "Lengkapi nama PIC dan Tanggal Kedatangan.", "warning");
+                return;
+            }
+
+            // Kosongkan array penampung sementara
+            pendingOrdersToSubmit = [];
+            let validationSuccess = true;
+
+            const recapList = document.getElementById('recap-list');
+            recapList.innerHTML = ''; // Kosongkan list rekap UI
+
+            for (let i = 0; i < wrapper.children.length; i++) {
+                const div = wrapper.children[i];
+                const id = div.id.replace('batch-row-', '');
+                
+                const itemInput = document.getElementById(`batch-row-item-${id}`);
+                const item = itemInput.value.trim();
+                const qty = parseFloat(document.getElementById(`batch-row-qty-${id}`).value) || 0;
+                const unit = document.getElementById(`batch-row-unit-${id}`).value;
+                let note = document.getElementById(`batch-row-note-${id}`).value.trim() || "-";
+
+                // Validasi input wajib
+                if (!item || (globalItemsData.length > 0 && !globalItemsData.includes(item))) {
+                    itemInput.classList.add('border-rose-500', 'bg-rose-50');
+                    setTimeout(() => itemInput.classList.remove('border-rose-500', 'bg-rose-50'), 3000);
+                    validationSuccess = false;
+                    continue; 
+                }
+
+                // Masukkan ke array penampung (belum disubmit)
+                pendingOrdersToSubmit.push({ item, qty, unit, note });
+
+                // Bangun UI List Rekap
+                recapList.innerHTML += `
+                    <li class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
+                        <div>
+                            <span class="font-bold text-slate-800 text-xs block">${item}</span>
+                            ${note !== '-' ? `<span class="text-[10px] text-slate-400 italic block mt-0.5"><i class="fa-regular fa-comment-dots"></i> ${note}</span>` : ''}
+                        </div>
+                        <div class="text-right whitespace-nowrap ml-3">
+                            <span class="font-black text-indigo-600 text-sm bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100">${qty} <span class="text-[10px] font-bold text-indigo-400">${unit}</span></span>
+                        </div>
+                    </li>
+                `;
+            }
+
+            if (!validationSuccess) {
+                showToast("Data Tidak Valid", "Ada baris bahan yang kosong atau tidak sesuai database.", "danger");
+                return;
+            }
+
+            // Jika validasi sukses, tampilkan data di modal
+            document.getElementById('recap-pic').innerText = pic;
+            
+            // Format Tanggal untuk display di Modal
+            const dObj = new Date(date);
+            const dateDisplay = dObj.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('recap-date').innerText = dateDisplay;
+
+            openConfirmModal();
+        }
+
+        // Membuka Animasi Modal Rekap
+        function openConfirmModal() {
+            const modal = document.getElementById('confirm-modal');
+            const content = document.getElementById('confirm-modal-content');
+            modal.classList.remove('hidden');
+            
+            // Sedikit delay untuk memicu animasi transisi Tailwind
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // Menutup Animasi Modal Rekap
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirm-modal');
+            const content = document.getElementById('confirm-modal-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200); 
+        }
+
+        // Eksekusi pengiriman sebenarnya (Dipanggil dari tombol di dalam Pop up Modal)
+        async function executeFinalSubmit() {
+            const pic = document.getElementById('batch-pic-name').value;
+            const date = document.getElementById('batch-arrival-date').value;
+            
+            localStorage.setItem('kitchen_batch_picname', pic);
+
+            const btnUtama = document.getElementById('btn-submit-batch');
+            const btnModal = document.getElementById('btn-final-submit');
+            
+            // Set Loading state
+            btnUtama.classList.add('btn-loading');
+            btnUtama.disabled = true;
+            btnUtama.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim...`;
+
+            btnModal.classList.add('btn-loading');
+            btnModal.disabled = true;
+            btnModal.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses...`;
+
+            const d = new Date(date);
+            const yearStr = d.getFullYear().toString();
+            const monthStr = (d.getMonth() + 1).toString();
+            const dayStr = d.getDate().toString();
+
+            let successfulCount = 0;
+
+            // Proses Fetch berulang (Loop) ke Google Form berdasarkan array yang sudah dikonfirmasi
+            for (let i = 0; i < pendingOrdersToSubmit.length; i++) {
+                let order = pendingOrdersToSubmit[i];
+                try {
+                    const formData = new FormData();
+                    formData.append(state.entryIds.item, order.item);
+                    formData.append(state.entryIds.qty, order.qty.toString());
+                    formData.append(state.entryIds.unit, order.unit);
+                    formData.append(state.entryIds.note, order.note);
+                    formData.append(state.entryIds.pic, pic);
+                    formData.append(`${state.entryIds.date}_year`, yearStr);
+                    formData.append(`${state.entryIds.date}_month`, monthStr);
+                    formData.append(`${state.entryIds.date}_day`, dayStr);
+
+                    const formResponseUrl = `https://docs.google.com/forms/d/e/${state.formId}/formResponse`;
+
+                    // Tunggu fetch selesai sebelum lanjut ke loop berikutnya.
+                    await fetch(formResponseUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData
+                    });
+                    successfulCount++;
+                    
+                    // Tambahkan jeda waktu (delay) 500ms antar pengiriman untuk mencegah request terblokir 
+                    // atau tumpang tindih oleh Google, terutama jika jumlah order sedikit/cuma 1.
+                    if (i < pendingOrdersToSubmit.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+
+                } catch (err) {
+                    console.error("Gagal mengirim order:", err);
+                }
+            }
+
+            // Tambahkan jeda akhir agar browser menyelesaikan semua proses network sebelum mengubah UI
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Kembalikan status tombol
+            btnUtama.classList.remove('btn-loading');
+            btnUtama.disabled = false;
+            btnUtama.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim Form Pesanan`;
+            
+            btnModal.classList.remove('btn-loading');
+            btnModal.disabled = false;
+            btnModal.innerHTML = `<i class="fa-solid fa-check-double"></i> Konfirmasi & Kirim`;
+
+            closeConfirmModal();
+
+            if (successfulCount > 0) {
+                showToast("Kirim Berhasil!", `${successfulCount} Pesanan sudah tercatat di Google Sheet.`, "success");
+                clearForm();
+            } else {
+                showToast("Pengiriman Gagal", "Pastikan koneksi internet stabil.", "danger");
+            }
+        }
+
+        function clearForm() {
+            const wrapper = document.getElementById('batch-rows-wrapper');
+            wrapper.innerHTML = '';
+            for (let i = 0; i < 3; i++) addNewBatchRow(); // Reset kembali ke 3 baris
+            updateSummaryText();
+        }
+
+        // ==========================================
+        //  FUNGSI CHECK-IN PENERIMAAN
+        // ==========================================
+        async function fetchHistoryData() {
+            if(!navigator.onLine) {
+                return showToast("Offline", "Anda tidak bisa menarik data riwayat saat sedang offline.", "warning");
+            }
+
+            const dateStr = document.getElementById('history-date-filter').value;
+            const tbody = document.getElementById('history-table-body');
+            
+            if (!dateStr) return;
+            
+            if (!state.appScriptUrlHistory) {
+                tbody.innerHTML = `<tr><td colspan=\"3\" class=\"p-8 text-center text-rose-500 italic font-bold\">Harap masukkan Link App Script Tabel Riwayat di menu pengaturan (Gear Icon) terlebih dahulu.</td></tr>`;
+                showToast("Link App Script Kosong", "Atur link untuk menarik riwayat dari server.", "danger");
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan=\"3\" class=\"p-10 text-center text-slate-400\"><i class=\"fa-solid fa-spinner animate-spin text-indigo-500 mr-2 text-2xl mb-3 block\"></i> Sedang menarik data pesanan dari server...</td></tr>`;
+
+            try {
+                const response = await fetch(state.appScriptUrlHistory);
+                
+                if (!response.ok) throw new Error("HTTP Error");
+                
+                const data = await response.json();
+                if (data.status === "error") {
+                    throw new Error(data.message);
+                }
+                
+                const records = Array.isArray(data) ? data : [];
+                const filteredRecords = records.filter(order => order.tglDatang === dateStr);
+                
+                filteredRecords.sort((a, b) => {
+                    let nameA = String(a.item || "").toLowerCase();
+                    let nameB = String(b.item || "").toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+
+                renderHistoryTable(filteredRecords, dateStr);
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan=\"3\" class=\"p-10 text-center text-rose-500 italic font-bold\"><i class=\"fa-solid fa-triangle-exclamation text-3xl mb-2\"></i><br>Terjadi kesalahan koneksi atau URL Script Salah.</td></tr>`;
+            }
+        }
+
+        function renderHistoryTable(data, dateStr) {
+            const tbody = document.getElementById('history-table-body');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan=\"3\" class=\"p-10 text-center text-slate-400 italic font-medium\">Tidak ada jadwal kedatangan barang pada tanggal ${dateStr}.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach((row) => {
+                const id = row.rowIndex; 
+                const itemName = row.item || "Item Tidak Diketahui";
+                const qtyVal = row.qty || 0;
+                const unitVal = row.unit || "";
+                
+                const statusKedatangan = row.kedatangan || ""; 
+                const catatanAktual = row.catatan || "";
+                
+                const isChecked = statusKedatangan === "Datang"; 
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 border-b border-slate-50">
+                        <div class="font-bold text-slate-800 text-[13px]">${itemName}</div>
+                        <div class="font-bold text-indigo-600 mt-1 text-[11px] bg-indigo-50 inline-block px-2 py-0.5 rounded-md border border-indigo-100"><i class="fa-solid fa-box text-[9px] mr-1"></i> ${qtyVal} ${unitVal}</div>
+                        ${isChecked ? '<span class="ml-2 text-[9px] font-bold bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded uppercase">Sudah Datang</span>' : ''}
+                    </td>
+                    <td class="p-4 border-b border-slate-50 text-center align-middle">
+                        <label class="inline-flex items-center gap-2 cursor-pointer bg-white border ${isChecked ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200'} px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors shadow-sm" onchange="toggleRowStyle(this, '${id}', '${qtyVal}')">
+                            <input type="checkbox" id="checkin-status-${id}" ${isChecked ? 'checked' : ''} class="w-5 h-5 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer">
+                            <span class="text-[10px] font-black uppercase tracking-wider ${isChecked ? 'text-emerald-700' : 'text-slate-400'} status-text">Datang</span>
+                        </label>
+                    </td>
+                    <td class="p-4 border-b border-slate-50 align-middle">
+                        <input type="number" step="any" id="checkin-actual-qty-${id}" value="${catatanAktual}" placeholder="Kosongkan jika pas (${qtyVal})" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            tbody.dataset.currentDate = dateStr;
+            tbody.dataset.currentData = JSON.stringify(data); 
+        }
+
+        function toggleRowStyle(labelElement, id, expectedQty) {
+            const isChecked = labelElement.querySelector('input').checked;
+            const textSpan = labelElement.querySelector('.status-text');
+            const actualQtyInput = document.getElementById(`checkin-actual-qty-${id}`);
+
+            if(isChecked) {
+                labelElement.classList.add('border-emerald-300', 'bg-emerald-50');
+                textSpan.classList.add('text-emerald-700');
+                textSpan.classList.remove('text-slate-400');
+                
+                if (actualQtyInput && !actualQtyInput.value.trim()) {
+                    actualQtyInput.value = expectedQty;
+                }
+            } else {
+                labelElement.classList.remove('border-emerald-300', 'bg-emerald-50');
+                textSpan.classList.remove('text-emerald-700');
+                textSpan.classList.add('text-slate-400');
+            }
+        }
+
+        async function saveCheckinData() {
+            if(!navigator.onLine) {
+                return showToast("Tidak Ada Internet", "Gagal menyimpan check-in saat offline.", "danger");
+            }
+
+            const tbody = document.getElementById('history-table-body');
+            const dateStr = tbody.dataset.currentDate;
+            const dataStr = tbody.dataset.currentData;
+            
+            if (!dateStr || !dataStr) {
+                return showToast("Data Kosong", "Tidak ada data yang bisa disimpan. Tarik data dulu.", "warning");
+            }
+
+            if (!state.appScriptUrlHistory) {
+                return showToast("App Script Kosong", "Atur link App Script Data Riwayat untuk menyimpan perubahan.", "danger");
+            }
+
+            let data = JSON.parse(dataStr);
+            let updatesToPush = [];
+
+            data.forEach((row) => {
+                const id = row.rowIndex;
+                const isCheckedNow = document.getElementById(`checkin-status-${id}`).checked;
+                let actualQtyInput = document.getElementById(`checkin-actual-qty-${id}`).value.trim();
+                const expectedQty = row.qty || 0;
+                
+                if (isCheckedNow && !actualQtyInput) {
+                    actualQtyInput = expectedQty.toString();
+                }
+
+                updatesToPush.push({
+                    rowIndex: id,
+                    kedatangan: isCheckedNow ? "Datang" : "", 
+                    catatanAktual: isCheckedNow ? actualQtyInput : "" 
+                });
+            });
+
+            if (updatesToPush.length === 0) {
+                return showToast("Info", "Tidak ada data untuk diproses.", "info");
+            }
+
+            const btn = document.getElementById('btn-save-checkin');
+            const originalBtnHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses ke Server...`;
+            btn.disabled = true;
+
+            try {
+                const payloadUpdate = {
+                    action: 'updateKedatangan',
+                    updates: updatesToPush
+                };
+
+                const response = await fetch(state.appScriptUrlHistory, {
+                    method: 'POST',
+                    body: JSON.stringify(payloadUpdate)
+                });
+
+                if(!response.ok) throw new Error("Gagal menyimpan update");
+
+                showToast("Berhasil Disimpan", "Data kedatangan berhasil di-update ke Kolom I & J.", "success");
+                fetchHistoryData();
+            } catch (err) {
+                console.error(err);
+                showToast("Gagal Menyimpan", "Terjadi kesalahan koneksi ke Server App Script.", "danger");
+            } finally {
+                btn.innerHTML = originalBtnHTML;
+                btn.disabled = false;
+            }
+        }
+
+        // ==========================================
+        //  HELPER FUNCTIONS
+        // ==========================================
+        function copyDetectorScript() {
+            const script = `(function(){try{const a=window.FB_PUBLIC_LOAD_DATA_||FB_PUBLIC_LOAD_DATA_;if(!a)return void alert("ERROR: Buka form!");const b=a[1][1],c={};b.forEach(a=>{if(!a||a.length<5||!a[4]||!Array.isArray(a[4]))return;const b=a[1]?a[1].replace(/\\s*\\*$/,"").trim():"";if(!b)return;const d=a[4][0];d&&Array.isArray(d)&&0<d.length&&d[0]&&(c[b]="entry."+d[0])});const d=JSON.stringify(c,null,2);console.log(d);const e=document.createElement('textarea');e.value=d;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert("Berhasil! JSON disalin ke clipboard.")}catch(a){console.error(a);alert("Gagal mendeteksi.")}})();`;
+            navigator.clipboard.writeText(script).then(() => {
+                showToast("Kode Tersalin!", "Silakan paste (Ctrl+V) di Console Google Form Anda.", "info");
+            }).catch(err => console.error(err));
+        }
+
+        function executeAutoImport() {
+            const importVal = document.getElementById('config-auto-import').value.trim();
+            if (!importVal) return showToast("Input Kosong", "Paste JSON terlebih dahulu.", "warning");
+
+            try {
+                const cleanJson = JSON.parse(importVal);
+                const fieldMapping = {
+                    item: ["Nama Item", "Bahan"],
+                    qty: ["Jumlah Order", "Qty"],
+                    unit: ["Satuan", "Unit"],
+                    note: ["Catatan untuk Vendor", "Catatan"],
+                    date: ["Tanggal Rencana Kedatangan", "Tgl Datang"],
+                    pic: ["PIC Order Kitchen", "PIC"]
+                };
+
+                for (let key in fieldMapping) {
+                    for (let matchText of fieldMapping[key]) {
+                        if (cleanJson[matchText]) {
+                            state.entryIds[key] = cleanJson[matchText];
+                            document.getElementById(`entry-${key}`).value = cleanJson[matchText];
+                            break;
+                        }
+                    }
+                }
+                showToast("Impor Sukses", "Entry ID berhasil terisi otomatis!", "success");
+            } catch (err) {
+                showToast("JSON Tidak Valid", "Pastikan format JSON benar.", "danger");
+            }
+        }
+
+        function showToast(title, desc = "", type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colorClass = "bg-emerald-600 border-emerald-500 text-white shadow-emerald-100";
+            if(type === 'warning') colorClass = "bg-amber-500 border-amber-400 text-white shadow-amber-100";
+            if(type === 'danger') colorClass = "bg-rose-600 border-rose-500 text-white shadow-rose-100";
+            if(type === 'info') colorClass = "bg-indigo-600 border-indigo-500 text-white shadow-indigo-100";
+
+            toast.className = `p-4 border rounded-2xl shadow-xl flex items-start gap-3 transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto min-w-[280px] max-w-sm ${colorClass}`;
+            toast.innerHTML = `<div class="flex-1"><h5 class="font-black text-xs">${title}</h5>${desc ? `<p class="text-[10px] opacity-90 mt-1 font-semibold leading-relaxed">${desc}</p>` : ''}</div>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
