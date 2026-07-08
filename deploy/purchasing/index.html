@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laksamana Space - Kitchen Order Control Panel Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Modul prakiraan/restock bersama (dipakai Kitchen & Purchasing) -->
+    <script src="laksamana-forecast.js"></script>
+    <!-- Prakiraan yang di-embed (fallback bila Link App Script belum diatur) -->
+    <script src="forecast_export.js" onerror="this.remove()"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        success: '#22c55e',
+                        warning: '#eab308',
+                        danger: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .backdrop-blur-xs {
+            backdrop-filter: blur(2px);
+        }
+        .tab-content {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toast-enter {
+            animation: slideInRight 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 tracking-tight leading-none" id="headerCafeName">Laksamana Space</h1>
+                        <p class="text-xs text-slate-500 font-medium mt-1">Kitchen Order Dashboard Pro</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="install-pwa-btn" onclick="triggerPWAInstall()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-100 transition-all">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Pasang di HP
+                    </button>
+                    
+                    <nav class="flex space-x-1 sm:space-x-2 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-indigo-600 shadow-sm">Monitor Order</button>
+                        <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900">Rekap Per Bulan</button>
+                        <button onclick="switchTab('database')" id="tab-database" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900">Database & Vendor</button>
+                        <button onclick="switchTab('integration')" id="tab-integration" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900">Panduan & PWA</button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+        <section id="content-dashboard" class="tab-content block">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Antrean Pesanan Bahan Baku</h2>
+                    <p class="text-slate-500 text-sm mt-1">Kelola, gabungkan, dan arsipkan kebutuhan kitchen secara real-time.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openSimulationModal()" class="bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Simulasikan Input Kitchen
+                    </button>
+                    <button onclick="fetchSheetData()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-100 transition-all">
+                        <svg id="sync-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.247 12H19m-4.907 4.907A8.001 8.001 0 114.304 4.304M5 19h4.586a1 1 0 001-1v-4.586"></path></svg>
+                        Segarkan Data Google Sheets
+                    </button>
+                </div>
+            </div>
+
+            <div id="connection-alert" class="hidden mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+                <span class="p-2 bg-amber-100 text-amber-800 rounded-xl mt-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </span>
+                <div class="w-full">
+                    <h4 class="font-bold text-slate-900 text-sm">Aplikasi Belum Terkoneksi ke Google Sheets Anda</h4>
+                    <p class="text-slate-600 text-xs mt-1">Saat ini aplikasi menampilkan data demonstrasi (mock) lokal. Anda bisa memasukkan URL Web App di bawah ini untuk menghubungkannya secara live.</p>
+                    <div class="flex flex-col gap-3 mt-3 w-full">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wide">URL - Orders</span>
+                                <input type="text" id="setup-web-url-orders" placeholder="https://script.google.com/..." class="bg-white border border-slate-300 text-xs rounded-lg px-3 py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wide">URL - Vendors</span>
+                                <input type="text" id="setup-web-url-vendors" placeholder="https://script.google.com/..." class="bg-white border border-slate-300 text-xs rounded-lg px-3 py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wide">URL - Items</span>
+                                <input type="text" id="setup-web-url-items" placeholder="https://script.google.com/..." class="bg-white border border-slate-300 text-xs rounded-lg px-3 py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <button onclick="saveConnectionUrlsFromDashboard()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all font-sans self-end">Hubungkan Semua</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-slate-200 mb-6 flex flex-wrap gap-1">
+                <button onclick="switchViewMode('active-individual')" id="subtab-active-individual" class="view-mode-btn border-b-2 border-indigo-600 px-4 py-2.5 text-sm font-bold text-indigo-600">📋 Per Item</button>
+                <button onclick="switchViewMode('active-consolidated')" id="subtab-active-consolidated" class="view-mode-btn border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800">📦 Gabung per Vendor</button>
+                <button onclick="switchViewMode('archived')" id="subtab-archived" class="view-mode-btn border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800">🗄️ Arsip Selesai</button>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm space-y-4">
+                <div class="flex flex-col lg:flex-row gap-4 justify-between items-center">
+                    <div class="flex items-center gap-3 w-full lg:w-auto overflow-x-auto py-1">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Filter Vendor:</span>
+                        <div class="flex gap-1.5" id="vendor-filter-list"></div>
+                    </div>
+                    <div class="relative w-full lg:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="search-order" oninput="filterOrders()" placeholder="Cari bahan, kode, atau PIC..." class="pl-9 pr-4 py-2 w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">📅 Tanggal Submit Form</label>
+                        <input type="date" id="filter-date-submit" onchange="filterOrders()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">🚚 Tanggal Rencana Kedatangan</label>
+                        <input type="date" id="filter-date-arrival" onchange="filterOrders()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="clearDateFilters()" class="w-full bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-xs font-bold py-2 px-4 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Reset Filter Tanggal
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="orders-container" class="space-y-4"></div>
+            
+            <div id="no-orders-message" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl">
+                <div class="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4h16z"></path></svg>
+                </div>
+                <h3 class="font-bold text-slate-800">Tidak Ada Orderan</h3>
+                <p id="empty-state-desc" class="text-slate-500 text-sm mt-1">Daftar pesanan kitchen bersih.</p>
+            </div>
+        </section>
+
+        <section id="content-overview" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Rekapitulasi Item Per Bulan</h3>
+                    <p class="text-xs text-slate-500">Pilih bulan untuk melihat total kuantitas order dan komparasi selisih dengan bulan sebelumnya.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500">Bulan:</label>
+                    <select id="recap-month-select" onchange="updateOverviewStats()" class="border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-bold text-indigo-600">
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Item Diorder</p>
+                        <h3 id="stat-this-month" class="text-3xl font-black text-slate-900 mt-2">0</h3>
+                    </div>
+                    <div id="stat-this-month-diff" class="mt-2"></div>
+                </div>
+                <div class="bg-indigo-600 p-6 rounded-2xl shadow-lg text-white flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Bahan Paling Banyak Diorder</p>
+                        <h3 id="stat-top-item" class="text-xl font-bold mt-2">-</h3>
+                    </div>
+                    <p class="text-[10px] text-indigo-200 mt-2">Bahan teratas berdasarkan kuantitas akumulasi.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Analisis</p>
+                        <h3 class="text-lg font-bold text-slate-900 mt-2 text-emerald-600 flex items-center gap-1">
+                            <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
+                            Live Komparasi Aktif
+                        </h3>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2">Selisih kuantitas pembelian otomatis dihitung real-time.</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.01.707.293l5.414 5.414a1 1.01.707.293v12a2 2 0 01-2 2H7"></path></svg>
+                    Daftar Rincian Akumulasi & Komparasi Kebutuhan Kitchen
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-100 uppercase text-[10px] font-black">
+                                <th class="py-3 px-4">Nama Bahan Baku</th>
+                                <th class="py-3 px-4 text-center">Frekuensi Order</th>
+                                <th class="py-3 px-4 text-right">Total Akumulasi Qty (Bulan Ini)</th>
+                                <th class="py-3 px-4 text-right">Selisih vs Bulan Lalu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overview-table-body" class="divide-y divide-slate-50">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-150 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+                    <span>💡 <b>Keterangan Warna Selisih:</b></span>
+                    <div class="flex flex-wrap gap-2.5">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">Merah (Naik / Lebih Banyak Pembelian)</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Hijau (Turun / Di Bawah Bulan Lalu)</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Stabil / Tetap</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-database" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="space-y-8">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011-1v5m-4 0h4"></path></svg>
+                            Identitas & Pengaturan
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Usaha Anda</label>
+                                <input type="text" id="input-cafe-name" onchange="updateCafeName(this.value)" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Koneksi Backend Aktif</label>
+                                <input type="text" id="input-vendor-form-url" readonly class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-slate-50 text-slate-400 font-semibold cursor-not-allowed" value="Terkoneksi Penuh ke Google Sheets">
+                                <p class="text-[10px] text-slate-400 mt-1">Sistem tersinkronisasi 100% online ke Google Sheets dengan Smart Cache.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-rose-600 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Sistem & Pemeliharaan
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">Jika data orderan baru dari kitchen otomatis langsung masuk ke menu <b>Arsip Selesai</b>, bersihkan memori tabrakan ID lama browser Anda di sini.</p>
+                        <button onclick="triggerResetArchiveConfirm()" class="w-full bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            🧹 Kosongkan Semua Cache Arsip Selesai
+                        </button>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                Daftar Kontak Vendor
+                            </h3>
+                            <button onclick="openAddVendorModal()" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg border border-indigo-200 transition-all">
+                                ➕ Tambah Vendor
+                            </button>
+                        </div>
+                        <div id="vendor-list" class="space-y-3"></div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            Kustomisasi Format Chat (Item)
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">Format pesan untuk pengiriman satu item tunggal.</p>
+                        <div class="space-y-3">
+                            <textarea id="template-editor" rows="6" class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"></textarea>
+                            <button onclick="saveTemplate()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl transition-all">Simpan Format Tunggal</button>
+                        </div>
+
+                        <h3 class="text-lg font-bold text-slate-900 mt-6 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            Kustomisasi Format Chat (Gabungan)
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">Format pesan saat beberapa pesanan dikelompokkan menjadi satu vendor.</p>
+                        <div class="space-y-3">
+                            <textarea id="template-editor-consolidated" rows="8" class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"></textarea>
+                            <button onclick="saveConsolidatedTemplate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition-all">Simpan Format Gabungan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    Aturan Distribusi Bahan Baku & Produk
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Atur penanggung jawab vendor di sini. Anda bisa menetapkan 1 vendor utama dan **banyak vendor alternatif** sekaligus.</p>
+                            </div>
+                            <button onclick="openAddProductModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-all self-start">
+                                + Tambah Aturan Baru
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Nama Bahan Baku</th>
+                                        <th class="py-3 px-4">Vendor Utama</th>
+                                        <th class="py-3 px-4">Vendor Alternatif (Bisa Banyak)</th>
+                                        <th class="py-3 px-4 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-mapping-list" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="content-integration" class="tab-content hidden space-y-8">
+            
+            <div class="bg-gradient-to-r from-indigo-800 to-indigo-950 text-white border border-indigo-700 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex-1 space-y-3">
+                    <span class="bg-emerald-500 text-slate-900 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">🔥 PWA Generator Aktif</span>
+                    <h2 class="text-xl md:text-2xl font-black tracking-tight">Pasang Dashboard di HP (Android & iOS)</h2>
+                    <p class="text-xs md:text-sm text-indigo-200 max-w-2xl leading-relaxed">
+                        Ubah file HTML tunggal ini menjadi aplikasi ponsel yang bisa di-install tanpa App Store. Cukup klik tombol di bawah untuk mengunduh berkas lengkapnya, lalu tempatkan berkas tersebut pada hosting gratisan Anda!
+                    </p>
+                </div>
+                <button onclick="downloadPWABundle()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 text-xs md:text-sm font-black px-6 py-3.5 rounded-2xl flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all self-start md:self-auto shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.01.707.293l5.414 5.414a1 1.01.707.293v12a2 2 0 01-2 2H7"></path></svg>
+                    Unduh Bundle PWA (ZIP)
+                </button>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2-2v14a2 2 0 002 2z"></path></svg>
+                    Cara Pasang Menjadi Aplikasi HP dalam 2 Menit:
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600 leading-relaxed">
+                    <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                        <strong class="text-slate-900 font-bold block mb-1">1. Ekstrak Berkas ZIP</strong>
+                        <p>Klik tombol hijau di atas untuk mendapatkan berkas ZIP. Ekstrak berkas tersebut, maka Anda akan mendapatkan 3 buah berkas: <code class="bg-slate-200 px-1 py-0.5 rounded font-mono">index.html</code>, <code class="bg-slate-200 px-1 py-0.5 rounded font-mono">manifest.json</code>, dan <code class="bg-slate-200 px-1 py-0.5 rounded font-mono">sw.js</code>.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                        <strong class="text-slate-900 font-bold block mb-1">2. Unggah ke Hosting Gratis</strong>
+                        <p>Buka situs <a href="https://netlify.com" target="_blank" class="text-indigo-600 underline font-semibold">Netlify.com</a> atau <a href="https://vercel.com" target="_blank" class="text-indigo-600 underline font-semibold">Vercel.com</a>. Buat akun gratis, lalu drag and drop folder hasil ekstrak tadi langsung ke kolom unggahan Netlify Drop.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                        <strong class="text-slate-900 font-bold block mb-1">3. Buka Link & Pasang!</strong>
+                        <p>Buka alamat tautan website aman (<code class="font-bold">https://</code>) yang diberikan Netlify di Google Chrome (Android) atau Safari (iOS) di ponsel Anda. Klik tombol <strong>"Pasang di HP"</strong> yang muncul di navigasi atas!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Panduan Sinkronisasi Sistem Terpusat Google Sheets</h2>
+                <p class="text-slate-600 text-xs">Ikuti langkah-langkah di bawah ini agar input dari Google Form kitchen bisa langsung masuk ke aplikasi lokal ini secara real-time.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 relative">
+                    <span class="absolute top-4 right-4 text-3xl font-extrabold text-slate-100">01</span>
+                    <h3 class="font-bold text-slate-900 mb-2">Persiapan Google Form</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">Buatlah Google Form untuk tim kitchen dengan minimal kolom pertanyaan berikut secara berurutan:</p>
+                    <ul class="text-xs text-slate-500 mt-2 list-disc list-inside space-y-1">
+                        <li>Nama Item (Dropdown)</li>
+                        <li>Jumlah Order (Angka)</li>
+                        <li>Satuan (Dropdown)</li>
+                        <li>Catatan untuk Vendor (Paragraf)</li>
+                        <li>Tanggal Rencana Kedatangan (Tanggal)</li>
+                        <li>PIC Order Kitchen (Jawaban Singkat)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 relative">
+                    <span class="absolute top-4 right-4 text-3xl font-extrabold text-slate-100">02</span>
+                    <h3 class="font-bold text-slate-900 mb-2">Pasang Apps Script</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">Di Google Sheets Anda:</p>
+                    <ol class="text-xs text-slate-500 mt-2 list-decimal list-inside space-y-1.5">
+                        <li>Klik menu <b>Ekstensi</b> > <b>Apps Script</b>.</li>
+                        <li>Anda dapat memisahkan script ke banyak file spreadsheet atau menyatukannya dengan mengarahkan URL tujuan masing-masing di form bawah ini.</li>
+                        <li>Gunakan kode Apps Script v9.9+ yang mendukung API terdistribusi.</li>
+                        <li>Klik ikon <b>Simpan</b> (disket).</li>
+                    </ol>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 relative">
+                    <span class="absolute top-4 right-4 text-3xl font-extrabold text-slate-100">03</span>
+                    <h3 class="font-bold text-slate-900 mb-2">Deploy Aplikasi Web</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">Aktifkan API di internet:</p>
+                    <ol class="text-xs text-slate-500 mt-2 list-decimal list-inside space-y-1.5">
+                        <li>Klik tombol <b>Deploy</b> > <b>New deployment</b>.</li>
+                        <li>Klik ikon gigi roda, pilih <b>Web app</b>.</li>
+                        <li>Atur <i>Who has access</i> menjadi: <b>Anyone</b>.</li>
+                        <li>Klik <b>Deploy</b> dan berikan izin otorisasi.</li>
+                        <li>Lakukan ini untuk setiap spreadsheet jika terpisah.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                            <span class="text-xs text-emerald-400 font-bold font-mono">DILENGKAPI TRIPLE API HANDLER</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">Arsitektur Modular / Terpusat</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Aplikasi kini dapat berkomunikasi ke tiga sumber database secara terpisah maupun terpusat. Tempelkan URL pada masing-masing kolom, dan sistem akan mengarahkan pembacaan serta penyimpanan data secara otomatis dan akurat.
+                        </p>
+                        <div class="mt-4 p-4 bg-slate-800 rounded-xl border border-slate-700 text-xs text-indigo-300 font-semibold">
+                            💡 Jika spreadsheet Anda hanya satu, Anda juga bisa menempelkan URL Web App yang sama di ketiga kolom input di sebelah kanan ini!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Tautkan Aplikasi Web (API)</h3>
+                        <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+                            Tempelkan tautan Web App URL hasil Deploy Anda ke input di bawah ini untuk mengaktifkan sinkronisasi otomatis ke Google Sheets.
+                        </p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Web App URL - Orders (Pesanan Kitchen)</label>
+                                <input type="text" id="input-web-url-orders" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Web App URL - Database Vendor</label>
+                                <input type="text" id="input-web-url-vendors" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Web App URL - Database Item (Produk)</label>
+                                <input type="text" id="input-web-url-items" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Web App URL - Data Prakiraan Stok (Restock)</label>
+                                <input type="text" id="input-web-url-forecast" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+
+                            <div class="border border-slate-100 rounded-xl p-4 bg-slate-50 space-y-2">
+                                <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                    <span>Status Orders API:</span>
+                                    <span id="orders-status-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-yellow-150 text-yellow-800">Mode Simulasi (Offline)</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                    <span>Status Vendors API:</span>
+                                    <span id="vendors-status-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-yellow-150 text-yellow-800">Mode Simulasi (Offline)</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+                                    <span>Status Items API:</span>
+                                    <span id="items-status-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-yellow-150 text-yellow-800">Mode Simulasi (Offline)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveAndTestConnections()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 mt-6 font-sans">
+                        Simpan & Tes Koneksi Live
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modals Markup -->
+    <!-- MODAL: KITCHEN SIMULATOR -->
+    <div id="modal-simulate" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-md mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-900">Simulasikan Input Kitchen</h3>
+                <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form onsubmit="submitSimulatedOrder(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Item</label>
+                    <select id="sim-item" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" required>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jumlah</label>
+                        <input type="number" id="sim-qty" min="1" step="0.1" value="10" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Satuan</label>
+                        <select id="sim-unit" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <option value="Kg">Kg</option>
+                            <option value="Gram">Gram</option>
+                            <option value="Pcs">Pcs</option>
+                            <option value="Pack">Pack</option>
+                            <option value="Box">Box</option>
+                            <option value="Ikat">Ikat</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tgl Rencana Datang</label>
+                        <input type="date" id="sim-arrival" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">PIC Kitchen</label>
+                        <input type="text" id="sim-pic" value="Chef Putra" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Catatan Tambahan</label>
+                    <textarea id="sim-note" rows="2" placeholder="Contoh: Harus segar, dipotong dadu, dll" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeSimulationModal()" class="w-1/2 border border-slate-200 text-slate-600 text-sm font-bold py-2.5 rounded-xl hover:bg-slate-50">Batal</button>
+                    <button type="submit" id="btn-submit-simulation" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2">
+                        <span>Kirim Order</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT VENDOR -->
+    <div id="modal-vendor" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300 relative font-sans">
+            <button onclick="closeVendorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-full hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="mb-5">
+                <h3 id="vendor-modal-title" class="text-lg font-black text-slate-900">Tambah Vendor Baru</h3>
+                <p class="text-xs text-slate-400 mt-1 font-medium">Isi formulir di bawah ini untuk menyimpan data vendor langsung ke Google Sheets Vendor.</p>
+            </div>
+            
+            <form onsubmit="submitAddVendor(event)" class="space-y-4">
+                <input type="hidden" id="vend-edit-key">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Vendor</label>
+                    <input type="text" id="vend-name" placeholder="Masukkan nama vendor..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp</label>
+                    <input type="text" id="vend-phone" placeholder="Contoh: 08123456789 atau 628..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <span class="text-[10px] text-slate-400 mt-1 block font-medium">Nomor HP otomatis dikonversi ke format internasional (62) untuk fungsi draf kirim chat.</span>
+                </div>
+
+                <div class="flex gap-2 pt-3">
+                    <button type="button" onclick="closeVendorModal()" class="w-1/2 border border-slate-200 text-slate-600 text-xs font-bold py-3 rounded-xl hover:bg-slate-50 transition-all font-sans">Batal</button>
+                    <button type="submit" id="btn-submit-vendor" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 font-sans">Simpan Vendor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT PRODUCT MAPPING -->
+    <div id="modal-product" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-md mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="product-modal-title" class="text-lg font-bold text-slate-900">Atur Distribusi Produk (Live)</h3>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form onsubmit="submitProductMapping(event)" class="space-y-4">
+                <input type="hidden" id="prod-edit-key">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Bahan Baku</label>
+                    <input type="text" id="prod-name" placeholder="Contoh: Paha Boneless" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Teks harus sama persis dengan opsi di Google Form Anda.</span>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Vendor Utama</label>
+                    <select id="prod-primary" onchange="updateBackupCheckboxes()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" required>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Vendor Alternatif / Cadangan (Pilih Lebih Dari 1)</label>
+                    <div id="prod-backups-container" class="max-h-36 overflow-y-auto border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Digunakan sebagai alternatif di daftar kirim pesanan.</span>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeProductModal()" class="w-1/2 border border-slate-200 text-slate-600 text-sm font-bold py-2.5 rounded-xl hover:bg-slate-50">Batal</button>
+                    <button type="submit" id="btn-submit-product" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-100">Simpan Aturan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: COOPERATIVE CONFIRMATION SYSTEM -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-sm mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300 space-y-4">
+            <div class="flex items-start gap-3">
+                <div class="p-2 bg-rose-50 text-rose-600 rounded-full shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="confirm-title" class="text-base font-bold text-slate-950">Konfirmasi Tindakan</h3>
+                    <p id="confirm-desc" class="text-xs text-slate-500 mt-1 leading-relaxed">Apakah Anda yakin ingin melanjutkan tindakan ini? Perubahan tidak dapat dibatalkan.</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-1">
+                <button id="confirm-cancel-btn" onclick="closeConfirmModal()" class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">Batal</button>
+                <button id="confirm-ok-btn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-rose-100">Hapus Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: WHATSAPP CONFIRMATION -->
+    <div id="modal-wa-confirm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-sm mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-start gap-3 shrink-0">
+                <div class="p-2 bg-emerald-50 text-emerald-600 rounded-full shrink-0">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.953-2.005-.001-3.973-.5-5.739-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.725 1.451 5.437 0 9.862-4.425 9.865-9.864.003-2.636-1.017-5.114-2.873-6.973-1.858-1.859-4.337-2.88-6.974-2.881-5.438 0-9.863 4.425-9.866 9.866-.001 1.636.425 3.234 1.233 4.634l-.992 3.621 3.702-.971c1.3.712 2.668 1.084 4.125 1.086z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-950">Buka WhatsApp?</h3>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">Silakan periksa kembali draf pesan di bawah ini sebelum mengirim.</p>
+                </div>
+            </div>
+
+            <div class="mt-4 mb-4 bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] leading-relaxed text-slate-700 font-mono whitespace-pre-wrap overflow-y-auto flex-1 shadow-inner" id="wa-message-preview">
+                <!-- Preview text will be injected here -->
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1 shrink-0">
+                <button onclick="closeWAConfirmModal()" class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50 transition-all">Batal</button>
+                <button onclick="executeWAAction()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-100 flex items-center gap-1.5">
+                    Lanjutkan
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Scripts & Logic Engine -->
+    <script>
+        const DEFAULT_TEMPLATE = `Halo {vendor},\nBerikut orderan resmi dari {cafe}:\n\n📌 *INFO PESANAN*\n• No. Order: {no_order}\n• Tgl Kedatangan: {tgl_datang}\n• PIC Kitchen: {pic}\n\n📦 *RINCIAN BARANG*\n• {item} : {qty} {unit}\n• Catatan: {note}\n\nMohon dikonfirmasi ya. Terima kasih!`;
+
+        const DEFAULT_TEMPLATE_CONSOLIDATED = `Halo {vendor},\nBerikut orderan gabungan resmi dari {cafe}:\n\n📌 *INFO PESANAN*\n• Tgl Kedatangan: {tgl_datang}\n• PIC Kitchen: {pic}\n\n📦 *RINCIAN BARANG*\n{items_list}\nMohon dikonfirmasi ketersediaan barang dan total tagihannya ya. Terima kasih!`;
+
+        // --- GLOBAL SYSTEM STATE ---
+        let appState = {
+            cafeName: "Laksamana Space",
+            webAppUrlOrders: "",
+            webAppUrlVendors: "",
+            webAppUrlItems: "",
+            webAppUrlForecast: "",
+            vendors: {},
+            products: {},
+            templateText: "",
+            templateConsolidated: "",
+            orders: [],
+            archivedOrderIds: [],
+            activeFilter: 'ALL',
+            viewMode: 'active-individual'
+        };
+
+        let currentConfirmAction = null;
+        let currentWaAction = null;
+
+        // Prakiraan/restock (modul bersama laksamana-forecast.js) + stok bersama.
+        let forecastBook = new LaksForecast.ForecastBook(null, null);
+        let stockAsOf = null;
+
+        window.onload = function() {
+            loadStateFromStorage();
+            initFilters();
+            loadForecastData().then(renderDashboard);
+            renderDatabaseTab();
+            updateConnectionUI();
+            initRecapSelector();
+            if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
+                fetchSheetData();
+            }
+        };
+
+        // Muat data prakiraan (App Script -> cache -> embedded), sama pola dgn
+        // aplikasi Kitchen. Hanya dipakai untuk menampilkan rekomendasi model.
+        async function loadForecastData() {
+            const hasItems = p => p && p.items && Object.keys(p.items).length > 0;
+            let payload = null;
+            if (appState.webAppUrlForecast && navigator.onLine) {
+                try {
+                    const res = await fetch(appState.webAppUrlForecast);
+                    if (res.ok) {
+                        const fetched = await res.json();
+                        if (hasItems(fetched)) {
+                            payload = fetched;
+                            localStorage.setItem('purchasing_cached_forecast', JSON.stringify(payload));
+                        }
+                    }
+                } catch (err) { console.warn("Gagal ambil forecast; pakai cache/embedded.", err); }
+            }
+            if (!hasItems(payload)) {
+                const cached = localStorage.getItem('purchasing_cached_forecast');
+                if (cached) { const c = JSON.parse(cached); if (hasItems(c)) payload = c; }
+            }
+            if (!hasItems(payload) && typeof window.LAKSAMANA_FORECAST !== 'undefined') {
+                payload = window.LAKSAMANA_FORECAST;
+            }
+            // Ambil STOK BERSAMA (yang diunggah supervisor via aplikasi Kitchen)
+            // dari Web App yang sama (?type=stock). Purchasing jadi bisa tampilkan
+            // stok kini, cukup-berapa-hari, & saran pesan yang sadar-stok.
+            const shared = await fetchSharedStock();
+            const stockMap = (shared && shared.stock) ? shared.stock : null;
+            stockAsOf = (shared && shared.as_of) || null;
+            forecastBook = new LaksForecast.ForecastBook(payload, stockMap);
+        }
+
+        // Ambil stok bersama dari Web App (type=stock). Null bila belum diatur/
+        // offline/kosong.
+        async function fetchSharedStock() {
+            if (!appState.webAppUrlForecast || !navigator.onLine) return null;
+            try {
+                const res = await fetch(appState.webAppUrlForecast + '?type=stock');
+                if (!res.ok) return null;
+                const data = await res.json();
+                return (data && data.stock) ? data : null;
+            } catch (err) {
+                console.warn("Gagal ambil stok bersama.", err);
+                return null;
+            }
+        }
+
+        function loadStateFromStorage() {
+            appState.cafeName = localStorage.getItem('cafeName') || "Laksamana Space";
+            appState.webAppUrlOrders = localStorage.getItem('webAppUrlOrders') || "";
+            appState.webAppUrlVendors = localStorage.getItem('webAppUrlVendors') || "";
+            appState.webAppUrlItems = localStorage.getItem('webAppUrlItems') || "";
+            appState.webAppUrlForecast = localStorage.getItem('webAppUrlForecast') || "";
+
+            let legacyAppUrl = localStorage.getItem('webAppUrl') || "";
+            if (legacyAppUrl && !appState.webAppUrlOrders) appState.webAppUrlOrders = legacyAppUrl;
+            if (legacyAppUrl && !appState.webAppUrlVendors) appState.webAppUrlVendors = legacyAppUrl;
+            if (legacyAppUrl && !appState.webAppUrlItems) appState.webAppUrlItems = legacyAppUrl;
+            
+            const savedVendors = localStorage.getItem('vendors');
+            appState.vendors = savedVendors ? JSON.parse(savedVendors) : {};
+            
+            const savedProducts = localStorage.getItem('products');
+            appState.products = savedProducts ? JSON.parse(savedProducts) : {};
+            
+            appState.templateText = localStorage.getItem('templateText') || DEFAULT_TEMPLATE;
+            appState.templateConsolidated = localStorage.getItem('templateConsolidated') || DEFAULT_TEMPLATE_CONSOLIDATED;
+            
+            const savedOrders = localStorage.getItem('orders');
+            appState.orders = savedOrders ? JSON.parse(savedOrders) : [];
+            
+            const savedArchivedIds = localStorage.getItem('archivedOrderIds');
+            appState.archivedOrderIds = savedArchivedIds ? JSON.parse(savedArchivedIds) : [];
+
+            document.getElementById('input-cafe-name').value = appState.cafeName;
+            document.getElementById('headerCafeName').innerText = appState.cafeName;
+            document.getElementById('template-editor').value = appState.templateText;
+            document.getElementById('template-editor-consolidated').value = appState.templateConsolidated;
+            
+            document.getElementById('input-web-url-orders').value = appState.webAppUrlOrders;
+            document.getElementById('input-web-url-vendors').value = appState.webAppUrlVendors;
+            document.getElementById('input-web-url-items').value = appState.webAppUrlItems;
+            const fcEl = document.getElementById('input-web-url-forecast');
+            if (fcEl) fcEl.value = appState.webAppUrlForecast;
+        }
+
+        function saveStateToStorage() {
+            localStorage.setItem('cafeName', appState.cafeName);
+            localStorage.setItem('webAppUrlOrders', appState.webAppUrlOrders);
+            localStorage.setItem('webAppUrlVendors', appState.webAppUrlVendors);
+            localStorage.setItem('webAppUrlItems', appState.webAppUrlItems);
+            localStorage.setItem('webAppUrlForecast', appState.webAppUrlForecast);
+            
+            localStorage.setItem('vendors', JSON.stringify(appState.vendors));
+            localStorage.setItem('products', JSON.stringify(appState.products));
+            
+            localStorage.setItem('templateText', appState.templateText);
+            localStorage.setItem('templateConsolidated', appState.templateConsolidated);
+            localStorage.setItem('orders', JSON.stringify(appState.orders));
+            localStorage.setItem('archivedOrderIds', JSON.stringify(appState.archivedOrderIds));
+        }
+
+        function normalizeDateToYYYYMMDD(dateVal) {
+            if (!dateVal) return "";
+            const rawString = String(dateVal).trim();
+            const standardMatch = rawString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (standardMatch) return `${standardMatch[1]}-${standardMatch[2]}-${standardMatch[3]}`;
+            const slashMatch = rawString.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (slashMatch) {
+                const day = slashMatch[1].padStart(2, '0');
+                const month = slashMatch[2].padStart(2, '0');
+                const year = slashMatch[3];
+                return `${year}-${month}-${day}`;
+            }
+            try {
+                const parsedDate = new Date(rawString);
+                if (!isNaN(parsedDate.getTime())) {
+                    const yyyy = parsedDate.getFullYear();
+                    const mm = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                    const dd = String(parsedDate.getDate()).padStart(2, '0');
+                    return `${yyyy}-${mm}-${dd}`;
+                }
+            } catch (e) {
+                console.error("Error normalizing date:", e);
+            }
+            return "";
+        }
+
+        function formatFriendlyDate(dateStr, showTime = true) {
+            if (!dateStr || dateStr === "-") return "-";
+            try {
+                let date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    const t = dateStr.split(/[- : T]/);
+                    if (t.length >= 3) {
+                        date = new Date(t[0], t[1] - 1, t[2], t[3] || 0, t[4] || 0, t[5] || 0);
+                    }
+                }
+                if (isNaN(date.getTime())) return dateStr;
+                const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+                const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                const dayName = days[date.getDay()];
+                const dayNum = date.getDate();
+                const monthName = months[date.getMonth()];
+                const year = date.getFullYear();
+                let result = `${dayName}, ${dayNum} ${monthName} ${year}`;
+                if (showTime) {
+                    const hours = date.getHours();
+                    const minutes = date.getMinutes();
+                    if (hours !== 0 || minutes !== 0 || showTime === 'always') {
+                        const hh = String(hours).padStart(2, '0');
+                        const mm = String(minutes).padStart(2, '0');
+                        result += ` Pukul ${hh}:${mm}`;
+                    }
+                }
+                return result;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`content-${tabId}`).classList.add('block');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                btn.classList.add('text-slate-600', 'hover:text-slate-900');
+            });
+            
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-600', 'hover:text-slate-900');
+
+            if (tabId === 'dashboard') {
+                renderDashboard();
+            } else if (tabId === 'database') {
+                renderDatabaseTab();
+            } else if (tabId === 'overview') {
+                updateOverviewStats();
+            }
+        }
+
+        function switchViewMode(mode) {
+            appState.viewMode = mode;
+            document.querySelectorAll('.view-mode-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-600', 'text-indigo-600');
+                btn.classList.add('border-transparent', 'text-slate-500', 'font-semibold');
+            });
+            const activeBtn = document.getElementById(`subtab-${mode}`);
+            activeBtn.classList.add('border-indigo-600', 'text-indigo-600');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-semibold');
+            renderDashboard();
+        }
+
+        function initRecapSelector() {
+            const select = document.getElementById('recap-month-select');
+            const now = new Date();
+            select.innerHTML = '';
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const opt = document.createElement('option');
+                opt.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                opt.innerText = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                select.appendChild(opt);
+            }
+        }
+
+        function getPreviousMonthString(yearMonthStr) {
+            const [year, month] = yearMonthStr.split('-').map(Number);
+            const d = new Date(year, month - 2, 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function updateOverviewStats() {
+            const selectedMonth = document.getElementById('recap-month-select').value; 
+            const prevMonth = getPreviousMonthString(selectedMonth); 
+
+            const getMonthStr = (dateVal) => {
+                const norm = normalizeDateToYYYYMMDD(dateVal);
+                return norm ? norm.substring(0, 7) : "";
+            };
+
+            const monthOrders = appState.orders.filter(o => getMonthStr(o.timestamp) === selectedMonth);
+            const prevMonthOrders = appState.orders.filter(o => getMonthStr(o.timestamp) === prevMonth);
+
+            document.getElementById('stat-this-month').innerText = monthOrders.length;
+            const totalDiff = monthOrders.length - prevMonthOrders.length;
+            const diffContainer = document.getElementById('stat-this-month-diff');
+            
+            if (prevMonthOrders.length === 0) {
+                diffContainer.innerHTML = `<span class="text-xs font-semibold text-slate-400">Belum ada pembanding bulan lalu</span>`;
+            } else if (totalDiff > 0) {
+                diffContainer.innerHTML = `<span class="text-xs font-bold text-rose-500 flex items-center gap-1">↗ +${totalDiff} order lebih banyak dari bulan lalu</span>`;
+            } else if (totalDiff < 0) {
+                diffContainer.innerHTML = `<span class="text-xs font-bold text-emerald-600 flex items-center gap-1">↘ -${Math.abs(totalDiff)} order lebih hemat dari bulan lalu</span>`;
+            } else {
+                diffContainer.innerHTML = `<span class="text-xs font-semibold text-slate-500">= Stabil (Sama dengan bulan lalu)</span>`;
+            }
+
+            const summaryCurrent = {};
+            monthOrders.forEach(o => {
+                if (!summaryCurrent[o.item]) summaryCurrent[o.item] = { qty: 0, unit: o.unit, freq: 0 };
+                summaryCurrent[o.item].qty += parseFloat(o.qty);
+                summaryCurrent[o.item].freq += 1;
+            });
+
+            const summaryPrev = {};
+            prevMonthOrders.forEach(o => {
+                if (!summaryPrev[o.item]) summaryPrev[o.item] = { qty: 0, unit: o.unit, freq: 0 };
+                summaryPrev[o.item].qty += parseFloat(o.qty);
+                summaryPrev[o.item].freq += 1;
+            });
+
+            const sortedItems = Object.keys(summaryCurrent).sort((a, b) => summaryCurrent[b].qty - summaryCurrent[a].qty);
+            const topItem = sortedItems[0];
+            document.getElementById('stat-top-item').innerText = topItem ? `${topItem}` : "-";
+
+            const tableBody = document.getElementById('overview-table-body');
+            tableBody.innerHTML = '';
+            
+            if (sortedItems.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-slate-400 font-medium italic">Tidak ada data order pada bulan ini.</td></tr>';
+                return;
+            }
+
+            sortedItems.forEach(name => {
+                const currentData = summaryCurrent[name];
+                const prevData = summaryPrev[name];
+                const currentQty = currentData.qty;
+                const prevQty = prevData ? prevData.qty : 0;
+                const diff = currentQty - prevQty;
+                const unit = currentData.unit;
+
+                let diffHTML = '';
+                if (prevQty === 0) {
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${currentQty.toLocaleString()} ${unit} (Baru)</span>`;
+                } else if (diff > 0) {
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${diff.toLocaleString()} ${unit} (Naik)</span>`;
+                } else if (diff < 0) {
+                    const absoluteDiff = Math.abs(diff);
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">-${absoluteDiff.toLocaleString()} ${unit} (Turun)</span>`;
+                } else {
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">= Stabil</span>`;
+                }
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                row.innerHTML = `
+                    <td class="py-4 px-4 font-bold text-slate-800">${name}</td>
+                    <td class="py-4 px-4 text-center font-semibold text-slate-500">${currentData.freq}x Order</td>
+                    <td class="py-4 px-4 text-right font-mono font-black text-indigo-600 text-base">
+                        ${currentQty.toLocaleString()} <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${unit}</span>
+                    </td>
+                    <td class="py-4 px-4 text-right">${diffHTML}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function getActiveIndividualCount() {
+            return appState.orders.filter(o => o.status !== "Arsip" && !appState.archivedOrderIds.includes(o.nomorOrder)).length;
+        }
+
+        function getActiveConsolidatedCount() {
+            const active = appState.orders.filter(o => o.status !== "Arsip" && !appState.archivedOrderIds.includes(o.nomorOrder));
+            const groups = {};
+            active.forEach(o => {
+                const mapping = appState.products[o.item];
+                const vendor = mapping ? mapping.utama : 'Tidak Terdaftar';
+                const key = `${vendor}_${o.tglDatang}`;
+                groups[key] = true;
+            });
+            return Object.keys(groups).filter(k => !k.startsWith('Tidak Terdaftar_')).length;
+        }
+
+        function getArchivedCount() {
+            return appState.orders.filter(o => o.status === "Arsip" || appState.archivedOrderIds.includes(o.nomorOrder)).length;
+        }
+
+        function updateSubTabCounts() {
+            const activeIndCount = getActiveIndividualCount();
+            const activeConsolCount = getActiveConsolidatedCount();
+            const archCount = getArchivedCount();
+
+            document.getElementById('subtab-active-individual').innerHTML = `📋 Per Item <span class="ml-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold">${activeIndCount}</span>`;
+            document.getElementById('subtab-active-consolidated').innerHTML = `📦 Gabung per Vendor <span class="ml-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold">${activeConsolCount}</span>`;
+            document.getElementById('subtab-archived').innerHTML = `🗄️ Arsip Selesai <span class="ml-1.5 px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">${archCount}</span>`;
+        }
+
+        function clearDateFilters() {
+            document.getElementById('filter-date-submit').value = '';
+            document.getElementById('filter-date-arrival').value = '';
+            filterOrders();
+            showToast("Filter Tanggal Direset", "Menampilkan seluruh list pesanan kembali.", "info");
+        }
+
+        function renderDashboard() {
+            const container = document.getElementById('orders-container');
+            const noOrders = document.getElementById('no-orders-message');
+            const searchVal = document.getElementById('search-order').value.toLowerCase();
+            const dateSubmitVal = document.getElementById('filter-date-submit').value;
+            const dateArrivalVal = document.getElementById('filter-date-arrival').value;
+            
+            container.innerHTML = '';
+            initFilters();
+            updateSubTabCounts();
+
+            let filtered = appState.orders.filter(ord => {
+                const matchesSearch = ord.item.toLowerCase().includes(searchVal) || 
+                                      ord.nomorOrder.toLowerCase().includes(searchVal) || 
+                                      ord.pic.toLowerCase().includes(searchVal);
+                
+                const mapping = appState.products[ord.item];
+                const vendorUtama = mapping ? mapping.utama : 'Tidak Terdaftar';
+                const matchesVendor = (appState.activeFilter === 'ALL') || (vendorUtama === appState.activeFilter);
+
+                let matchesDateSubmit = true;
+                if (dateSubmitVal) {
+                    const normalizedSubmit = normalizeDateToYYYYMMDD(ord.timestamp);
+                    matchesDateSubmit = (normalizedSubmit === dateSubmitVal);
+                }
+
+                let matchesDateArrival = true;
+                if (dateArrivalVal) {
+                    const normalizedArrival = normalizeDateToYYYYMMDD(ord.tglDatang);
+                    matchesDateArrival = (normalizedArrival === dateArrivalVal);
+                }
+
+                return matchesSearch && matchesVendor && matchesDateSubmit && matchesDateArrival;
+            });
+
+            if (appState.viewMode === 'active-individual') {
+                let activeOrders = filtered.filter(ord => ord.status !== "Arsip" && !appState.archivedOrderIds.includes(ord.nomorOrder));
+                let sorted = [...activeOrders].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                if (sorted.length === 0) {
+                    noOrders.classList.remove('hidden');
+                    document.getElementById('empty-state-desc').innerText = "Belum ada pesanan kitchen baru atau tidak ada kecocokan tanggal filter.";
+                    return;
+                }
+                noOrders.classList.add('hidden');
+
+                sorted.forEach(ord => renderIndividualCard(container, ord, false));
+
+            } else if (appState.viewMode === 'active-consolidated') {
+                let activeOrders = filtered.filter(ord => ord.status !== "Arsip" && !appState.archivedOrderIds.includes(ord.nomorOrder));
+                
+                const groups = {};
+                activeOrders.forEach(ord => {
+                    const mapping = appState.products[ord.item];
+                    const vendor = mapping ? mapping.utama : 'Tidak Terdaftar';
+                    if (vendor === 'Tidak Terdaftar') return;
+                    
+                    const groupKey = `${vendor}_${ord.tglDatang}`;
+                    if (!groups[groupKey]) {
+                        groups[groupKey] = {
+                            vendor: vendor,
+                            tglDatang: ord.tglDatang,
+                            items: []
+                        };
+                    }
+                    groups[groupKey].items.push(ord);
+                });
+
+                const groupKeys = Object.keys(groups);
+                if (groupKeys.length === 0) {
+                    noOrders.classList.remove('hidden');
+                    document.getElementById('empty-state-desc').innerText = "Tidak ada pesanan gabungan yang cocok.";
+                    return;
+                }
+                noOrders.classList.add('hidden');
+                groupKeys.forEach(key => renderConsolidatedCard(container, groups[key]));
+
+            } else if (appState.viewMode === 'archived') {
+                let archivedOrders = filtered.filter(ord => ord.status === "Arsip" || appState.archivedOrderIds.includes(ord.nomorOrder));
+                let sorted = [...archivedOrders].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                if (sorted.length === 0) {
+                    noOrders.classList.remove('hidden');
+                    document.getElementById('empty-state-desc').innerText = "Belum ada riwayat pesanan yang cocok dengan kriteria filter.";
+                    return;
+                }
+                noOrders.classList.add('hidden');
+                sorted.forEach(ord => renderIndividualCard(container, ord, true));
+            }
+        }
+
+        // Perbandingan sadar-STOK untuk tim purchasing. Memakai assess() dari modul
+        // bersama (butuh stok hari ini yang diunggah supervisor). Menampilkan:
+        // stok kini, cukup-berapa-hari (diwarnai status hijau/kuning/merah), saran
+        // pesan berbasis stok, dan tier akurasi. Kosong bila bahan tak ada di data
+        // prakiraan (mis. non-food) atau belum punya pemakaian tercatat.
+        function forecastRecoHTML(ord) {
+            const a = forecastBook.assess(ord.item);
+            if (!a.hasForecast || !(a.avgDaily > 0)) return '';
+            const F = LaksForecast;
+            const st = a.status;
+            const tier = a.tier || 'C';
+            const tierColor = tier === 'A' ? '#15803d' : tier === 'B' ? '#b45309' : '#b91c1c';
+            const tierLabel = a.tierLabel || '';
+            const uShort = (u => { const s=String(u||'').toLowerCase();
+                return s.includes('gram')?'gr':s.includes('kg')?'kg':s.includes('ml')?'ml':s.includes('pcs')?'pcs':(u||''); })(a.unit);
+
+            // Stok kini + cukup berapa hari (null bila stok belum diunggah).
+            const stokBlock = a.stockNow == null
+                ? `<div><span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Stok kini</span>
+                        <p class="text-sm font-semibold text-slate-400 italic leading-none">belum diunggah</p></div>`
+                : `<div><span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Stok kini</span>
+                        <p class="text-lg font-extrabold text-slate-700 leading-none">${F.fmtNum(a.stockNow)} <span class="text-xs font-normal text-slate-500">${uShort}</span></p></div>
+                   <div><span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Cukup untuk</span>
+                        <p class="text-lg font-extrabold leading-none" style="color:${st.color}">${F.fmtDays(a.daysCover)}</p></div>`;
+
+            // Saran pesan (berbasis stok) hanya bila memang perlu dipesan.
+            const showSuggest = st.key !== 'safe' && a.suggestOrderPacks != null;
+            const suggestBlock = showSuggest
+                ? `<div><span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Saran Model</span>
+                        <p class="text-lg font-extrabold text-emerald-600 leading-none">${a.suggestOrderPacks > 0
+                            ? '~'+F.fmtNum(a.suggestOrderPacks)+' <span class="text-xs font-normal text-slate-500">'+(a.purchaseUnit||'')+'</span>'
+                            : '<span class="text-sm">cukup</span>'}</p></div>`
+                : '';
+
+            return `${stokBlock}${suggestBlock}
+                <div><span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Akurasi</span>
+                    <p class="text-sm font-black leading-none" style="color:${tierColor}">${tier} <span class="text-[10px] font-semibold text-slate-400">${tierLabel}</span></p></div>`;
+        }
+
+        function renderIndividualCard(container, ord, isArchivedView) {
+            const mapping = appState.products[ord.item];
+            const vendorUtama = mapping?.utama || "Tidak Terdaftar";
+            const vendorsCadangan = mapping?.cadangan || [];
+            
+            const card = document.createElement('div');
+            card.className = "bg-white border border-slate-200 rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-4 border-l-4 " + 
+                             (vendorUtama === 'Tidak Terdaftar' ? 'border-l-rose-500' : 'border-l-indigo-500') + " order-card";
+
+            let actionsHTML = '';
+            if (!isArchivedView) {
+                if (vendorUtama !== 'Tidak Terdaftar') {
+                    let optionsHTML = `<option value="${vendorUtama}">Utama: ${vendorUtama}</option>`;
+                    vendorsCadangan.forEach(vc => {
+                        if (appState.vendors[vc]) {
+                            optionsHTML += `<option value="${vc}">Alternatif: ${vc}</option>`;
+                        }
+                    });
+
+                    actionsHTML += `
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kirim via Vendor:</label>
+                            <select id="vendor-select-${ord.nomorOrder}" class="w-full border border-slate-200 rounded-lg p-1.5 text-xs font-semibold focus:ring-1 focus:ring-indigo-500 bg-white">
+                                ${optionsHTML}
+                            </select>
+                            <button onclick="confirmIndividualWA('${ord.nomorOrder}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1 shadow-sm transition-all">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.953-2.005-.001-3.973-.5-5.739-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.725 1.451 5.437 0 9.862-4.425 9.865-9.864.003-2.636-1.017-5.114-2.873-6.973-1.858-1.859-4.337-2.88-6.974-2.881-5.438 0-9.863 4.425-9.866 9.866-.001 1.636.425 3.234 1.233 4.634l-.992 3.621 3.702-.971c1.3.712 2.668 1.084 4.125 1.086z"/></svg>
+                                Kirim Draf WhatsApp
+                            </button>
+                        </div>`;
+                } else {
+                    actionsHTML += `<div class="p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl text-center">Bahan Baku ini belum dipetakan ke Vendor manapun. Atur terlebih dahulu di tab Database.</div>`;
+                }
+                actionsHTML += `<button onclick="markAsArchived('${ord.nomorOrder}', false, ${ord.rowIndex})" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold transition-all">Selesai / Arsipkan</button>`;
+            } else {
+                actionsHTML += `<button onclick="unarchiveOrder('${ord.nomorOrder}', ${ord.rowIndex})" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-2 rounded-xl text-xs font-bold transition-all">🔄 Pulihkan dari Arsip</button>`;
+            }
+
+            const highlightSubmitTime = `
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl shadow-xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    📅 Submit: ${formatFriendlyDate(ord.timestamp, 'always')}
+                </div>`;
+
+            card.innerHTML = `
+                <div class="flex-1 space-y-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${ord.nomorOrder}</span>
+                        <span class="text-[11px] font-extrabold text-indigo-600 uppercase tracking-wider">${vendorUtama}</span>
+                        ${vendorsCadangan.length > 0 ? `<span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Tersedia ${vendorsCadangan.length} Vendor Alternatif</span>` : ''}
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-900 leading-tight">${ord.item}</h4>
+                    <div class="flex flex-wrap items-end gap-x-5 gap-y-1">
+                        <div>
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Diminta Kitchen</span>
+                            <p class="text-xl font-extrabold text-indigo-600 leading-none">${ord.qty} <span class="text-xs font-normal text-slate-500">${ord.unit}</span></p>
+                        </div>
+                        ${forecastRecoHTML(ord)}
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-1 border-t border-slate-100">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-400">
+                            <span>🚚 <b>Kedatangan:</b> <span class="text-indigo-800 font-bold bg-indigo-50 px-2 py-0.5 rounded-lg">${formatFriendlyDate(ord.tglDatang, false)}</span></span>
+                            <span>🧑 <b>PIC:</b> <span class="text-slate-700 font-semibold">${ord.pic}</span></span>
+                        </div>
+                        <div class="pt-1">
+                            ${highlightSubmitTime}
+                        </div>
+                    </div>
+
+                    ${ord.note && ord.note !== "-" ? `
+                    <div class="mt-2 text-xs bg-slate-50 text-slate-600 italic p-2.5 rounded-lg border border-slate-100 inline-block max-w-xl">
+                        <b>Catatan Kitchen:</b> "${ord.note}"
+                    </div>` : ''}
+                </div>
+                <div class="flex flex-col gap-2 min-w-[200px] justify-center pt-3 md:pt-0 border-t md:border-t-0 border-slate-150">${actionsHTML}</div>
+            `;
+            container.appendChild(card);
+        }
+
+        function triggerWAFromCard(orderId) {
+            const selectEl = document.getElementById(`vendor-select-${orderId}`);
+            if (!selectEl) return;
+            const chosenVendor = selectEl.value;
+            const ord = appState.orders.find(o => o.nomorOrder === orderId);
+            if (!ord) return;
+
+            const targetWA = appState.vendors[chosenVendor]?.whatsapp;
+            if (!targetWA) {
+                showToast("Pengiriman Gagal", "Nomor WhatsApp vendor terpilih belum diatur.", "danger");
+                return;
+            }
+
+            const compiledMsg = compileTemplateChat(chosenVendor, ord);
+            const waUrl = `https://api.whatsapp.com/send?phone=${targetWA}&text=${encodeURIComponent(compiledMsg)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function renderConsolidatedCard(container, group) {
+            // Identifier statik agar tidak kacau
+            const cardId = `group-${group.vendor.replace(/[^a-zA-Z0-9]/g, '')}-${group.tglDatang.replace(/[^a-zA-Z0-9]/g, '')}-${Math.random().toString(36).substring(7)}`;
+            
+            const card = document.createElement('div');
+            card.className = "bg-white border border-indigo-200 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between";
+            
+            let itemsHTML = '';
+            group.items.forEach(o => {
+                itemsHTML += `
+                    <div class="flex justify-between items-start py-2 border-b border-slate-100 last:border-0 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900">${o.item}</span>
+                            ${o.note && o.note !== "-" ? `<p class="text-[10px] text-slate-500 italic font-medium">"Catatan: ${o.note}"</p>` : ''}
+                        </div>
+                        <span class="font-extrabold text-indigo-600 shrink-0 ml-2">${o.qty} ${o.unit}</span>
+                    </div>`;
+            });
+
+            const pics = [...new Set(group.items.map(o => o.pic))].join(', ');
+            
+            // Kumpulkan daftar vendor alternatif berdasarkan rincian barang yang berada dalam grup ini
+            const alternativeVendors = new Set();
+            group.items.forEach(o => {
+                const mapping = appState.products[o.item];
+                if (mapping && mapping.cadangan) {
+                    mapping.cadangan.forEach(v => alternativeVendors.add(v));
+                }
+            });
+
+            let optionsHTML = `<option value="${group.vendor}">Utama: ${group.vendor}</option>`;
+            alternativeVendors.forEach(vc => {
+                if (appState.vendors[vc] && vc !== group.vendor) {
+                    optionsHTML += `<option value="${vc}">Alternatif: ${vc}</option>`;
+                }
+            });
+
+            const itemIdsStr = group.items.map(o => `'${o.nomorOrder}'`).join(',');
+            const rowIndicesArr = group.items.map(o => o.rowIndex);
+            
+            // Variabel aman parameter CSV agar bisa dilemparkan via onclick
+            const orderIdsCSV = group.items.map(o => o.nomorOrder).join(',');
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold font-sans">📦 Gabungan: ${group.vendor}</span>
+                        <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-semibold">🧑 PIC: ${pics}</span>
+                    </div>
+                    
+                    <div class="bg-indigo-50/40 rounded-xl px-4 py-2 border border-indigo-100 mb-4 text-xs">
+                        <span class="font-semibold text-indigo-800">🚚 Jadwal Kedatangan:</span>
+                        <p class="font-bold text-indigo-950 mt-0.5">${formatFriendlyDate(group.tglDatang, false)}</p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl px-4 py-2 border border-slate-100 mb-4">
+                        ${itemsHTML}
+                    </div>
+                    
+                    <div class="space-y-1.5 mb-2">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kirim Borongan via Vendor:</label>
+                        <select id="vendor-select-${cardId}" class="w-full border border-slate-200 rounded-lg p-2 text-xs font-semibold focus:ring-1 focus:ring-indigo-500 bg-white shadow-sm">
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2 mt-3 pt-4 border-t border-slate-100">
+                    <button onclick="prepareConsolidatedWA('${group.vendor}', '${group.tglDatang}', 'vendor-select-${cardId}', '${orderIdsCSV}')" class="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm font-sans">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.953-2.005-.001-3.973-.5-5.739-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.725 1.451 5.437 0 9.862-4.425 9.865-9.864.003-2.636-1.017-5.114-2.873-6.973-1.858-1.859-4.337-2.88-6.974-2.881-5.438 0-9.863 4.425-9.866 9.866-.001 1.636.425 3.234 1.233 4.634l-.992 3.621 3.702-.971c1.3.712 2.668 1.084 4.125 1.086z"/></svg>
+                        Kirim Chat Borongan (${group.items.length} Item)
+                    </button>
+                    <button onclick="archiveConsolidatedGroup([${itemIdsStr}], [${rowIndicesArr}], false)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition-all font-sans">
+                        Selesai & Arsipkan Semua
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+
+        function renderDatabaseTab() {
+            const vendorList = document.getElementById('vendor-list');
+            vendorList.innerHTML = '';
+            
+            if (Object.keys(appState.vendors).length === 0) {
+                vendorList.innerHTML = `
+                    <div class="p-6 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                        <p class="text-xs text-slate-500 mb-2">Database Vendor masih kosong / Belum tersambung.</p>
+                    </div>`;
+            }
+
+            for (let name in appState.vendors) {
+                const item = appState.vendors[name];
+                const card = document.createElement('div');
+                card.className = "flex justify-between items-center p-3 border border-slate-100 rounded-xl bg-slate-50";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-900">${name}</h4>
+                        <p class="text-xs text-slate-500 font-mono mt-0.5">${item.whatsapp}</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="openEditVendorModal('${name}')" class="p-1 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M18.364 4.982a2.828 2.828 0 114.04 4.04l-11.54 11.54-5.04 1.35 1.35-5.04 11.54-11.54z"></path></svg>
+                        </button>
+                        <button onclick="triggerDeleteVendorConfirm('${name}')" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+                vendorList.appendChild(card);
+            }
+
+            const productList = document.getElementById('product-mapping-list');
+            productList.innerHTML = '';
+            
+            if (Object.keys(appState.products).length === 0) {
+                productList.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-xs text-slate-400 italic">Belum ada aturan distribusi bahan baku tersambung.</td></tr>`;
+            }
+
+            for (let name in appState.products) {
+                const mapping = appState.products[name];
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50";
+                
+                const alternatives = mapping.cadangan || [];
+                let badgesAlternatives = '';
+                if (alternatives.length > 0) {
+                    alternatives.forEach(alt => {
+                        badgesAlternatives += `<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 mr-1 mb-1">${alt}</span>`;
+                    });
+                } else {
+                    badgesAlternatives = `<span class="text-xs text-slate-400 font-medium italic">-</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-sm text-slate-900">${name}</td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-100">${mapping.utama}</span>
+                    </td>
+                    <td class="py-3 px-4 flex flex-wrap">
+                        ${badgesAlternatives}
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button onclick="openEditProductModal('${name}')" class="p-1 text-slate-400 hover:text-indigo-600 rounded-lg">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M18.364 4.982a2.828 2.828 0 114.04 4.04l-11.54 11.54-5.04 1.35 1.35-5.04 11.54-11.54z"></path></svg>
+                            </button>
+                            <button onclick="triggerDeleteProductConfirm('${name}')" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                productList.appendChild(tr);
+            }
+        }
+
+        function openConfirmModal(title, desc, action) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-desc').innerText = desc;
+            currentConfirmAction = action;
+            toggleModal('modal-confirm', true);
+        }
+
+        function closeConfirmModal() {
+            toggleModal('modal-confirm', false);
+            currentConfirmAction = null;
+        }
+
+        document.getElementById('confirm-ok-btn').addEventListener('click', function() {
+            if (currentConfirmAction) {
+                currentConfirmAction();
+            }
+            closeConfirmModal();
+        });
+
+        function openWAConfirmModal(action, messagePreview = "") {
+            currentWaAction = action;
+            document.getElementById('wa-message-preview').textContent = messagePreview;
+            toggleModal('modal-wa-confirm', true);
+        }
+
+        function closeWAConfirmModal() {
+            toggleModal('modal-wa-confirm', false);
+            currentWaAction = null;
+        }
+
+        function executeWAAction() {
+            if (currentWaAction) {
+                currentWaAction();
+            }
+            closeWAConfirmModal();
+        }
+
+        function confirmIndividualWA(orderId) {
+            const selectEl = document.getElementById(`vendor-select-${orderId}`);
+            const chosenVendor = selectEl ? selectEl.value : "";
+            const ord = appState.orders.find(o => o.nomorOrder === orderId);
+            
+            let compiledMsg = "Gagal memuat pesan.";
+            if (ord && chosenVendor) {
+                compiledMsg = compileTemplateChat(chosenVendor, ord);
+            }
+
+            openWAConfirmModal(() => {
+                triggerWAFromCard(orderId);
+            }, compiledMsg);
+        }
+
+        function prepareConsolidatedWA(vendorUtama, tglDatang, selectId, orderIdsCSV) {
+            // Function ini meniru fitur Individual WA. Tarik vendor yang dipilih saat ini.
+            const selectEl = document.getElementById(selectId);
+            const chosenVendor = selectEl ? selectEl.value : vendorUtama;
+            
+            const orderIds = orderIdsCSV.split(',');
+            const items = appState.orders.filter(o => orderIds.includes(o.nomorOrder));
+            const pics = [...new Set(items.map(o => o.pic))].join(', ');
+            
+            let text = "Gagal memuat pesan.";
+            let waLink = "";
+            
+            if (chosenVendor && items.length > 0) {
+                // Template asli tetap dipertahankan utuh
+                text = compileTemplateConsolidated(chosenVendor, tglDatang, pics, items);
+                const targetWA = appState.vendors[chosenVendor]?.whatsapp;
+                
+                if (!targetWA) {
+                    showToast("Pengiriman Gagal", `Nomor WhatsApp vendor "${chosenVendor}" belum diatur di database.`, "danger");
+                    return;
+                }
+                waLink = `https://api.whatsapp.com/send?phone=${targetWA}&text=${encodeURIComponent(text)}`;
+            }
+
+            confirmConsolidatedWA(encodeURIComponent(waLink), encodeURIComponent(text));
+        }
+
+        function confirmConsolidatedWA(encodedLink, encodedMessage) {
+            const decodedMessage = decodeURIComponent(encodedMessage);
+            openWAConfirmModal(() => {
+                window.open(decodeURIComponent(encodedLink), '_blank');
+            }, decodedMessage);
+        }
+
+        function triggerDeleteVendorConfirm(name) {
+            openConfirmModal(
+                "Hapus Vendor?",
+                `Apakah Anda yakin ingin menghapus vendor "${name}" secara permanen dari Google Sheets Vendor?`,
+                async function() {
+                    if (!appState.webAppUrlVendors) {
+                        showToast("Koneksi Diperlukan", "Mohon atur Web App URL Vendor terlebih dahulu.", "danger");
+                        return;
+                    }
+                    showToast("Menghapus...", `Sedang menghapus vendor "${name}" dari Google Sheets...`, "info");
+                    try {
+                        const result = await sendPostRequest({ action: 'deleteVendor', vendorName: name }, 'vendors');
+                        if (result && result.status === 'success') {
+                            showToast("Dihapus!", `Vendor "${name}" berhasil dihapus dari Google Sheets.`, "success");
+                            await fetchSheetData();
+                        } else {
+                            showToast("Gagal Menghapus", result ? result.message : "Kesalahan server backend.", "danger");
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        showToast("Gangguan Jaringan", "Gagal menghubungi Apps Script Anda.", "danger");
+                    }
+                }
+            );
+        }
+
+        function triggerDeleteProductConfirm(name) {
+            openConfirmModal(
+                "Hapus Aturan Distribusi?",
+                `Apakah Anda yakin ingin menghapus aturan produk "${name}" secara permanen dari Google Sheets Item?`,
+                async function() {
+                    if (!appState.webAppUrlItems) {
+                        showToast("Koneksi Diperlukan", "Mohon atur Web App URL Database Item terlebih dahulu.", "danger");
+                        return;
+                    }
+                    showToast("Menghapus...", `Sedang menghapus aturan "${name}" dari Google Sheets...`, "info");
+                    try {
+                        const result = await sendPostRequest({ action: 'deleteProduct', productName: name }, 'items');
+                        if (result && result.status === 'success') {
+                            showToast("Dihapus!", `Aturan produk "${name}" berhasil dihapus dari Google Sheets.`, "success");
+                            await fetchSheetData();
+                        } else {
+                            showToast("Gagal Menghapus", result ? result.message : "Kesalahan server backend.", "danger");
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        showToast("Gangguan Jaringan", "Gagal menghubungi Apps Script Anda.", "danger");
+                    }
+                }
+            );
+        }
+
+        function triggerResetArchiveConfirm() {
+            openConfirmModal(
+                "Reset Semua Cache Lokal?",
+                "Apakah Anda yakin ingin mengosongkan riwayat memori pada browser ini? Ini akan mereset status pesanan kembali sesuai di Google Sheet.",
+                function() {
+                    appState.archivedOrderIds = [];
+                    saveStateToStorage();
+                    renderDashboard();
+                    showToast("Cache Arsip Dikosongkan!", "Sistem bersih.", "success");
+                }
+            );
+        }
+
+        function initFilters() {
+            const filterContainer = document.getElementById('vendor-filter-list');
+            filterContainer.innerHTML = '';
+            const allBtn = document.createElement('button');
+            allBtn.onclick = () => setFilter('ALL');
+            allBtn.className = `px-3 py-1 text-xs font-bold rounded-lg border transition-all whitespace-nowrap ${
+                appState.activeFilter === 'ALL' ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            }`;
+            allBtn.innerText = 'Semua';
+            filterContainer.appendChild(allBtn);
+
+            for (let name in appState.vendors) {
+                const btn = document.createElement('button');
+                btn.onclick = () => setFilter(name);
+                btn.className = `px-3 py-1 text-xs font-bold rounded-lg border transition-all whitespace-nowrap ${
+                    appState.activeFilter === name ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`;
+                btn.innerText = name;
+                filterContainer.appendChild(btn);
+            }
+        }
+
+        function setFilter(filterType) {
+            appState.activeFilter = filterType;
+            renderDashboard();
+        }
+
+        function filterOrders() {
+            renderDashboard();
+        }
+
+        function compileTemplateChat(vendorName, ord) {
+            let compiled = appState.templateText;
+            compiled = compiled.replace(/{vendor}/g, vendorName);
+            compiled = compiled.replace(/{cafe}/g, appState.cafeName);
+            compiled = compiled.replace(/{no_order}/g, ord.nomorOrder);
+            compiled = compiled.replace(/{tgl_datang}/g, formatFriendlyDate(ord.tglDatang, false));
+            compiled = compiled.replace(/{pic}/g, ord.pic);
+            compiled = compiled.replace(/{item}/g, ord.item);
+            compiled = compiled.replace(/{qty}/g, ord.qty);
+            compiled = compiled.replace(/{unit}/g, ord.unit);
+            compiled = compiled.replace(/{note}/g, ord.note || "-");
+            return compiled;
+        }
+
+        function compileTemplateConsolidated(vendorName, tglDatang, pic, items) {
+            let compiled = appState.templateConsolidated;
+            compiled = compiled.replace(/{vendor}/g, vendorName);
+            compiled = compiled.replace(/{cafe}/g, appState.cafeName);
+            compiled = compiled.replace(/{tgl_datang}/g, formatFriendlyDate(tglDatang, false));
+            compiled = compiled.replace(/{pic}/g, pic);
+            let listText = '';
+            items.forEach(o => {
+                listText += `• ${o.item} : ${o.qty} ${o.unit}\n`;
+                if(o.note && o.note !== '-') listText += `  Catatan: ${o.note}\n`;
+            });
+            compiled = compiled.replace(/{items_list}/g, listText);
+            return compiled;
+        }
+
+        async function sendPostRequest(payload, target = 'orders') {
+            let url = appState.webAppUrlOrders;
+            if (target === 'vendors') url = appState.webAppUrlVendors;
+            if (target === 'items') url = appState.webAppUrlItems;
+
+            if (!url) {
+                showToast("API Offline", "Tautkan Web App URL terlebih dahulu di tab Panduan.", "warning");
+                return null;
+            }
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (e) {
+                console.error("POST Error:", e);
+                showToast("Koneksi API Bermasalah", "Terjadi kegagalan komunikasi ke Apps Script.", "danger");
+                return null;
+            }
+        }
+
+        async function markAsArchived(orderId, silent = false, rowIndex = 0) {
+            if (!appState.archivedOrderIds.includes(orderId)) {
+                appState.archivedOrderIds.push(orderId);
+            }
+            const targetIdx = appState.orders.findIndex(o => o.nomorOrder === orderId);
+            if (targetIdx !== -1) appState.orders[targetIdx].status = "Arsip";
+            saveStateToStorage();
+            renderDashboard();
+            if (!silent) showToast("Order Selesai Diproses!", "Order dipindahkan ke tab Arsip.", "success");
+            if (appState.webAppUrlOrders && rowIndex > 0) {
+                await sendPostRequest({ action: 'archive', rows: [rowIndex] }, 'orders');
+            }
+        }
+
+        async function archiveConsolidatedGroup(ids, rowIndices, silent = false) {
+            ids.forEach(id => {
+                if (!appState.archivedOrderIds.includes(id)) appState.archivedOrderIds.push(id);
+                const targetIdx = appState.orders.findIndex(o => o.nomorOrder === id);
+                if (targetIdx !== -1) appState.orders[targetIdx].status = "Arsip";
+            });
+            saveStateToStorage();
+            renderDashboard();
+            if (!silent) showToast("Gabungan Order Selesai!", "Seluruh item dipindahkan ke tab Arsip.", "success");
+            if (appState.webAppUrlOrders && rowIndices && rowIndices.length > 0) {
+                await sendPostRequest({ action: 'archive', rows: rowIndices }, 'orders');
+            }
+        }
+
+        async function unarchiveOrder(orderId, rowIndex = 0) {
+            appState.archivedOrderIds = appState.archivedOrderIds.filter(id => id !== orderId);
+            const targetIdx = appState.orders.findIndex(o => o.nomorOrder === orderId);
+            if (targetIdx !== -1) appState.orders[targetIdx].status = "Aktif";
+            saveStateToStorage();
+            renderDashboard();
+            showToast("Order Dikembalikan!", "Pesanan kembali aktif di antrean utama.", "info");
+            if (appState.webAppUrlOrders && rowIndex > 0) {
+                await sendPostRequest({ action: 'unarchive', rowIndex: rowIndex }, 'orders');
+            }
+        }
+
+        async function submitSimulatedOrder(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-simulation');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Mengirim...</span>`;
+            btn.disabled = true;
+
+            const item = document.getElementById('sim-item').value;
+            const qty = document.getElementById('sim-qty').value;
+            const unit = document.getElementById('sim-unit').value;
+            const note = document.getElementById('sim-note').value;
+            const arrival = document.getElementById('sim-arrival').value;
+            const pic = document.getElementById('sim-pic').value;
+
+            if (appState.webAppUrlOrders) {
+                const payload = {
+                    action: 'batchOrder',
+                    orders: [{ item: item, qty: parseFloat(qty), unit: unit, note: note || "-", tglDatang: arrival, pic: pic }]
+                };
+                const resData = await sendPostRequest(payload, 'orders');
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                if (resData && resData.status === 'success') {
+                    closeSimulationModal();
+                    showToast("Order Kitchen Terkirim!", "Pesanan kitchen sukses ditulis langsung ke Google Sheet.", "success");
+                    await fetchSheetData();
+                } else {
+                    showToast("Simulasi Gagal", "Gagal menyimpan pesanan ke API Google Sheet Anda.", "danger");
+                }
+                return;
+            }
+
+            const formatTanggal = () => {
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+            };
+            const dateCode = () => {
+                const d = new Date();
+                return `${String(d.getFullYear()).substring(2)}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+            };
+            const fakeId = `LKS-${dateCode()}-${item.substring(0, 3).toUpperCase()}-${String(appState.orders.length + 1).padStart(2,'0')}`;
+            appState.orders.unshift({
+                rowIndex: appState.orders.length + 2, nomorOrder: fakeId, timestamp: formatTanggal(),
+                item: item, qty: parseFloat(qty), unit: unit, note: note || "-", tglDatang: arrival, pic: pic, status: "Aktif"
+            });
+            saveStateToStorage();
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            closeSimulationModal();
+            renderDashboard();
+            showToast("Order Ditambahkan (Mode Offline)!", "Pesanan kitchen baru masuk simulasi local storage.");
+        }
+
+        function updateCafeName(val) {
+            appState.cafeName = val.trim();
+            document.getElementById('headerCafeName').innerText = appState.cafeName;
+            saveStateToStorage();
+            showToast("Nama Cafe Berhasil Diupdate!");
+        }
+
+        async function submitAddVendor(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-vendor');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Menyimpan...</span>`;
+            btn.disabled = true;
+
+            const editKey = document.getElementById('vend-edit-key').value;
+            const name = document.getElementById('vend-name').value.trim();
+            let phone = document.getElementById('vend-phone').value.trim();
+            
+            phone = phone.replace(/\D/g, '');
+            if (phone.startsWith('0')) phone = '62' + phone.substring(1);
+            else if (phone.startsWith('8')) phone = '62' + phone;
+
+            if (!editKey && appState.vendors[name]) {
+                showToast("Gagal Menambahkan", "Nama vendor sudah terdaftar.", "danger");
+                btn.innerHTML = originalHTML; btn.disabled = false; return;
+            }
+
+            if (!appState.webAppUrlVendors) {
+                showToast("Koneksi Diperlukan", "Mohon atur Web App URL Vendor terlebih dahulu.", "danger");
+                btn.innerHTML = originalHTML; btn.disabled = false; return;
+            }
+
+            try {
+                const result = await sendPostRequest({ action: 'addVendor', vendorName: name, vendorPhone: phone, oldVendorName: editKey }, 'vendors');
+                if (result && result.status === 'success') {
+                    showToast("Berhasil Disinkronkan", `Vendor "${name}" berhasil tersimpan langsung di Google Sheet.`, "success");
+                    closeVendorModal();
+                    await fetchSheetData();
+                } else {
+                    showToast("Gagal Sinkronisasi", result ? result.message : "Kesalahan server backend.", "danger");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Kesalahan Jaringan", "Gagal menghubungi Apps Script Anda.", "danger");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function updateBackupCheckboxes() {
+            const primarySelected = document.getElementById('prod-primary').value;
+            const container = document.getElementById('prod-backups-container');
+            container.innerHTML = '';
+            let alternativesAvailable = false;
+            for (let name in appState.vendors) {
+                if (name === primarySelected) continue; 
+                alternativesAvailable = true;
+                const wrapper = document.createElement('label');
+                wrapper.className = "flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer p-1 hover:bg-slate-100 rounded bg-slate-50 border border-slate-100";
+                wrapper.innerHTML = `<input type="checkbox" name="prod-backup-check" value="${name}" class="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"> <span>${name}</span>`;
+                container.appendChild(wrapper);
+            }
+            if (!alternativesAvailable) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic font-medium">Tambahkan vendor lain terlebih dahulu untuk dijadikan cadangan.</span>`;
+            }
+        }
+
+        async function submitProductMapping(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-product');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Menyimpan...</span>`;
+            btn.disabled = true;
+
+            const name = document.getElementById('prod-name').value.trim();
+            const primary = document.getElementById('prod-primary').value;
+            const backupCheckboxes = document.querySelectorAll('input[name="prod-backup-check"]:checked');
+            const backups = Array.from(backupCheckboxes).map(cb => cb.value);
+            const editKey = document.getElementById('prod-edit-key').value;
+
+            if (!editKey && appState.products[name]) {
+                showToast("Gagal Menambahkan", "Nama bahan baku sudah terdaftar.", "danger");
+                btn.innerHTML = originalHTML; btn.disabled = false; return;
+            }
+
+            if (!appState.webAppUrlItems) {
+                showToast("Koneksi Diperlukan", "Mohon atur Web App URL Item (Produk) terlebih dahulu.", "danger");
+                btn.innerHTML = originalHTML; btn.disabled = false; return;
+            }
+
+            try {
+                const result = await sendPostRequest({ action: 'addProduct', productName: name, primaryVendor: primary, backupVendors: backups, oldProductName: editKey }, 'items');
+                if (result && result.status === 'success') {
+                    showToast("Berhasil Disinkronkan", `Aturan "${name}" berhasil tersimpan langsung di Google Sheet.`, "success");
+                    closeProductModal();
+                    await fetchSheetData();
+                } else {
+                    showToast("Gagal Sinkronisasi", result ? result.message : "Kesalahan server backend.", "danger");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Kesalahan Jaringan", "Gagal menghubungi Apps Script Anda.", "danger");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function saveTemplate() {
+            appState.templateText = document.getElementById('template-editor').value;
+            saveStateToStorage();
+            showToast("Format Chat WhatsApp Tunggal Diupdate!");
+        }
+
+        function saveConsolidatedTemplate() {
+            appState.templateConsolidated = document.getElementById('template-editor-consolidated').value;
+            saveStateToStorage();
+            showToast("Format Chat WhatsApp Gabungan Diupdate!");
+        }
+
+        function updateConnectionUI() {
+            const ordersBadge = document.getElementById('orders-status-badge');
+            const vendorsBadge = document.getElementById('vendors-status-badge');
+            const itemsBadge = document.getElementById('items-status-badge');
+            const alertBox = document.getElementById('connection-alert');
+            
+            if (appState.webAppUrlOrders) {
+                ordersBadge.innerText = "ONLINE: Terhubung";
+                ordersBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+            } else {
+                ordersBadge.innerText = "Mode Simulasi (Offline)";
+                ordersBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-200";
+            }
+
+            if (appState.webAppUrlVendors) {
+                vendorsBadge.innerText = "ONLINE: Terhubung";
+                vendorsBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+            } else {
+                vendorsBadge.innerText = "Mode Simulasi (Offline)";
+                vendorsBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-200";
+            }
+            
+            if (appState.webAppUrlItems) {
+                itemsBadge.innerText = "ONLINE: Terhubung";
+                itemsBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+            } else {
+                itemsBadge.innerText = "Mode Simulasi (Offline)";
+                itemsBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-200";
+            }
+
+            if (appState.webAppUrlOrders && appState.webAppUrlVendors && appState.webAppUrlItems) {
+                alertBox.classList.add('hidden');
+            } else {
+                alertBox.classList.remove('hidden');
+                document.getElementById('setup-web-url-orders').value = appState.webAppUrlOrders;
+                document.getElementById('setup-web-url-vendors').value = appState.webAppUrlVendors;
+                document.getElementById('setup-web-url-items').value = appState.webAppUrlItems;
+            }
+        }
+
+        function saveConnectionUrlsFromDashboard() {
+            appState.webAppUrlOrders = document.getElementById('setup-web-url-orders').value.trim();
+            appState.webAppUrlVendors = document.getElementById('setup-web-url-vendors').value.trim();
+            appState.webAppUrlItems = document.getElementById('setup-web-url-items').value.trim();
+            document.getElementById('input-web-url-orders').value = appState.webAppUrlOrders;
+            document.getElementById('input-web-url-vendors').value = appState.webAppUrlVendors;
+            document.getElementById('input-web-url-items').value = appState.webAppUrlItems;
+            saveStateToStorage();
+            updateConnectionUI();
+            fetchSheetData();
+        }
+
+        function saveAndTestConnections() {
+            appState.webAppUrlOrders = document.getElementById('input-web-url-orders').value.trim();
+            appState.webAppUrlVendors = document.getElementById('input-web-url-vendors').value.trim();
+            appState.webAppUrlItems = document.getElementById('input-web-url-items').value.trim();
+            const fcEl = document.getElementById('input-web-url-forecast');
+            appState.webAppUrlForecast = fcEl ? fcEl.value.trim() : "";
+            saveStateToStorage();
+            updateConnectionUI();
+            fetchSheetData();
+            loadForecastData().then(renderDashboard);
+        }
+
+        async function fetchSheetData() {
+            if (!appState.webAppUrlOrders && !appState.webAppUrlVendors && !appState.webAppUrlItems) {
+                updateConnectionUI(); return;
+            }
+
+            const syncIcon = document.getElementById('sync-icon');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+
+            const timestamp = Date.now();
+            let ordersFetchPromise = Promise.resolve(null);
+            let vendorsFetchPromise = Promise.resolve(null);
+            let itemsFetchPromise = Promise.resolve(null);
+
+            if (appState.webAppUrlOrders) {
+                ordersFetchPromise = fetch(`${appState.webAppUrlOrders}?t=${timestamp}`).then(res => res.json()).catch(err => {
+                    return { status: "error", msg: "orders_fetch_failed" };
+                });
+            }
+
+            if (appState.webAppUrlVendors) {
+                if (appState.webAppUrlVendors === appState.webAppUrlOrders) {
+                    vendorsFetchPromise = ordersFetchPromise;
+                } else {
+                    vendorsFetchPromise = fetch(`${appState.webAppUrlVendors}?t=${timestamp}`).then(res => res.json()).catch(err => {
+                        return { status: "error", msg: "vendors_fetch_failed" };
+                    });
+                }
+            }
+            
+            if (appState.webAppUrlItems) {
+                if (appState.webAppUrlItems === appState.webAppUrlOrders) {
+                    itemsFetchPromise = ordersFetchPromise;
+                } else if (appState.webAppUrlItems === appState.webAppUrlVendors) {
+                    itemsFetchPromise = vendorsFetchPromise;
+                } else {
+                    itemsFetchPromise = fetch(`${appState.webAppUrlItems}?t=${timestamp}`).then(res => res.json()).catch(err => {
+                        return { status: "error", msg: "items_fetch_failed" };
+                    });
+                }
+            }
+
+            try {
+                const [ordersRes, vendorsRes, itemsRes] = await Promise.all([ordersFetchPromise, vendorsFetchPromise, itemsFetchPromise]);
+                let syncSucceeded = false;
+
+                if (ordersRes && ordersRes.status !== "error") {
+                    let oData = [];
+                    if (Array.isArray(ordersRes)) {
+                        oData = ordersRes;
+                    } else if (ordersRes.orders && Array.isArray(ordersRes.orders)) {
+                        oData = ordersRes.orders;
+                    } else if (ordersRes.data && Array.isArray(ordersRes.data)) {
+                        oData = ordersRes.data;
+                    }
+
+                    if (oData.length > 0) {
+                        appState.orders = oData.filter(o => o.item && String(o.item).trim() !== "");
+                        appState.archivedOrderIds = appState.orders
+                            .filter(o => o.status === "Arsip" || o.status === "Selesai")
+                            .map(o => o.nomorOrder);
+                        syncSucceeded = true;
+                    }
+                }
+
+                if (vendorsRes && vendorsRes.status !== "error") {
+                    let vData = null;
+                    if (vendorsRes.vendors && typeof vendorsRes.vendors === 'object') {
+                        vData = vendorsRes.vendors;
+                    } else if (typeof vendorsRes === 'object' && !Array.isArray(vendorsRes) && vendorsRes.orders === undefined && vendorsRes.products === undefined) {
+                        vData = vendorsRes;
+                    }
+
+                    if (vData) {
+                        appState.vendors = vData;
+                        syncSucceeded = true;
+                    }
+                }
+                
+                if (itemsRes && itemsRes.status !== "error") {
+                    let iData = null;
+                    if (itemsRes.products && typeof itemsRes.products === 'object') {
+                        iData = itemsRes.products;
+                    } else if (itemsRes.items && typeof itemsRes.items === 'object') {
+                        iData = itemsRes.items;
+                    } else if (typeof itemsRes === 'object' && !Array.isArray(itemsRes) && itemsRes.orders === undefined && itemsRes.vendors === undefined) {
+                        iData = itemsRes;
+                    }
+
+                    if (iData) {
+                        appState.products = iData;
+                        syncSucceeded = true;
+                    }
+                }
+
+                if (syncSucceeded) {
+                    saveStateToStorage();
+                    renderDashboard();
+                    renderDatabaseTab();
+                    if (!document.getElementById('content-overview').classList.contains('hidden')) {
+                        updateOverviewStats();
+                    }
+                    showToast("Sinkronisasi Sukses!", "Data Web App API berhasil diperbarui.", "success");
+                }
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                showToast("Sinkron Gagal", "Periksa koneksi internet Anda atau keakuratan Web App URL Anda.", "danger");
+            } finally {
+                if (syncIcon) syncIcon.classList.remove('animate-spin');
+                updateConnectionUI();
+            }
+        }
+
+        function downloadPWABundle() {
+            try {
+                const zip = new JSZip();
+                const currentHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const manifestJson = {
+                    "name": `${appState.cafeName} Order Control`, "short_name": appState.cafeName,
+                    "description": `Dashboard Kontrol Order Bahan Baku Kitchen - ${appState.cafeName}`,
+                    "start_url": "index.html", "display": "standalone", "background_color": "#4f46e5", "theme_color": "#4f46e5",
+                    "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2921/2921822.png", "sizes": "192x192", "type": "image/png"}]
+                };
+                const swJsText = `self.addEventListener('fetch', event => {});`;
+                zip.file("index.html", currentHtml);
+                zip.file("manifest.json", JSON.stringify(manifestJson, null, 2));
+                zip.file("sw.js", swJsText);
+                zip.generateAsync({ type: "blob" }).then(function (content) {
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(content);
+                    downloadLink.download = `${appState.cafeName.replace(/\s+/g, '_')}_PWA.zip`;
+                    downloadLink.click();
+                    showToast("Bundle PWA Berhasil Diunduh!", "Silakan ekstrak lalu hosting di Netlify.", "info");
+                });
+            } catch (err) {
+                showToast("Pembuatan ZIP Gagal", "Pastikan browser Anda tidak memblokir download.", "danger");
+            }
+        }
+
+        function showToast(title, desc = "", type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let colorClass = "bg-emerald-600 border-emerald-500 text-white shadow-emerald-100";
+            if(type === 'warning') colorClass = "bg-amber-500 border-amber-400 text-white shadow-amber-100";
+            if(type === 'danger') colorClass = "bg-rose-600 border-rose-500 text-white shadow-rose-100";
+            if(type === 'info') colorClass = "bg-blue-600 border-blue-500 text-white shadow-blue-100";
+            toast.className = `p-4 border rounded-xl shadow-lg flex items-start gap-3 transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto min-w-[280px] max-w-sm ${colorClass}`;
+            toast.innerHTML = `<div class="flex-1"><h5 class="font-bold text-xs">${title}</h5>${desc ? `<p class="text-[10px] opacity-90 mt-1 font-medium">${desc}</p>` : ''}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.add('translate-y-2', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); deferredPrompt = e;
+            const installBtn = document.getElementById('install-pwa-btn');
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+
+        function triggerPWAInstall() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+                deferredPrompt = null;
+                const installBtn = document.getElementById('install-pwa-btn');
+                if (installBtn) installBtn.classList.add('hidden');
+            });
+        }
+
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+        }
+
+        function openSimulationModal() {
+            const select = document.getElementById('sim-item');
+            select.innerHTML = '';
+            for (let pName in appState.products) {
+                const opt = document.createElement('option');
+                opt.value = pName; opt.innerText = pName; select.appendChild(opt);
+            }
+            if(Object.keys(appState.products).length === 0) {
+                showToast("Belum Ada Aturan Produk", "Tambahkan aturan produk terlebih dahulu di Tab Database.", "warning"); return;
+            }
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('sim-arrival').value = tomorrow.toISOString().split('T')[0];
+            toggleModal('modal-simulate', true);
+        }
+        function closeSimulationModal() { toggleModal('modal-simulate', false); }
+
+        function openAddVendorModal() {
+            document.getElementById('vendor-modal-title').innerText = "Tambah Vendor Baru (Live Sheets)";
+            document.getElementById('vend-edit-key').value = "";
+            document.getElementById('vend-name').value = "";
+            document.getElementById('vend-name').removeAttribute('readonly');
+            document.getElementById('vend-phone').value = "";
+            toggleModal('modal-vendor', true);
+        }
+
+        function openEditVendorModal(name) {
+            document.getElementById('vendor-modal-title').innerText = "Edit Vendor (Live Sheets)";
+            document.getElementById('vend-edit-key').value = name;
+            document.getElementById('vend-name').value = name;
+            document.getElementById('vend-name').removeAttribute('readonly'); 
+            document.getElementById('vend-phone').value = appState.vendors[name].whatsapp;
+            toggleModal('modal-vendor', true);
+        }
+        function closeVendorModal() { toggleModal('modal-vendor', false); }
+
+        function openAddProductModal() {
+            document.getElementById('product-modal-title').innerText = "Atur Distribusi Produk Baru (Live)";
+            document.getElementById('prod-edit-key').value = "";
+            document.getElementById('prod-name').value = "";
+            document.getElementById('prod-name').removeAttribute('readonly');
+            populateVendorDropdowns();
+            updateBackupCheckboxes();
+            toggleModal('modal-product', true);
+        }
+
+        function openEditProductModal(key) {
+            document.getElementById('product-modal-title').innerText = "Edit Aturan Produk (Live)";
+            document.getElementById('prod-edit-key').value = key;
+            document.getElementById('prod-name').value = key;
+            document.getElementById('prod-name').setAttribute('readonly', 'true');
+            populateVendorDropdowns();
+            const mapping = appState.products[key];
+            document.getElementById('prod-primary').value = mapping.utama;
+            updateBackupCheckboxes();
+            const registeredBackups = mapping.cadangan || [];
+            registeredBackups.forEach(vc => {
+                const cb = document.querySelector(`input[name="prod-backup-check"][value="${vc}"]`);
+                if (cb) cb.checked = true;
+            });
+            toggleModal('modal-product', true);
+        }
+
+        function closeProductModal() { toggleModal('modal-product', false); }
+
+        function populateVendorDropdowns() {
+            const primSelect = document.getElementById('prod-primary');
+            primSelect.innerHTML = '';
+            for (let name in appState.vendors) {
+                const opt1 = document.createElement('option');
+                opt1.value = name; opt1.innerText = name; primSelect.appendChild(opt1);
+            }
+        }
+
+        function toggleModal(modalId, show) {
+            const el = document.getElementById(modalId);
+            const child = el.firstElementChild;
+            if (show) {
+                el.classList.remove('hidden');
+                setTimeout(() => { el.classList.remove('opacity-0'); child.classList.remove('scale-95'); }, 10);
+            } else {
+                el.classList.add('opacity-0'); child.classList.add('scale-95');
+                setTimeout(() => el.classList.add('hidden'), 300);
+            }
+        }
+    </script>
+</body>
+</html>
