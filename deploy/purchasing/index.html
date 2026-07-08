@@ -62,12 +62,65 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        /* Keypad Login */
+        .pin-key {
+            padding: 0.85rem 0;
+            border-radius: 1rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: all 0.15s ease;
+        }
+        .pin-key:hover { background: rgba(255,255,255,0.18); }
+        .pin-key:active { transform: scale(0.94); }
     </style>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4f46e5">
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- ============================================== -->
+    <!-- LOGIN SCREEN (PIN Akses)                        -->
+    <!-- ============================================== -->
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-xs">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-3">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+                <h1 class="text-white text-lg font-black tracking-tight">LAKSAMANA CONTROL PANEL</h1>
+                <p class="text-slate-400 text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
+                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-white/10 border border-white/20 text-white text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500">
+
+                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg py-2">
+                    <span id="login-error-text">PIN salah.</span>
+                </div>
+
+                <!-- Keypad -->
+                <div class="grid grid-cols-3 gap-2 mt-4">
+                    <button onclick="pinPad('1')" class="pin-key">1</button>
+                    <button onclick="pinPad('2')" class="pin-key">2</button>
+                    <button onclick="pinPad('3')" class="pin-key">3</button>
+                    <button onclick="pinPad('4')" class="pin-key">4</button>
+                    <button onclick="pinPad('5')" class="pin-key">5</button>
+                    <button onclick="pinPad('6')" class="pin-key">6</button>
+                    <button onclick="pinPad('7')" class="pin-key">7</button>
+                    <button onclick="pinPad('8')" class="pin-key">8</button>
+                    <button onclick="pinPad('9')" class="pin-key">9</button>
+                    <button onclick="pinPad('clear')" class="pin-key !bg-slate-700/40 !text-slate-300 text-sm">⌫</button>
+                    <button onclick="pinPad('0')" class="pin-key">0</button>
+                    <button onclick="attemptLogin()" class="pin-key !bg-emerald-600 hover:!bg-emerald-500 !text-white text-sm">➜</button>
+                </div>
+            </div>
+            <p class="text-center text-slate-500 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
+        </div>
+    </div>
 
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,6 +146,22 @@
                         <button onclick="switchTab('database')" id="tab-database" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900">Database & Vendor</button>
                         <button onclick="switchTab('integration')" id="tab-integration" class="tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900">Panduan & PWA</button>
                     </nav>
+
+                    <!-- Badge user yang login -->
+                    <div id="user-badge" class="hidden items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span id="user-badge-name">-</span>
+                    </div>
+
+                    <!-- Kelola User (Admin) -->
+                    <button id="btn-manage-users" onclick="openUserManager()" class="hidden p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-all" title="Kelola User & Hak Akses">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+
+                    <!-- Logout -->
+                    <button id="btn-logout" onclick="logout()" class="hidden p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all" title="Keluar / Logout">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -704,11 +773,118 @@
         </div>
     </div>
 
+    <!-- MODAL: KELOLA USER (Admin) -->
+    <div id="modal-users" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-lg mx-4 p-6 shadow-2xl transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Kelola User &amp; Hak Akses
+                </h3>
+                <button onclick="closeUserManager()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between mb-2">
+                <span id="users-sync-note" class="text-[10px] font-bold text-slate-400"></span>
+            </div>
+
+            <!-- Form Tambah / Edit User -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span id="user-form-title" class="text-[10px] font-black uppercase tracking-wider text-indigo-600">Tambah User Baru</span>
+                    <button id="user-form-cancel" onclick="resetUserForm()" class="hidden text-[10px] font-bold text-slate-400 hover:text-slate-600">↺ Batal Edit</button>
+                </div>
+                <input type="hidden" id="user-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Nama</label>
+                        <input type="text" id="user-form-name" placeholder="cth: Putra" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">PIN (angka)</label>
+                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="cth: 1111" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Hak Akses</label>
+                        <select id="user-form-role" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="admin">Admin (Kelola User + Semua)</option>
+                            <option value="full">Full (Semua Menu)</option>
+                            <option value="view">View (Lihat Saja)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Tim / Keterangan</label>
+                        <select id="user-form-ket" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="">- Tidak ada -</option>
+                            <option value="Kitchen">Kitchen</option>
+                            <option value="Bar">Bar</option>
+                            <option value="Floor">Floor</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveUser()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm">
+                    💾 <span id="user-save-label">Simpan User</span>
+                </button>
+            </div>
+
+            <!-- Daftar User -->
+            <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">Daftar User Terdaftar</div>
+            <div id="user-list" class="flex-1 overflow-y-auto space-y-2 border border-slate-100 rounded-xl p-2 bg-slate-50/50 min-h-[120px]"></div>
+        </div>
+    </div>
+
     <!-- App Scripts & Logic Engine -->
     <script>
         const DEFAULT_TEMPLATE = `Halo {vendor},\nBerikut orderan resmi dari {cafe}:\n\n📌 *INFO PESANAN*\n• No. Order: {no_order}\n• Tgl Kedatangan: {tgl_datang}\n• PIC Kitchen: {pic}\n\n📦 *RINCIAN BARANG*\n• {item} : {qty} {unit}\n• Catatan: {note}\n\nMohon dikonfirmasi ya. Terima kasih!`;
 
         const DEFAULT_TEMPLATE_CONSOLIDATED = `Halo {vendor},\nBerikut orderan gabungan resmi dari {cafe}:\n\n📌 *INFO PESANAN*\n• Tgl Kedatangan: {tgl_datang}\n• PIC Kitchen: {pic}\n\n📦 *RINCIAN BARANG*\n{items_list}\nMohon dikonfirmasi ketersediaan barang dan total tagihannya ya. Terima kasih!`;
+
+        // ==================================================================
+        //  ⚙️  PENGATURAN SERVER TERTANAM (isi SEKALI di sini, tanpa input)
+        //  Semua device yang membuka file ini otomatis tersinkron tanpa
+        //  perlu menempelkan URL lagi. Kosongkan ("") untuk memakai input manual.
+        // ==================================================================
+        const EMBEDDED_CONFIG = {
+            webAppUrlOrders:  "https://script.google.com/macros/s/AKfycbw3ZpXR10UJt8Jhw9sUdsinhAOLkzCBPfJQi69ZFgZAZnFp4CR0PIfaQ8h0NIDL5UdUaQ/exec",   // Orders (Pesanan Kitchen)
+            webAppUrlVendors: "https://script.google.com/macros/s/AKfycbxmcasA83xbYE3SRt22fF1Uw5uKEukUTPxLkkAcHZf698_VpgO7EBIPeXlIHGywRTaUxQ/exec",   // Database Vendor
+            webAppUrlItems:   "https://script.google.com/macros/s/AKfycbxRk-q2IoyJPLGAdKpFbJbo-wghP1JP5LSOx-3CRJJj1QFFTLyFYvKDB0eujxouHUHRag/exec",   // Database Item (Produk)
+            webAppUrlForecast:""    // Data Prakiraan Stok (isi bila sudah tersedia)
+        };
+
+        // Link App Script khusus DATABASE USER (Google Sheet "Users").
+        //  - Deploy file users_appscript.gs (lihat repo) sebagai Web App, lalu
+        //    tempelkan URL /exec-nya di sini agar CRUD user tersimpan di Sheet.
+        //  - Bila dibiarkan kosong, user tetap berfungsi secara LOKAL (localStorage)
+        //    memakai SEED_USERS di bawah, dan Admin tetap bisa CRUD (tersimpan lokal).
+        const USERS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxB5fPjEIe-RIDFlTUIKY9mOjTyso4Mw6hauC8YNDeS7ILzikMtaxOKLsr0aJimI2Ijkg/exec";
+
+        // ==================================================================
+        //  👥  DAFTAR USER AWAL (dipakai saat pertama kali / fallback offline)
+        //  role: 'admin' | 'full' | 'view'   |   keterangan(tim): 'Kitchen' | 'Bar' | 'Floor' | ''
+        //  Setelah Web App User aktif, sumber utama = Google Sheet.
+        // ==================================================================
+        const SEED_USERS = [
+            { id: "u-admin",   name: "Admin",   pin: "9999", role: "admin", keterangan: "" },
+            { id: "u-putra",   name: "Putra",   pin: "1111", role: "full",  keterangan: "Kitchen" },
+            { id: "u-adit",    name: "Adit",    pin: "2222", role: "full",  keterangan: "Kitchen" },
+            { id: "u-syahdan", name: "Syahdan", pin: "3333", role: "full",  keterangan: "Kitchen" },
+            { id: "u-anggi",   name: "Anggi",   pin: "4444", role: "full",  keterangan: "Kitchen" },
+            { id: "u-arif",    name: "Arif",    pin: "5555", role: "full",  keterangan: "Bar" },
+            { id: "u-ismail",  name: "Ismail",  pin: "6666", role: "full",  keterangan: "" },
+            { id: "u-mella",   name: "Mella",   pin: "7777", role: "full",  keterangan: "Floor" },
+            { id: "u-devi",    name: "Devi",    pin: "8888", role: "full",  keterangan: "Floor" }
+        ];
+
+        // Peta cadangan Nama -> Tim (dipakai bila PIC order bukan user terdaftar)
+        const FALLBACK_TEAM = { Putra:"Kitchen", Adit:"Kitchen", Syahdan:"Kitchen", Anggi:"Kitchen", Arif:"Bar", Mella:"Floor", Devi:"Floor" };
+
+        const SESSION_HOURS = 24; // masa berlaku sesi login
+
+        let currentUser = null;    // { id, name, pin, role, keterangan }
+        let usersCache = [];       // daftar user termuat (Sheet atau lokal)
+        let appBooted = false;     // cegah init ganda
 
         // --- GLOBAL SYSTEM STATE ---
         let appState = {
@@ -735,6 +911,17 @@
         let stockAsOf = null;
 
         window.onload = function() {
+            ensureUsersLocal();          // seed lokal bila kosong (agar login langsung jalan)
+            refreshUsersFromSheet();     // sinkron dari Sheet di background (bila URL diatur)
+            const sess = getSession();
+            if (sess) enterApp(sess);    // sesi valid -> langsung masuk
+            else document.getElementById('login-pin').focus();
+        };
+
+        // Boot aplikasi utama (sekali) — dipanggil setelah login sukses / sesi valid.
+        function bootApp() {
+            if (appBooted) return;
+            appBooted = true;
             loadStateFromStorage();
             initFilters();
             loadForecastData().then(renderDashboard);
@@ -744,7 +931,230 @@
             if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
                 fetchSheetData();
             }
-        };
+        }
+
+        // ==========================================
+        //  AUTH: USER STORE (lokal + Google Sheet)
+        // ==========================================
+        function loadUsersLocal() {
+            try { return JSON.parse(localStorage.getItem('laksamana_users')) || []; }
+            catch(e){ return []; }
+        }
+        function saveUsersLocal(users) { usersCache = users; localStorage.setItem('laksamana_users', JSON.stringify(users)); }
+        function ensureUsersLocal() {
+            let users = loadUsersLocal();
+            if (!users || users.length === 0) { users = JSON.parse(JSON.stringify(SEED_USERS)); localStorage.setItem('laksamana_users', JSON.stringify(users)); }
+            usersCache = users;
+            return users;
+        }
+
+        // Tarik daftar user dari Web App (Sheet). Diam-diam gagal -> pakai lokal.
+        async function refreshUsersFromSheet() {
+            if (!USERS_WEBAPP_URL || !navigator.onLine) return;
+            try {
+                const res = await fetch(`${USERS_WEBAPP_URL}?t=${Date.now()}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                const list = Array.isArray(data) ? data : (data.users || null);
+                if (Array.isArray(list) && list.length > 0) {
+                    const norm = list.map(u => ({
+                        id: String(u.id || ('u-' + String(u.name || '').toLowerCase())),
+                        name: String(u.name || '').trim(),
+                        pin: String(u.pin || '').trim(),
+                        role: String(u.role || 'full').toLowerCase(),
+                        keterangan: u.keterangan || u.tim || ''
+                    })).filter(u => u.name && u.pin);
+                    if (norm.length > 0) {
+                        saveUsersLocal(norm);
+                        const modal = document.getElementById('modal-users');
+                        if (modal && !modal.classList.contains('hidden')) renderUserList();
+                    }
+                }
+            } catch (err) { console.warn("Gagal sinkron user dari Sheet; pakai lokal.", err); }
+        }
+
+        // Kirim perintah CRUD ke Web App User (add/update/delete). Gagal-diam bila
+        // URL belum diatur/offline (perubahan tetap tersimpan lokal).
+        async function pushUserToSheet(action, user) {
+            if (!USERS_WEBAPP_URL || !navigator.onLine) return false;
+            try {
+                await fetch(USERS_WEBAPP_URL, { method:'POST', body: JSON.stringify({ action, user }) });
+                return true;
+            } catch (err) { console.warn("Gagal push user ke Sheet.", err); return false; }
+        }
+
+        // Petakan nama PIC -> tim (Kitchen/Bar/Floor) dari database user.
+        function getTeam(name) {
+            if (!name) return "";
+            const s = String(name).toLowerCase();
+            const u = usersCache.find(x => x.name && (s === x.name.toLowerCase() || s.includes(x.name.toLowerCase())));
+            if (u && u.keterangan) return u.keterangan;
+            for (const k in FALLBACK_TEAM) { if (s.includes(k.toLowerCase())) return FALLBACK_TEAM[k]; }
+            return "";
+        }
+
+        // Badge tim untuk ditempel di kartu order.
+        function teamBadge(name) {
+            const team = getTeam(name);
+            if (!team) return "";
+            const styles = {
+                Kitchen: "bg-orange-100 text-orange-700 border-orange-200",
+                Bar:     "bg-purple-100 text-purple-700 border-purple-200",
+                Floor:   "bg-teal-100 text-teal-700 border-teal-200"
+            };
+            const cls = styles[team] || "bg-slate-100 text-slate-600 border-slate-200";
+            const icon = team === 'Kitchen' ? '🍳' : team === 'Bar' ? '🍸' : team === 'Floor' ? '🪑' : '🏷️';
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black rounded-full border ${cls} uppercase tracking-wider">${icon} Tim ${team}</span>`;
+        }
+
+        // ==========================================
+        //  AUTH: SESSION + LOGIN
+        // ==========================================
+        function getSession() {
+            try {
+                const sRaw = localStorage.getItem('laksamana_session');
+                if (!sRaw) return null;
+                const s = JSON.parse(sRaw);
+                if (!s || !s.userId || !s.expiry) return null;
+                if (Date.now() > s.expiry) { localStorage.removeItem('laksamana_session'); return null; }
+                return usersCache.find(x => x.id === s.userId) || null;
+            } catch(e){ return null; }
+        }
+        function setSession(user) {
+            localStorage.setItem('laksamana_session', JSON.stringify({ userId: user.id, expiry: Date.now() + SESSION_HOURS*3600*1000 }));
+        }
+        function logout() { localStorage.removeItem('laksamana_session'); location.reload(); }
+
+        function pinPad(val) {
+            const input = document.getElementById('login-pin');
+            if (val === 'clear') input.value = input.value.slice(0, -1);
+            else input.value += val;
+        }
+        function attemptLogin() {
+            const pin = document.getElementById('login-pin').value.trim();
+            const errBox = document.getElementById('login-error');
+            if (!pin) return;
+            const user = usersCache.find(u => u.pin === pin);
+            if (!user) {
+                document.getElementById('login-error-text').innerText = "PIN tidak dikenali. Coba lagi.";
+                errBox.classList.remove('hidden');
+                document.getElementById('login-pin').value = "";
+                return;
+            }
+            errBox.classList.add('hidden');
+            setSession(user);
+            enterApp(user);
+        }
+
+        function enterApp(user) {
+            currentUser = user;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('login-pin').value = "";
+            const badge = document.getElementById('user-badge');
+            badge.classList.remove('hidden'); badge.classList.add('flex');
+            document.getElementById('user-badge-name').innerText = user.name + (user.role === 'admin' ? ' (Admin)' : '');
+            document.getElementById('btn-logout').classList.remove('hidden');
+            document.getElementById('btn-manage-users').classList.toggle('hidden', user.role !== 'admin');
+            bootApp();
+        }
+
+        // ==========================================
+        //  USER MANAGER (Admin CRUD -> Sheet + lokal)
+        // ==========================================
+        function openUserManager() {
+            if (!currentUser || currentUser.role !== 'admin') return showToast("Akses Ditolak", "Hanya Admin yang bisa kelola user.", "danger");
+            resetUserForm();
+            renderUserList();
+            const note = document.getElementById('users-sync-note');
+            if (note) note.innerText = USERS_WEBAPP_URL ? "🟢 Tersinkron ke Google Sheet" : "🟡 Mode lokal (isi USERS_WEBAPP_URL untuk sinkron Sheet)";
+            toggleModal('modal-users', true);
+            refreshUsersFromSheet();
+        }
+        function closeUserManager() { toggleModal('modal-users', false); }
+
+        function renderUserList() {
+            const box = document.getElementById('user-list');
+            if (!box) return;
+            const roleLabel = { admin:"Admin", full:"Full", view:"View" };
+            const roleCls = { admin:"bg-rose-100 text-rose-700", full:"bg-indigo-100 text-indigo-700", view:"bg-slate-100 text-slate-600" };
+            box.innerHTML = usersCache.map(u => `
+                <div class="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-3 py-2 shadow-sm">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-black text-slate-800">${u.name}</span>
+                            <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${roleCls[u.role]||'bg-slate-100 text-slate-600'}">${roleLabel[u.role]||u.role}</span>
+                            ${u.keterangan ? `<span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">${u.keterangan}</span>` : ''}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold mt-0.5">PIN: ${u.pin}</div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="editUser('${u.id}')" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Edit">✏️</button>
+                        <button onclick="deleteUser('${u.id}')" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus">🗑️</button>
+                    </div>
+                </div>`).join('');
+        }
+        function resetUserForm() {
+            document.getElementById('user-edit-id').value = "";
+            document.getElementById('user-form-name').value = "";
+            document.getElementById('user-form-pin').value = "";
+            document.getElementById('user-form-role').value = "full";
+            document.getElementById('user-form-ket').value = "";
+            document.getElementById('user-form-title').innerText = "Tambah User Baru";
+            document.getElementById('user-save-label').innerText = "Simpan User";
+            document.getElementById('user-form-cancel').classList.add('hidden');
+        }
+        function editUser(id) {
+            const u = usersCache.find(x => x.id === id);
+            if (!u) return;
+            document.getElementById('user-edit-id').value = u.id;
+            document.getElementById('user-form-name').value = u.name;
+            document.getElementById('user-form-pin').value = u.pin;
+            document.getElementById('user-form-role').value = u.role;
+            document.getElementById('user-form-ket').value = u.keterangan || "";
+            document.getElementById('user-form-title').innerText = "Edit User: " + u.name;
+            document.getElementById('user-save-label').innerText = "Update User";
+            document.getElementById('user-form-cancel').classList.remove('hidden');
+        }
+        function saveUser() {
+            const id = document.getElementById('user-edit-id').value;
+            const name = document.getElementById('user-form-name').value.trim();
+            const pin = document.getElementById('user-form-pin').value.trim();
+            const role = document.getElementById('user-form-role').value;
+            const ket = document.getElementById('user-form-ket').value;
+            if (!name || !pin) return showToast("Data Kurang", "Nama dan PIN wajib diisi.", "warning");
+            if (!/^\d{3,8}$/.test(pin)) return showToast("PIN Tidak Valid", "PIN harus 3-8 digit angka.", "warning");
+            let users = loadUsersLocal();
+            if (users.some(u => u.pin === pin && u.id !== id)) return showToast("PIN Ganda", "PIN sudah dipakai user lain.", "danger");
+            let saved;
+            if (id) {
+                const u = users.find(x => x.id === id);
+                if (!u) return;
+                u.name = name; u.pin = pin; u.role = role; u.keterangan = ket;
+                saved = u;
+                showToast("User Diupdate", `${name} berhasil disimpan.`, "success");
+            } else {
+                saved = { id: "u-" + Date.now(), name, pin, role, keterangan: ket };
+                users.push(saved);
+                showToast("User Ditambah", `${name} berhasil ditambahkan.`, "success");
+            }
+            saveUsersLocal(users);
+            resetUserForm();
+            renderUserList();
+            pushUserToSheet(id ? 'update' : 'add', saved);
+        }
+        function deleteUser(id) {
+            let users = loadUsersLocal();
+            const u = users.find(x => x.id === id);
+            if (!u) return;
+            if (currentUser && u.id === currentUser.id) return showToast("Tidak Bisa", "Anda tidak bisa menghapus akun sendiri.", "warning");
+            if (u.role === 'admin' && users.filter(x => x.role === 'admin').length <= 1) return showToast("Tidak Bisa", "Minimal harus ada 1 Admin.", "warning");
+            if (!confirm(`Hapus user "${u.name}"?`)) return;
+            users = users.filter(x => x.id !== id);
+            saveUsersLocal(users);
+            renderUserList();
+            pushUserToSheet('delete', u);
+            showToast("User Dihapus", `${u.name} telah dihapus.`, "success");
+        }
 
         // Muat data prakiraan (App Script -> cache -> embedded), sama pola dgn
         // aplikasi Kitchen. Hanya dipakai untuk menampilkan rekomendasi model.
@@ -805,7 +1215,14 @@
             if (legacyAppUrl && !appState.webAppUrlOrders) appState.webAppUrlOrders = legacyAppUrl;
             if (legacyAppUrl && !appState.webAppUrlVendors) appState.webAppUrlVendors = legacyAppUrl;
             if (legacyAppUrl && !appState.webAppUrlItems) appState.webAppUrlItems = legacyAppUrl;
-            
+
+            // >>> Pengaturan tertanam (EMBEDDED_CONFIG) selalu menang bila diisi <<<
+            // Membuat semua device otomatis tersinkron tanpa input URL manual.
+            if (EMBEDDED_CONFIG.webAppUrlOrders)   appState.webAppUrlOrders = EMBEDDED_CONFIG.webAppUrlOrders;
+            if (EMBEDDED_CONFIG.webAppUrlVendors)  appState.webAppUrlVendors = EMBEDDED_CONFIG.webAppUrlVendors;
+            if (EMBEDDED_CONFIG.webAppUrlItems)    appState.webAppUrlItems = EMBEDDED_CONFIG.webAppUrlItems;
+            if (EMBEDDED_CONFIG.webAppUrlForecast) appState.webAppUrlForecast = EMBEDDED_CONFIG.webAppUrlForecast;
+
             const savedVendors = localStorage.getItem('vendors');
             appState.vendors = savedVendors ? JSON.parse(savedVendors) : {};
             
@@ -1282,6 +1699,7 @@
                         <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-400">
                             <span>🚚 <b>Kedatangan:</b> <span class="text-indigo-800 font-bold bg-indigo-50 px-2 py-0.5 rounded-lg">${formatFriendlyDate(ord.tglDatang, false)}</span></span>
                             <span>🧑 <b>PIC:</b> <span class="text-slate-700 font-semibold">${ord.pic}</span></span>
+                            ${teamBadge(ord.pic)}
                         </div>
                         <div class="pt-1">
                             ${highlightSubmitTime}
@@ -1328,7 +1746,10 @@
                 itemsHTML += `
                     <div class="flex justify-between items-start py-2 border-b border-slate-100 last:border-0 text-xs">
                         <div>
-                            <span class="font-bold text-slate-900">${o.item}</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-slate-900">${o.item}</span>
+                                ${teamBadge(o.pic)}
+                            </div>
                             ${o.note && o.note !== "-" ? `<p class="text-[10px] text-slate-500 italic font-medium">"Catatan: ${o.note}"</p>` : ''}
                         </div>
                         <span class="font-extrabold text-indigo-600 shrink-0 ml-2">${o.qty} ${o.unit}</span>
