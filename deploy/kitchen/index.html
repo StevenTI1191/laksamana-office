@@ -83,7 +83,21 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
+        /* Keypad Login */
+        .pin-key {
+            padding: 0.85rem 0;
+            border-radius: 1rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: all 0.15s ease;
+        }
+        .pin-key:hover { background: rgba(255,255,255,0.18); }
+        .pin-key:active { transform: scale(0.94); }
+
         /* Modal Transition Utilities */
         .modal-active {
             opacity: 1 !important;
@@ -97,6 +111,46 @@
 </head>
 <body class="min-h-screen pb-16">
 
+    <!-- ============================================== -->
+    <!-- LOGIN SCREEN (PIN Akses)                        -->
+    <!-- ============================================== -->
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-xs">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20 mb-3">
+                    <i class="fa-solid fa-kitchen-set text-white"></i>
+                </div>
+                <h1 class="text-white text-lg font-black brand-font tracking-tight">LAKSAMANA KITCHEN</h1>
+                <p class="text-slate-400 text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
+                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-white/10 border border-white/20 text-white text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500">
+
+                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg py-2">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <span id="login-error-text">PIN salah.</span>
+                </div>
+
+                <!-- Keypad -->
+                <div class="grid grid-cols-3 gap-2 mt-4">
+                    <button onclick="pinPad('1')" class="pin-key">1</button>
+                    <button onclick="pinPad('2')" class="pin-key">2</button>
+                    <button onclick="pinPad('3')" class="pin-key">3</button>
+                    <button onclick="pinPad('4')" class="pin-key">4</button>
+                    <button onclick="pinPad('5')" class="pin-key">5</button>
+                    <button onclick="pinPad('6')" class="pin-key">6</button>
+                    <button onclick="pinPad('7')" class="pin-key">7</button>
+                    <button onclick="pinPad('8')" class="pin-key">8</button>
+                    <button onclick="pinPad('9')" class="pin-key">9</button>
+                    <button onclick="pinPad('clear')" class="pin-key !bg-slate-700/40 !text-slate-300 text-sm"><i class="fa-solid fa-delete-left"></i></button>
+                    <button onclick="pinPad('0')" class="pin-key">0</button>
+                    <button onclick="attemptLogin()" class="pin-key !bg-emerald-600 hover:!bg-emerald-500 !text-white text-sm"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <p class="text-center text-slate-500 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
+        </div>
+    </div>
+
     <!-- Header Area -->
     <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
@@ -106,22 +160,40 @@
                 </div>
                 <div>
                     <h1 class="text-sm font-black tracking-tight leading-none brand-font">LAKSAMANA KITCHEN</h1>
-                    <p class="text-[10px] text-slate-400 font-bold mt-1">Batch Input & Check-in v11.0</p>
+                    <p class="text-[10px] text-slate-400 font-bold mt-1">Batch Input & Check-in v12.0</p>
                 </div>
             </div>
-            
+
             <div class="flex items-center space-x-2">
                 <button id="btn-install-pwa" class="hidden px-3 py-1.5 text-[10px] font-extrabold rounded-lg border border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/30 flex items-center gap-1.5 uppercase">
                     <i class="fa-solid fa-download"></i> Install App
                 </button>
 
+                <!-- Badge user yang sedang login -->
+                <div id="user-badge" class="hidden px-2.5 py-1 text-[10px] font-bold rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-200 items-center gap-1.5">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <span id="user-badge-name">-</span>
+                </div>
+
                 <div id="connection-badge" class="px-2.5 py-1 text-[10px] font-bold rounded-lg border border-rose-500/30 bg-rose-50 text-rose-500 flex items-center gap-1.5 transition-all">
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                     <span id="connection-text">Offline</span>
                 </div>
-                <button onclick="toggleConfigPanel()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all relative animate-bounce" title="Pengaturan Sistem">
+
+                <!-- Kelola User (hanya Admin) -->
+                <button id="btn-manage-users" onclick="openUserManager()" class="hidden p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all" title="Kelola User & Hak Akses">
+                    <i class="fa-solid fa-users-gear"></i>
+                </button>
+
+                <!-- Pengaturan Server (hanya Admin) -->
+                <button id="btn-config" onclick="toggleConfigPanel()" class="hidden p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all relative" title="Pengaturan Sistem">
                     <i class="fa-solid fa-gears"></i>
                     <span id="settings-dot" class="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
+                </button>
+
+                <!-- Logout -->
+                <button id="btn-logout" onclick="logout()" class="hidden p-2 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl transition-all" title="Keluar / Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </div>
@@ -250,6 +322,7 @@
 							<option value="Arif">Arif</option>
 							<option value="Ismail">Ismail</option>
 							<option value="Mella">Mella</option>
+							<option value="Devi">Devi</option>
                         </select>
                     </div>
                     <div>
@@ -482,7 +555,106 @@
         </div>
     </div>
 
+    <!-- 5. User Manager Modal (Admin only) -->
+    <div id="user-modal" class="fixed inset-0 bg-slate-900/70 z-[80] flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]" id="user-modal-content">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-indigo-500"></i> Kelola User & Hak Akses
+                </h3>
+                <button onclick="closeModal('user-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- Form Tambah / Edit User -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span id="user-form-title" class="text-[10px] font-black uppercase tracking-wider text-indigo-600">Tambah User Baru</span>
+                    <button id="user-form-cancel" onclick="resetUserForm()" class="hidden text-[10px] font-bold text-slate-400 hover:text-slate-600"><i class="fa-solid fa-rotate-left mr-1"></i>Batal Edit</button>
+                </div>
+                <input type="hidden" id="user-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Nama</label>
+                        <input type="text" id="user-form-name" placeholder="cth: Putra" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">PIN (angka)</label>
+                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="cth: 1111" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Hak Akses</label>
+                        <select id="user-form-role" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="admin">Admin (Kelola User + Semua)</option>
+                            <option value="full">Full (Order + Check-in)</option>
+                            <option value="checkin">Check-in Penerimaan Saja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Keterangan</label>
+                        <select id="user-form-ket" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="">- Tidak ada -</option>
+                            <option value="Kitchen">Kitchen</option>
+                            <option value="Bar">Bar</option>
+                            <option value="Floor">Floor</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveUser()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> <span id="user-save-label">Simpan User</span>
+                </button>
+            </div>
+
+            <!-- Daftar User -->
+            <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">Daftar User Terdaftar</div>
+            <div id="user-list" class="flex-1 overflow-y-auto space-y-2 border border-slate-100 rounded-xl p-2 bg-slate-50/50 min-h-[120px]"></div>
+        </div>
+    </div>
+
     <script>
+        // ==================================================================
+        //  ⚙️  PENGATURAN SERVER TERTANAM (isi SEKALI di sini, tanpa input)
+        //  ------------------------------------------------------------------
+        //  Paste link & entry ID di bawah ini. Setelah diisi, semua device
+        //  yang membuka file ini otomatis tersinkron TANPA perlu setting lagi.
+        //  Biarkan kosong ("") jika ingin memakai pengaturan manual (gear).
+        // ==================================================================
+        const EMBEDDED_CONFIG = {
+            formUrl:            "https://docs.google.com/forms/d/e/1FAIpQLSeAjKOr2wp_uQDdlXfDktNeOS91YkvlIOA7o2pUHtYehAFo7A/viewform",   // Link Google Form Belanja (…/viewform)
+            appScriptUrlItem:   "https://script.google.com/macros/s/AKfycbxRk-q2IoyJPLGAdKpFbJbo-wghP1JP5LSOx-3CRJJj1QFFTLyFYvKDB0eujxouHUHRag/exec",   // Link App Script: Database Item (Bahan)
+            appScriptUrlHistory:"https://script.google.com/macros/s/AKfycbw3ZpXR10UJt8Jhw9sUdsinhAOLkzCBPfJQi69ZFgZAZnFp4CR0PIfaQ8h0NIDL5UdUaQ/exec",   // Link App Script: Tabel Riwayat & Check-in
+            appScriptUrlForecast:"",   // Link App Script: Data Prakiraan Stok (isi bila sudah tersedia)
+            entryIds: {
+                item: "entry.314340744",    // ID: Nama Item
+                qty:  "entry.906874541",    // ID: QTY
+                unit: "entry.1914148737",   // ID: Satuan
+                note: "entry.1535060527",   // ID: Catatan
+                date: "entry.930153719",    // ID: Tanggal
+                pic:  "entry.865297874"     // ID: PIC
+            }
+        };
+
+        // ==================================================================
+        //  👥  DAFTAR USER AWAL (bisa diubah lewat menu "Kelola User" / Admin)
+        //  role: 'admin' | 'full' | 'checkin'   |   keterangan: 'Kitchen' | 'Bar' | 'Floor' | ''
+        //  Data tersimpan di localStorage; blok ini hanya dipakai saat pertama kali.
+        // ==================================================================
+        const SEED_USERS = [
+            { id: "u-admin",   name: "Admin",   pin: "9999", role: "admin",   keterangan: "" },
+            { id: "u-putra",   name: "Putra",   pin: "1111", role: "full",    keterangan: "Kitchen" },
+            { id: "u-adit",    name: "Adit",    pin: "2222", role: "full",    keterangan: "Kitchen" },
+            { id: "u-syahdan", name: "Syahdan", pin: "3333", role: "full",    keterangan: "Kitchen" },
+            { id: "u-anggi",   name: "Anggi",   pin: "4444", role: "full",    keterangan: "Kitchen" },
+            { id: "u-arif",    name: "Arif",    pin: "5555", role: "full",    keterangan: "Bar" },
+            { id: "u-ismail",  name: "Ismail",  pin: "6666", role: "full",    keterangan: "" },
+            { id: "u-mella",   name: "Mella",   pin: "7777", role: "full",    keterangan: "Floor" },
+            { id: "u-devi",    name: "Devi",    pin: "8888", role: "full",    keterangan: "Floor" }
+        ];
+
+        // Peta cadangan Nama -> Keterangan (dipakai bila PIC order bukan user terdaftar)
+        const FALLBACK_KETERANGAN = { Putra:"Kitchen", Adit:"Kitchen", Syahdan:"Kitchen", Anggi:"Kitchen", Arif:"Bar", Mella:"Floor", Devi:"Floor" };
+
+        const SESSION_HOURS = 24; // masa berlaku sesi login
+
         // ==========================================
         //  PWA SETUP
         // ==========================================
@@ -559,26 +731,236 @@
             picName: "Putra"
         };
 
+        let currentUser = null;   // { id, name, pin, role, keterangan }
+        let appInitialized = false;
+
         document.addEventListener('DOMContentLoaded', function() {
             injectPwaManifest();
             registerServiceWorker();
             window.addEventListener('online', updateNetworkStatus);
             window.addEventListener('offline', updateNetworkStatus);
-            updateNetworkStatus();
 
-            for (let i = 0; i < 3; i++) addNewBatchRow();
-
-            loadSettings();
-            setTomorrowAsDefaultDate();
-            
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('history-date-filter').value = today;
-            loadItemsFromAppScript();
-
-            // Prakiraan/restock: muat data & tampilkan status stok.
-            loadForecastData();
-            updateStockBadge();
+            ensureUsers();          // siapkan daftar user (seed bila kosong)
+            const sess = getSession();
+            if (sess) {
+                enterApp(sess);     // sudah login -> langsung masuk
+            } else {
+                document.getElementById('login-pin').focus();
+            }
         });
+
+        // ==========================================
+        //  AUTH: USER STORE (CRUD)
+        // ==========================================
+        function ensureUsers() {
+            let users = loadUsers();
+            if (!users || users.length === 0) {
+                users = JSON.parse(JSON.stringify(SEED_USERS));
+                saveUsers(users);
+            }
+            return users;
+        }
+        function loadUsers() {
+            try { return JSON.parse(localStorage.getItem('laksamana_users')) || []; }
+            catch(e){ return []; }
+        }
+        function saveUsers(users) { localStorage.setItem('laksamana_users', JSON.stringify(users)); }
+
+        function getKeterangan(name) {
+            if (!name) return "";
+            const u = loadUsers().find(x => x.name.toLowerCase() === String(name).toLowerCase());
+            if (u && u.keterangan) return u.keterangan;
+            return FALLBACK_KETERANGAN[name] || "";
+        }
+
+        // ==========================================
+        //  AUTH: SESSION
+        // ==========================================
+        function getSession() {
+            try {
+                const s = JSON.parse(localStorage.getItem('laksamana_session'));
+                if (!s || !s.userId || !s.expiry) return null;
+                if (Date.now() > s.expiry) { localStorage.removeItem('laksamana_session'); return null; }
+                const u = loadUsers().find(x => x.id === s.userId);
+                return u || null;   // user mungkin sudah dihapus admin
+            } catch(e){ return null; }
+        }
+        function setSession(user) {
+            localStorage.setItem('laksamana_session', JSON.stringify({
+                userId: user.id, expiry: Date.now() + SESSION_HOURS * 3600 * 1000
+            }));
+        }
+        function logout() {
+            localStorage.removeItem('laksamana_session');
+            location.reload();
+        }
+
+        // ==========================================
+        //  AUTH: LOGIN FLOW
+        // ==========================================
+        function pinPad(val) {
+            const input = document.getElementById('login-pin');
+            if (val === 'clear') { input.value = input.value.slice(0, -1); }
+            else { input.value += val; }
+        }
+        function attemptLogin() {
+            const pin = document.getElementById('login-pin').value.trim();
+            const errBox = document.getElementById('login-error');
+            if (!pin) return;
+            const user = loadUsers().find(u => u.pin === pin);
+            if (!user) {
+                document.getElementById('login-error-text').innerText = "PIN tidak dikenali. Coba lagi.";
+                errBox.classList.remove('hidden');
+                document.getElementById('login-pin').value = "";
+                return;
+            }
+            errBox.classList.add('hidden');
+            setSession(user);
+            enterApp(user);
+        }
+
+        // Masuk aplikasi setelah login sukses / sesi valid
+        function enterApp(user) {
+            currentUser = user;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('login-pin').value = "";
+
+            // Badge user + tombol logout
+            const badge = document.getElementById('user-badge');
+            badge.classList.remove('hidden'); badge.classList.add('flex');
+            document.getElementById('user-badge-name').innerText = user.name + (user.role === 'admin' ? ' (Admin)' : '');
+            document.getElementById('btn-logout').classList.remove('hidden');
+
+            if (!appInitialized) {
+                appInitialized = true;
+                updateNetworkStatus();
+                for (let i = 0; i < 3; i++) addNewBatchRow();
+                loadSettings();
+                setTomorrowAsDefaultDate();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('history-date-filter').value = today;
+                loadItemsFromAppScript();
+                // Prakiraan/restock: muat data & tampilkan status stok.
+                loadForecastData();
+                updateStockBadge();
+            }
+
+            applyAccessControl(user);   // set setelah settings siap
+        }
+
+        // Sesuaikan tampilan sesuai hak akses user
+        function applyAccessControl(user) {
+            const isAdmin   = user.role === 'admin';
+            const canOrder  = user.role === 'admin' || user.role === 'full';
+
+            // Tombol Admin
+            document.getElementById('btn-manage-users').classList.toggle('hidden', !isAdmin);
+            document.getElementById('btn-config').classList.toggle('hidden', !isAdmin);
+
+            // Tab & halaman Order Belanja — switchTab dulu, baru sembunyikan
+            // (switchTab menimpa className tab, jadi 'hidden' harus diterapkan setelahnya)
+            switchTab(canOrder ? 'order' : 'checkin');
+            document.getElementById('tab-order').classList.toggle('hidden', !canOrder);
+        }
+
+        // ==========================================
+        //  USER MANAGER (Admin CRUD)
+        // ==========================================
+        function openUserManager() {
+            if (!currentUser || currentUser.role !== 'admin') return showToast("Akses Ditolak", "Hanya Admin yang bisa kelola user.", "danger");
+            resetUserForm();
+            renderUserList();
+            openModal('user-modal');
+        }
+
+        function renderUserList() {
+            const box = document.getElementById('user-list');
+            const users = loadUsers();
+            const roleLabel = { admin: "Admin", full: "Order + Check-in", checkin: "Check-in Saja" };
+            const roleCls   = { admin: "bg-rose-100 text-rose-700", full: "bg-indigo-100 text-indigo-700", checkin: "bg-amber-100 text-amber-700" };
+            box.innerHTML = users.map(u => `
+                <div class="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-3 py-2 shadow-sm">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-slate-800">${u.name}</span>
+                            <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${roleCls[u.role]||'bg-slate-100 text-slate-600'}">${roleLabel[u.role]||u.role}</span>
+                            ${u.keterangan ? `<span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">${u.keterangan}</span>` : ''}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold mt-0.5">PIN: ${u.pin}</div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="editUser('${u.id}')" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Edit"><i class="fa-solid fa-pen text-[11px]"></i></button>
+                        <button onclick="deleteUser('${u.id}')" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetUserForm() {
+            document.getElementById('user-edit-id').value = "";
+            document.getElementById('user-form-name').value = "";
+            document.getElementById('user-form-pin').value = "";
+            document.getElementById('user-form-role').value = "full";
+            document.getElementById('user-form-ket').value = "";
+            document.getElementById('user-form-title').innerText = "Tambah User Baru";
+            document.getElementById('user-save-label').innerText = "Simpan User";
+            document.getElementById('user-form-cancel').classList.add('hidden');
+        }
+
+        function editUser(id) {
+            const u = loadUsers().find(x => x.id === id);
+            if (!u) return;
+            document.getElementById('user-edit-id').value = u.id;
+            document.getElementById('user-form-name').value = u.name;
+            document.getElementById('user-form-pin').value = u.pin;
+            document.getElementById('user-form-role').value = u.role;
+            document.getElementById('user-form-ket').value = u.keterangan || "";
+            document.getElementById('user-form-title').innerText = "Edit User: " + u.name;
+            document.getElementById('user-save-label').innerText = "Update User";
+            document.getElementById('user-form-cancel').classList.remove('hidden');
+        }
+
+        function saveUser() {
+            const id   = document.getElementById('user-edit-id').value;
+            const name = document.getElementById('user-form-name').value.trim();
+            const pin  = document.getElementById('user-form-pin').value.trim();
+            const role = document.getElementById('user-form-role').value;
+            const ket  = document.getElementById('user-form-ket').value;
+
+            if (!name || !pin) return showToast("Data Kurang", "Nama dan PIN wajib diisi.", "warning");
+            if (!/^\d{3,8}$/.test(pin)) return showToast("PIN Tidak Valid", "PIN harus 3-8 digit angka.", "warning");
+
+            let users = loadUsers();
+            // PIN unik antar user
+            if (users.some(u => u.pin === pin && u.id !== id)) return showToast("PIN Ganda", "PIN sudah dipakai user lain.", "danger");
+
+            if (id) {
+                const u = users.find(x => x.id === id);
+                if (!u) return;
+                u.name = name; u.pin = pin; u.role = role; u.keterangan = ket;
+                showToast("User Diupdate", `${name} berhasil disimpan.`, "success");
+            } else {
+                users.push({ id: "u-" + Date.now(), name, pin, role, keterangan: ket });
+                showToast("User Ditambah", `${name} berhasil ditambahkan.`, "success");
+            }
+            saveUsers(users);
+            resetUserForm();
+            renderUserList();
+        }
+
+        function deleteUser(id) {
+            let users = loadUsers();
+            const u = users.find(x => x.id === id);
+            if (!u) return;
+            if (u.id === currentUser.id) return showToast("Tidak Bisa", "Anda tidak bisa menghapus akun sendiri.", "warning");
+            if (u.role === 'admin' && users.filter(x => x.role === 'admin').length <= 1)
+                return showToast("Tidak Bisa", "Minimal harus ada 1 Admin.", "warning");
+            if (!confirm(`Hapus user "${u.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            users = users.filter(x => x.id !== id);
+            saveUsers(users);
+            renderUserList();
+            showToast("User Dihapus", `${u.name} telah dihapus.`, "success");
+        }
 
         function updateNetworkStatus() {
             const badge = document.getElementById('connection-badge');
@@ -633,6 +1015,15 @@
 
             const savedEntries = localStorage.getItem('kitchen_entry_ids');
             if (savedEntries) state.entryIds = JSON.parse(savedEntries);
+
+            // >>> Pengaturan tertanam (EMBEDDED_CONFIG) selalu menang bila diisi <<<
+            if (EMBEDDED_CONFIG.formUrl)              { state.formUrl = EMBEDDED_CONFIG.formUrl; extractFormId(EMBEDDED_CONFIG.formUrl); }
+            if (EMBEDDED_CONFIG.appScriptUrlItem)     state.appScriptUrlItem = EMBEDDED_CONFIG.appScriptUrlItem;
+            if (EMBEDDED_CONFIG.appScriptUrlHistory)  state.appScriptUrlHistory = EMBEDDED_CONFIG.appScriptUrlHistory;
+            if (EMBEDDED_CONFIG.appScriptUrlForecast) state.appScriptUrlForecast = EMBEDDED_CONFIG.appScriptUrlForecast;
+            ['item','qty','unit','note','date','pic'].forEach(k => {
+                if (EMBEDDED_CONFIG.entryIds && EMBEDDED_CONFIG.entryIds[k]) state.entryIds[k] = EMBEDDED_CONFIG.entryIds[k];
+            });
 
             state.picName = localStorage.getItem('kitchen_batch_picname') || "Putra";
             document.getElementById('batch-pic-name').value = state.picName;
