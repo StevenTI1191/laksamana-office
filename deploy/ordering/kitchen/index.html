@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Laksamana Space - Kitchen Batch Input & Check-in</title>
+    <title>Laksamana Office - Kitchen</title>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0f172a">
@@ -326,7 +326,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
                     <div>
                         <label class="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1.5">🧑‍🍳 PIC Kitchen</label>
-                        <select id="batch-pic-name" class="w-full bg-slate-700 border border-white/20 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold">
+                        <select id="batch-pic-name" class="w-full bg-slate-700 border border-white/20 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold disabled:opacity-70 disabled:cursor-not-allowed">
                             <option value="Putra">Putra</option>
                             <option value="Adit">Adit</option>
                             <option value="Syahdan">Syahdan</option>
@@ -873,6 +873,27 @@
             // (switchTab menimpa className tab, jadi 'hidden' harus diterapkan setelahnya)
             switchTab(canOrder ? 'order' : 'checkin');
             document.getElementById('tab-order').classList.toggle('hidden', !canOrder);
+
+            lockPicKitchenToUser(user);
+        }
+
+        // Kunci pilihan PIC Kitchen ke nama akun yang sedang login
+        // (Admin tetap boleh memilih bebas, karena "Admin" bukan bagian dari daftar PIC Kitchen)
+        function lockPicKitchenToUser(user) {
+            const sel = document.getElementById('batch-pic-name');
+            if (user.role === 'admin') {
+                sel.disabled = false;
+                return;
+            }
+            if (![...sel.options].some(o => o.value === user.name)) {
+                const opt = document.createElement('option');
+                opt.value = user.name; opt.textContent = user.name;
+                sel.appendChild(opt);
+            }
+            sel.value = user.name;
+            state.picName = user.name;
+            localStorage.setItem('kitchen_batch_picname', user.name);
+            sel.disabled = true;
         }
 
         // ==========================================
@@ -1363,7 +1384,7 @@
                 <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
                     <div class="flex flex-nowrap items-stretch text-[11px] min-w-full">
                         ${metricCell('Stok kini', stokTxt)}
-                        ${metricCell('Cukup untuk', coverTxt, false, noUsage ? null : st.bg)}
+                        ${metricCell('Cukup', coverTxt, false, noUsage ? null : st.bg)}
                         ${showSuggest ? metricCell('Saran pesan',
                             a.suggestOrderPacks > 0
                                ? `${F.fmtNum(a.suggestOrderPacks)} <span class="text-slate-400 font-semibold">${a.purchaseUnit}</span>`

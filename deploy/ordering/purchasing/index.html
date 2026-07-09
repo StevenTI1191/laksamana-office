@@ -278,10 +278,11 @@
         </section>
 
         <section id="content-overview" class="tab-content hidden space-y-6">
+            <!-- Header: judul + pemilih bulan (jangkar analisis) -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900">Rekapitulasi Item Per Bulan</h3>
-                    <p class="text-xs text-slate-500">Pilih bulan untuk melihat total kuantitas order dan komparasi selisih dengan bulan sebelumnya.</p>
+                    <h3 class="text-lg font-bold text-slate-900">Rekap & Analitik Order Bulanan</h3>
+                    <p class="text-xs text-slate-500">Ringkasan volume, tren, konsentrasi vendor, kontribusi tim, dan status stok — dalam satu halaman.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-slate-500">Bulan:</label>
@@ -290,46 +291,106 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <!-- ROW 1: KPI strip (5 tile, tiap tile punya delta vs bulan lalu) -->
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Item Diorder</p>
-                        <h3 id="stat-this-month" class="text-3xl font-black text-slate-900 mt-2">0</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Qty Diorder</p>
+                        <h3 id="kpi-total-qty" class="text-2xl font-black text-slate-900 mt-1.5 leading-none">0</h3>
                     </div>
-                    <div id="stat-this-month-diff" class="mt-2"></div>
+                    <div id="kpi-total-qty-diff" class="mt-2"></div>
                 </div>
-                <div class="bg-indigo-600 p-6 rounded-2xl shadow-lg text-white flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Bahan Paling Banyak Diorder</p>
-                        <h3 id="stat-top-item" class="text-xl font-bold mt-2">-</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Baris Order</p>
+                        <h3 id="kpi-order-rows" class="text-2xl font-black text-slate-900 mt-1.5 leading-none">0</h3>
                     </div>
-                    <p class="text-[10px] text-indigo-200 mt-2">Bahan teratas berdasarkan kuantitas akumulasi.</p>
+                    <div id="kpi-order-rows-diff" class="mt-2"></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Analisis</p>
-                        <h3 class="text-lg font-bold text-slate-900 mt-2 text-emerald-600 flex items-center gap-1">
-                            <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
-                            Live Komparasi Aktif
-                        </h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bahan Unik</p>
+                        <h3 id="kpi-unique-items" class="text-2xl font-black text-slate-900 mt-1.5 leading-none">0</h3>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Selisih kuantitas pembelian otomatis dihitung real-time.</p>
+                    <div id="kpi-unique-items-diff" class="mt-2"></div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vendor Aktif</p>
+                        <h3 id="kpi-active-vendors" class="text-2xl font-black text-slate-900 mt-1.5 leading-none">0</h3>
+                    </div>
+                    <div id="kpi-active-vendors-diff" class="mt-2"></div>
+                </div>
+                <div class="bg-gradient-to-br from-gold-2 to-gold-dim p-5 rounded-2xl shadow-md shadow-gold-dim/20 text-white flex flex-col justify-between col-span-2 lg:col-span-1">
+                    <div>
+                        <p class="text-[10px] font-bold text-gold-soft/90 uppercase tracking-wider">Perlu Perhatian Stok</p>
+                        <h3 id="kpi-attention" class="text-2xl font-black mt-1.5 leading-none">0</h3>
+                    </div>
+                    <p id="kpi-attention-sub" class="text-[10px] text-gold-soft/90 mt-2 leading-snug">Bahan yang stoknya menipis / perlu restock.</p>
                 </div>
             </div>
 
+            <!-- ROW 2: tren 6 bulan + pola per hari -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Tren Volume Order — 6 Bulan
+                        </h4>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Qty / Bulan</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mb-3">Lihat arah kebutuhan sesungguhnya, bukan sekadar naik/turun 1 bulan.</p>
+                    <div id="chart-trend" class="w-full"></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                            <span class="w-2 h-2 rounded-full bg-gold-2"></span> Pola Order per Hari
+                        </h4>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-rata Qty</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mb-3">Kapan permintaan datang — akhir pekan disorot agar stok bisa disiapkan lebih awal.</p>
+                    <div id="chart-dow" class="w-full"></div>
+                </div>
+            </div>
+
+            <!-- ROW 3: konsentrasi vendor + kontribusi tim -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm mb-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Konsentrasi per Vendor
+                    </h4>
+                    <p class="text-[11px] text-slate-400 mb-4">Seberapa besar ketergantungan pada tiap pemasok bulan ini (share dari total qty).</p>
+                    <div id="chart-vendor" class="w-full space-y-2.5"></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm mb-1">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Kontribusi per Tim
+                    </h4>
+                    <p class="text-[11px] text-slate-400 mb-4">Order berasal dari tim/station mana (berdasarkan PIC pemesan).</p>
+                    <div id="chart-team" class="w-full flex flex-col sm:flex-row items-center gap-5"></div>
+                </div>
+            </div>
+
+            <!-- ROW 4: tabel rincian diperkaya (sparkline + status stok + movers) -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.01.707.293l5.414 5.414a1 1.01.707.293v12a2 2 0 01-2 2H7"></path></svg>
-                    Daftar Rincian Akumulasi & Komparasi Kebutuhan Kitchen
-                </h4>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707v12a2 2 0 01-2 2H7"></path></svg>
+                        Rincian per Bahan — Akumulasi, Tren & Stok
+                    </h4>
+                    <div id="movers-summary" class="text-[11px] text-slate-500"></div>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="text-slate-400 border-b border-slate-100 uppercase text-[10px] font-black">
                                 <th class="py-3 px-4">Nama Bahan Baku</th>
-                                <th class="py-3 px-4 text-center">Frekuensi Order</th>
-                                <th class="py-3 px-4 text-right">Total Akumulasi Qty (Bulan Ini)</th>
-                                <th class="py-3 px-4 text-right">Selisih vs Bulan Lalu</th>
+                                <th class="py-3 px-4 text-center">Frek.</th>
+                                <th class="py-3 px-4">Tren 4 Bln</th>
+                                <th class="py-3 px-4 text-right">Total Qty (Bulan Ini)</th>
+                                <th class="py-3 px-4 text-right">Selisih vs Bln Lalu</th>
+                                <th class="py-3 px-4 text-center">Status Stok</th>
                             </tr>
                         </thead>
                         <tbody id="overview-table-body" class="divide-y divide-slate-50">
@@ -337,13 +398,16 @@
                     </table>
                 </div>
                 <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-150 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
-                    <span>💡 <b>Keterangan Warna Selisih:</b></span>
+                    <span>💡 <b>Warna Selisih:</b></span>
                     <div class="flex flex-wrap gap-2.5">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">Merah (Naik / Lebih Banyak Pembelian)</span>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Hijau (Turun / Di Bawah Bulan Lalu)</span>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Stabil / Tetap</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">Merah (Naik / Lebih Banyak)</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Hijau (Turun / Lebih Hemat)</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Stabil</span>
                     </div>
                 </div>
+                <!-- Catatan: analitik ini berbasis KUANTITAS. Nilai rupiah (spend) bisa
+                     ditambahkan bila kolom harga/unit tersedia di sheet Items (products[item].harga),
+                     seperti halaman COGS di dashboard Magang. -->
             </div>
         </section>
 
@@ -1400,57 +1464,322 @@
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
 
+        // ==========================================
+        //  REKAP / ANALITIK BULANAN
+        // ==========================================
+        // Semua analitik di bawah berbasis KUANTITAS (qty) & frekuensi order, bukan
+        // rupiah — data order belum punya kolom harga. Bila kelak sheet Items memuat
+        // harga/unit (products[item].harga), estimasi spend bisa ditambahkan di sini.
+
+        const RECAP_MONTH_NAMES = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+        const RECAP_DOW = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"]; // index 0 = Senin
+        const recapMonthStr = (dateVal) => {
+            const norm = normalizeDateToYYYYMMDD(dateVal);
+            return norm ? norm.substring(0, 7) : "";
+        };
+        // Ringkas satuan agar hemat ruang di kartu/tabel.
+        const recapUnitShort = (u) => {
+            const s = String(u || '').toLowerCase();
+            if (s.includes('gram') && !s.includes('kilo')) return 'gr';
+            if (s.includes('kg') || s.includes('kilo')) return 'kg';
+            if (s.includes('ml') || s.includes('mili')) return 'ml';
+            if (s.includes('liter') || s === 'l') return 'L';
+            if (s.includes('pcs') || s.includes('buah')) return 'pcs';
+            return u || '';
+        };
+        // Geser string "YYYY-MM" sebanyak n bulan (n negatif = mundur).
+        function shiftMonthStr(yearMonthStr, n) {
+            const [y, m] = yearMonthStr.split('-').map(Number);
+            const d = new Date(y, m - 1 + n, 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+        // Bangun ringkasan {item: {qty, unit, freq}} dari sekumpulan order.
+        function summarizeOrders(list) {
+            const map = {};
+            list.forEach(o => {
+                if (!map[o.item]) map[o.item] = { qty: 0, unit: o.unit, freq: 0 };
+                map[o.item].qty += parseFloat(o.qty) || 0;
+                map[o.item].freq += 1;
+            });
+            return map;
+        }
+
+        // Chip delta MoM memakai bahasa warna yang sama dengan tabel:
+        // merah = naik (lebih banyak beli), hijau = turun (lebih hemat).
+        function recapDeltaChip(cur, prev, { invert = false } = {}) {
+            if (prev === 0 && cur === 0) return `<span class="text-[11px] font-semibold text-slate-400">Belum ada data</span>`;
+            if (prev === 0) return `<span class="text-[11px] font-bold text-slate-500">Baru bulan ini</span>`;
+            const diff = cur - prev;
+            const pct = Math.round((diff / prev) * 100);
+            if (diff === 0) return `<span class="text-[11px] font-semibold text-slate-500">= Stabil</span>`;
+            const up = diff > 0;
+            // invert=true untuk metrik "makin banyak = makin baik" (mis. tak dipakai kini);
+            // default: naik = merah (belanja bertambah).
+            const good = invert ? up : !up;
+            const cls = good ? 'text-emerald-600' : 'text-rose-500';
+            const arrow = up ? '↗' : '↘';
+            return `<span class="text-[11px] font-bold ${cls}">${arrow} ${up ? '+' : ''}${pct}% vs bln lalu</span>`;
+        }
+
         function updateOverviewStats() {
-            const selectedMonth = document.getElementById('recap-month-select').value; 
-            const prevMonth = getPreviousMonthString(selectedMonth); 
+            const selectedMonth = document.getElementById('recap-month-select').value;
+            if (!selectedMonth) return;
+            const prevMonth = getPreviousMonthString(selectedMonth);
 
-            const getMonthStr = (dateVal) => {
-                const norm = normalizeDateToYYYYMMDD(dateVal);
-                return norm ? norm.substring(0, 7) : "";
-            };
+            const monthOrders = appState.orders.filter(o => recapMonthStr(o.timestamp) === selectedMonth);
+            const prevMonthOrders = appState.orders.filter(o => recapMonthStr(o.timestamp) === prevMonth);
 
-            const monthOrders = appState.orders.filter(o => getMonthStr(o.timestamp) === selectedMonth);
-            const prevMonthOrders = appState.orders.filter(o => getMonthStr(o.timestamp) === prevMonth);
+            const summaryCurrent = summarizeOrders(monthOrders);
+            const summaryPrev = summarizeOrders(prevMonthOrders);
 
-            document.getElementById('stat-this-month').innerText = monthOrders.length;
-            const totalDiff = monthOrders.length - prevMonthOrders.length;
-            const diffContainer = document.getElementById('stat-this-month-diff');
-            
-            if (prevMonthOrders.length === 0) {
-                diffContainer.innerHTML = `<span class="text-xs font-semibold text-slate-400">Belum ada pembanding bulan lalu</span>`;
-            } else if (totalDiff > 0) {
-                diffContainer.innerHTML = `<span class="text-xs font-bold text-rose-500 flex items-center gap-1">↗ +${totalDiff} order lebih banyak dari bulan lalu</span>`;
-            } else if (totalDiff < 0) {
-                diffContainer.innerHTML = `<span class="text-xs font-bold text-emerald-600 flex items-center gap-1">↘ -${Math.abs(totalDiff)} order lebih hemat dari bulan lalu</span>`;
-            } else {
-                diffContainer.innerHTML = `<span class="text-xs font-semibold text-slate-500">= Stabil (Sama dengan bulan lalu)</span>`;
-            }
+            // ---------- ROW 1: KPI ----------
+            const sumQty = (list) => list.reduce((a, o) => a + (parseFloat(o.qty) || 0), 0);
+            const curQty = sumQty(monthOrders), prevQty = sumQty(prevMonthOrders);
+            const vendorOf = (item) => (appState.products[item] && appState.products[item].utama) || 'Tak Terdaftar';
+            const uniqVendors = (list) => new Set(list.map(o => vendorOf(o.item)).filter(v => v !== 'Tak Terdaftar')).size;
 
-            const summaryCurrent = {};
+            setRecapKpi('kpi-total-qty', Math.round(curQty).toLocaleString(), 'kpi-total-qty-diff', recapDeltaChip(curQty, prevQty));
+            setRecapKpi('kpi-order-rows', monthOrders.length, 'kpi-order-rows-diff', recapDeltaChip(monthOrders.length, prevMonthOrders.length));
+            setRecapKpi('kpi-unique-items', Object.keys(summaryCurrent).length, 'kpi-unique-items-diff', recapDeltaChip(Object.keys(summaryCurrent).length, Object.keys(summaryPrev).length));
+            setRecapKpi('kpi-active-vendors', uniqVendors(monthOrders), 'kpi-active-vendors-diff', recapDeltaChip(uniqVendors(monthOrders), uniqVendors(prevMonthOrders)));
+
+            // Perlu perhatian stok: bahan yang diorder bulan ini & stoknya sudah
+            // di/menuju titik pesan ('order' = pesan sekarang, 'soon' = segera siapkan).
+            let attention = 0, attentionNames = [];
+            Object.keys(summaryCurrent).forEach(item => {
+                try {
+                    const a = forecastBook.assess(item);
+                    const k = a && a.status && a.status.key;
+                    if (a && a.hasForecast && (k === 'order' || k === 'soon')) { attention++; attentionNames.push(item); }
+                } catch (e) {}
+            });
+            document.getElementById('kpi-attention').innerText = attention;
+            document.getElementById('kpi-attention-sub').innerText = attention === 0
+                ? 'Semua bahan bulan ini stoknya aman.'
+                : attentionNames.slice(0, 3).join(', ') + (attention > 3 ? `, +${attention - 3} lain` : '');
+
+            // ---------- ROW 2: tren 6 bulan + pola per hari ----------
+            renderTrendChart(selectedMonth);
+            renderDowChart(monthOrders);
+
+            // ---------- ROW 3: vendor + tim ----------
+            renderVendorChart(monthOrders, curQty);
+            renderTeamChart(monthOrders);
+
+            // ---------- ROW 4: tabel rincian ----------
+            renderRecapTable(summaryCurrent, summaryPrev, selectedMonth);
+        }
+
+        function setRecapKpi(valId, val, diffId, diffHTML) {
+            document.getElementById(valId).innerText = val;
+            document.getElementById(diffId).innerHTML = diffHTML;
+        }
+
+        // ----- Tren 6 bulan: bar + garis tren (SVG inline) -----
+        function renderTrendChart(selectedMonth) {
+            const el = document.getElementById('chart-trend');
+            const months = [];
+            for (let i = 5; i >= 0; i--) months.push(shiftMonthStr(selectedMonth, -i));
+            const totals = months.map(m =>
+                appState.orders.filter(o => recapMonthStr(o.timestamp) === m)
+                    .reduce((a, o) => a + (parseFloat(o.qty) || 0), 0));
+            const max = Math.max(1, ...totals);
+            const W = 480, H = 220, padB = 30, padT = 12, padL = 8, padR = 8;
+            const plotH = H - padB - padT, plotW = W - padL - padR;
+            const bw = plotW / months.length;
+            const x = (i) => padL + i * bw + bw * 0.5;
+            const y = (v) => padT + plotH - (v / max) * plotH;
+
+            let bars = '', pts = [], labels = '';
+            months.forEach((m, i) => {
+                const bh = (totals[i] / max) * plotH;
+                const isCur = m === selectedMonth;
+                const bx = padL + i * bw + bw * 0.18, bwid = bw * 0.64;
+                bars += `<rect x="${bx.toFixed(1)}" y="${(padT + plotH - bh).toFixed(1)}" width="${bwid.toFixed(1)}" height="${bh.toFixed(1)}" rx="4"
+                            fill="${isCur ? '#4f46e5' : '#c7d2fe'}"><title>${RECAP_MONTH_NAMES[+m.split('-')[1]-1]} ${m.split('-')[0]}: ${Math.round(totals[i]).toLocaleString()}</title></rect>`;
+                pts.push(`${x(i).toFixed(1)},${y(totals[i]).toFixed(1)}`);
+                labels += `<text x="${x(i).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700">${RECAP_MONTH_NAMES[+m.split('-')[1]-1]}</text>`;
+                labels += `<text x="${x(i).toFixed(1)}" y="${(y(totals[i]) - 6).toFixed(1)}" text-anchor="middle" font-size="9" fill="${isCur ? '#4f46e5' : '#64748b'}" font-weight="800">${totals[i] >= 1000 ? (totals[i]/1000).toFixed(1)+'k' : Math.round(totals[i])}</text>`;
+            });
+            const line = `<polyline points="${pts.join(' ')}" fill="none" stroke="#A9791F" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>`;
+            const dots = pts.map(p => { const [px,py]=p.split(','); return `<circle cx="${px}" cy="${py}" r="3" fill="#A9791F"/>`; }).join('');
+
+            if (totals.every(t => t === 0)) { el.innerHTML = recapEmpty('Belum ada data order di rentang ini.'); return; }
+            el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full" style="height:auto" preserveAspectRatio="xMidYMid meet">${bars}${line}${dots}${labels}</svg>`;
+        }
+
+        // ----- Pola per hari dalam seminggu (rata-rata qty per order, weekend disorot) -----
+        function renderDowChart(monthOrders) {
+            const el = document.getElementById('chart-dow');
+            const sum = new Array(7).fill(0), cnt = new Array(7).fill(0);
             monthOrders.forEach(o => {
-                if (!summaryCurrent[o.item]) summaryCurrent[o.item] = { qty: 0, unit: o.unit, freq: 0 };
-                summaryCurrent[o.item].qty += parseFloat(o.qty);
-                summaryCurrent[o.item].freq += 1;
+                const norm = normalizeDateToYYYYMMDD(o.timestamp);
+                if (!norm) return;
+                const d = new Date(norm + 'T00:00:00');
+                if (isNaN(d)) return;
+                const idx = (d.getDay() + 6) % 7; // 0 = Senin
+                sum[idx] += parseFloat(o.qty) || 0; cnt[idx] += 1;
             });
+            const avg = sum.map((s, i) => cnt[i] ? s / cnt[i] : 0);
+            const max = Math.max(1, ...avg);
+            if (cnt.every(c => c === 0)) { el.innerHTML = recapEmpty('Belum ada data order bulan ini.'); return; }
 
-            const summaryPrev = {};
-            prevMonthOrders.forEach(o => {
-                if (!summaryPrev[o.item]) summaryPrev[o.item] = { qty: 0, unit: o.unit, freq: 0 };
-                summaryPrev[o.item].qty += parseFloat(o.qty);
-                summaryPrev[o.item].freq += 1;
+            const W = 480, H = 200, padB = 26, padT = 14, padL = 8, padR = 8;
+            const plotH = H - padB - padT, plotW = W - padL - padR, bw = plotW / 7;
+            let bars = '', labels = '';
+            avg.forEach((v, i) => {
+                const bh = (v / max) * plotH, isWknd = i >= 5;
+                const bx = padL + i * bw + bw * 0.2, bwid = bw * 0.6;
+                bars += `<rect x="${bx.toFixed(1)}" y="${(padT + plotH - bh).toFixed(1)}" width="${bwid.toFixed(1)}" height="${bh.toFixed(1)}" rx="4"
+                            fill="${isWknd ? '#C8961F' : '#6366f1'}"><title>${RECAP_DOW[i]}: rata-rata ${Math.round(v).toLocaleString()} / order (${cnt[i]} order)</title></rect>`;
+                labels += `<text x="${(bx + bwid/2).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="${isWknd ? '#A9791F' : '#94a3b8'}" font-weight="700">${RECAP_DOW[i]}</text>`;
+                if (v > 0) labels += `<text x="${(bx + bwid/2).toFixed(1)}" y="${(padT + plotH - bh - 5).toFixed(1)}" text-anchor="middle" font-size="9" fill="#64748b" font-weight="800">${v >= 1000 ? (v/1000).toFixed(1)+'k' : Math.round(v)}</text>`;
             });
+            el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full" style="height:auto" preserveAspectRatio="xMidYMid meet">${bars}${labels}</svg>`
+                + `<div class="flex justify-end gap-3 mt-1 text-[10px] font-bold"><span class="text-indigo-500">■ Hari kerja</span><span class="text-gold-2">■ Akhir pekan</span></div>`;
+        }
+
+        // ----- Konsentrasi per vendor (horizontal bar share) -----
+        function renderVendorChart(monthOrders, totalQty) {
+            const el = document.getElementById('chart-vendor');
+            const byVendor = {};
+            monthOrders.forEach(o => {
+                const v = (appState.products[o.item] && appState.products[o.item].utama) || 'Tak Terdaftar';
+                byVendor[v] = (byVendor[v] || 0) + (parseFloat(o.qty) || 0);
+            });
+            const rows = Object.entries(byVendor).sort((a, b) => b[1] - a[1]).slice(0, 7);
+            if (rows.length === 0 || totalQty === 0) { el.innerHTML = recapEmpty('Belum ada order bulan ini.'); return; }
+            const max = rows[0][1];
+            const palette = ['#4f46e5','#6366f1','#818cf8','#A9791F','#C8961F','#0ea5e9','#94a3b8'];
+            el.innerHTML = rows.map(([name, qty], i) => {
+                const pctOfTotal = Math.round((qty / totalQty) * 100);
+                const w = Math.max(3, (qty / max) * 100);
+                const muted = name === 'Tak Terdaftar';
+                return `<div>
+                    <div class="flex items-center justify-between text-[11px] mb-0.5">
+                        <span class="font-bold ${muted ? 'text-slate-400 italic' : 'text-slate-700'} truncate pr-2">${name}</span>
+                        <span class="font-black text-slate-500 whitespace-nowrap">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">· ${pctOfTotal}%</span></span>
+                    </div>
+                    <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width:${w}%;background:${muted ? '#cbd5e1' : palette[i % palette.length]}"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ----- Kontribusi per tim (donut via conic-gradient + legend) -----
+        function renderTeamChart(monthOrders) {
+            const el = document.getElementById('chart-team');
+            // Map PIC -> keterangan (Kitchen/Bar/Floor) dari daftar user.
+            const users = (typeof loadUsersLocal === 'function') ? loadUsersLocal() : [];
+            const ketOf = (pic) => {
+                if (!pic) return 'Lainnya';
+                const u = users.find(x => String(x.name).toLowerCase() === String(pic).toLowerCase());
+                const k = u && u.keterangan ? u.keterangan : '';
+                return k || 'Lainnya';
+            };
+            const byTeam = {};
+            monthOrders.forEach(o => {
+                const t = ketOf(o.pic);
+                byTeam[t] = (byTeam[t] || 0) + (parseFloat(o.qty) || 0);
+            });
+            const rows = Object.entries(byTeam).sort((a, b) => b[1] - a[1]);
+            const total = rows.reduce((a, r) => a + r[1], 0);
+            if (rows.length === 0 || total === 0) { el.innerHTML = recapEmpty('Belum ada order bulan ini.'); return; }
+            const colorMap = { 'Kitchen': '#4f46e5', 'Bar': '#C8961F', 'Floor': '#0ea5e9', 'Lainnya': '#94a3b8' };
+            const fallback = ['#6366f1','#818cf8','#a5b4fc','#cbd5e1'];
+            let acc = 0, segs = [];
+            const legend = rows.map(([name, qty], i) => {
+                const pct = (qty / total) * 100;
+                const col = colorMap[name] || fallback[i % fallback.length];
+                segs.push(`${col} ${acc.toFixed(2)}% ${(acc + pct).toFixed(2)}%`);
+                acc += pct;
+                return `<div class="flex items-center justify-between gap-3 text-[11px]">
+                    <span class="flex items-center gap-1.5 font-bold text-slate-700"><span class="w-2.5 h-2.5 rounded-sm" style="background:${col}"></span>${name}</span>
+                    <span class="font-black text-slate-500">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">· ${Math.round(pct)}%</span></span>
+                </div>`;
+            }).join('');
+            el.innerHTML = `
+                <div class="relative shrink-0" style="width:120px;height:120px">
+                    <div class="w-full h-full rounded-full" style="background:conic-gradient(${segs.join(',')})"></div>
+                    <div class="absolute inset-0 m-auto rounded-full bg-white flex flex-col items-center justify-center" style="width:66px;height:66px">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">Total</span>
+                        <span class="text-sm font-black text-slate-800 leading-none">${total >= 1000 ? (total/1000).toFixed(1)+'k' : Math.round(total)}</span>
+                    </div>
+                </div>
+                <div class="flex-1 w-full space-y-1.5">${legend}</div>`;
+        }
+
+        // ----- Sparkline mini (tren qty 4 bulan) -----
+        function recapSparkline(series) {
+            const max = Math.max(1, ...series);
+            const W = 64, H = 20;
+            const step = series.length > 1 ? W / (series.length - 1) : 0;
+            const pts = series.map((v, i) => `${(i * step).toFixed(1)},${(H - (v / max) * (H - 3) - 1.5).toFixed(1)}`);
+            const last = series[series.length - 1], prev = series[series.length - 2] || 0;
+            const col = last > prev ? '#f43f5e' : last < prev ? '#10b981' : '#94a3b8';
+            const [lx, ly] = pts[pts.length - 1].split(',');
+            return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="inline-block align-middle">
+                <polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="${lx}" cy="${ly}" r="1.8" fill="${col}"/></svg>`;
+        }
+
+        // ----- Badge status stok dari forecastBook -----
+        // Pakai warna dari modul forecast (status.color/status.bg) agar konsisten
+        // dengan kartu order di tab Monitor.
+        function recapStockBadge(item) {
+            let a;
+            try { a = forecastBook.assess(item); } catch (e) { a = null; }
+            if (!a || !a.hasForecast) return `<span class="text-[10px] text-slate-300">—</span>`;
+            const st = a.status || {};
+            const days = a.daysCover;
+            const label = st.label || st.key || '';
+            const daysTxt = (days != null && isFinite(days) && LaksForecast.fmtDays) ? LaksForecast.fmtDays(days) : '';
+            const color = st.color || '#4b5563', bg = st.bg || '#F1F5F9';
+            return `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${color};background:${bg}">${label}${daysTxt ? ' · ' + daysTxt : ''}</span>`;
+        }
+
+        function recapEmpty(msg) {
+            return `<div class="py-10 text-center text-slate-400 text-xs font-medium italic">${msg}</div>`;
+        }
+
+        // ----- Tabel rincian per bahan (freq, sparkline, qty, selisih, stok) + movers -----
+        function renderRecapTable(summaryCurrent, summaryPrev, selectedMonth) {
+            const tableBody = document.getElementById('overview-table-body');
+            const moversEl = document.getElementById('movers-summary');
+            tableBody.innerHTML = '';
 
             const sortedItems = Object.keys(summaryCurrent).sort((a, b) => summaryCurrent[b].qty - summaryCurrent[a].qty);
-            const topItem = sortedItems[0];
-            document.getElementById('stat-top-item').innerText = topItem ? `${topItem}` : "-";
-
-            const tableBody = document.getElementById('overview-table-body');
-            tableBody.innerHTML = '';
-            
             if (sortedItems.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-slate-400 font-medium italic">Tidak ada data order pada bulan ini.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-slate-400 font-medium italic">Tidak ada data order pada bulan ini.</td></tr>';
+                moversEl.innerHTML = '';
                 return;
             }
+
+            // Movers: kenaikan qty terbesar vs bulan lalu (yang punya pembanding).
+            let topRiser = null;
+            sortedItems.forEach(name => {
+                const prevQ = summaryPrev[name] ? summaryPrev[name].qty : 0;
+                if (prevQ > 0) {
+                    const d = summaryCurrent[name].qty - prevQ;
+                    if (!topRiser || d > topRiser.diff) topRiser = { name, diff: d, unit: summaryCurrent[name].unit };
+                }
+            });
+            moversEl.innerHTML = (topRiser && topRiser.diff > 0)
+                ? `📈 Kenaikan terbesar: <b class="text-rose-500">${topRiser.name}</b> (+${Math.round(topRiser.diff).toLocaleString()} ${recapUnitShort(topRiser.unit)})`
+                : `<span class="text-slate-400">Belum ada kenaikan menonjol vs bulan lalu.</span>`;
+
+            // Series 4 bulan per item (untuk sparkline).
+            const monthsSeries = [];
+            for (let i = 3; i >= 0; i--) monthsSeries.push(shiftMonthStr(selectedMonth, -i));
+            const seriesByItem = {};
+            monthsSeries.forEach(m => {
+                const orders = appState.orders.filter(o => recapMonthStr(o.timestamp) === m);
+                orders.forEach(o => {
+                    if (!seriesByItem[o.item]) seriesByItem[o.item] = {};
+                    seriesByItem[o.item][m] = (seriesByItem[o.item][m] || 0) + (parseFloat(o.qty) || 0);
+                });
+            });
 
             sortedItems.forEach(name => {
                 const currentData = summaryCurrent[name];
@@ -1458,29 +1787,31 @@
                 const currentQty = currentData.qty;
                 const prevQty = prevData ? prevData.qty : 0;
                 const diff = currentQty - prevQty;
-                const unit = currentData.unit;
+                const unit = recapUnitShort(currentData.unit);
 
-                let diffHTML = '';
+                let diffHTML;
                 if (prevQty === 0) {
-                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${currentQty.toLocaleString()} ${unit} (Baru)</span>`;
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${Math.round(currentQty).toLocaleString()} ${unit} (Baru)</span>`;
                 } else if (diff > 0) {
-                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${diff.toLocaleString()} ${unit} (Naik)</span>`;
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">+${Math.round(diff).toLocaleString()} ${unit} (Naik)</span>`;
                 } else if (diff < 0) {
-                    const absoluteDiff = Math.abs(diff);
-                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">-${absoluteDiff.toLocaleString()} ${unit} (Turun)</span>`;
+                    diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">-${Math.round(Math.abs(diff)).toLocaleString()} ${unit} (Turun)</span>`;
                 } else {
                     diffHTML = `<span class="inline-flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">= Stabil</span>`;
                 }
 
+                const series = monthsSeries.map(m => (seriesByItem[name] && seriesByItem[name][m]) || 0);
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50 transition-colors";
                 row.innerHTML = `
                     <td class="py-4 px-4 font-bold text-slate-800">${name}</td>
-                    <td class="py-4 px-4 text-center font-semibold text-slate-500">${currentData.freq}x Order</td>
+                    <td class="py-4 px-4 text-center font-semibold text-slate-500">${currentData.freq}x</td>
+                    <td class="py-4 px-4">${recapSparkline(series)}</td>
                     <td class="py-4 px-4 text-right font-mono font-black text-indigo-600 text-base">
-                        ${currentQty.toLocaleString()} <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${unit}</span>
+                        ${Math.round(currentQty).toLocaleString()} <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${unit}</span>
                     </td>
                     <td class="py-4 px-4 text-right">${diffHTML}</td>
+                    <td class="py-4 px-4 text-center">${recapStockBadge(name)}</td>
                 `;
                 tableBody.appendChild(row);
             });
