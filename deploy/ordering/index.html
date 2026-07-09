@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laksamana — Sistem Pemesanan</title>
+    <meta name="description" content="Portal pemesanan Laksamana Space — pilih sisi Kitchen atau Purchasing.">
+    <meta name="theme-color" content="#0f172a">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Comfortaa:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#4f46e5', success: '#10b981', warning: '#f59e0b', danger: '#ef4444' },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], brand: ['Comfortaa', 'cursive'] }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .brand-font { font-family: 'Comfortaa', cursive; }
+        .side-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+        .side-card:hover { transform: translateY(-4px); }
+        @media (prefers-reduced-motion: reduce) { .side-card { transition: none; } .side-card:hover { transform: none; } }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white flex flex-col items-center justify-center p-5">
+
+    <!-- ==== KONFIGURASI TUJUAN ====
+         Ubah URL di bawah bila subdomain berubah. -->
+    <script>
+        const SIDES = {
+            kitchen:    "https://kitchen.laksamana.id",
+            purchasing: "https://purchase.laksamana.id"
+        };
+        function goTo(side) { window.location.href = SIDES[side]; }
+    </script>
+
+    <main class="w-full max-w-3xl">
+
+        <!-- Brand -->
+        <div class="text-center mb-8 sm:mb-10">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20 mb-4">
+                <i class="fa-solid fa-anchor text-white"></i>
+            </div>
+            <h1 class="brand-font text-2xl sm:text-3xl font-bold tracking-tight">LAKSAMANA</h1>
+            <p class="text-slate-400 text-xs sm:text-sm font-bold mt-2 uppercase tracking-widest">Sistem Pemesanan</p>
+            <p class="text-slate-500 text-[11px] sm:text-xs font-semibold mt-3">Pilih sisi Anda untuk melanjutkan ke login</p>
+        </div>
+
+        <!-- Pilihan sisi -->
+        <div class="grid sm:grid-cols-2 gap-4 sm:gap-5">
+
+            <!-- Kitchen -->
+            <button onclick="goTo('kitchen')"
+                    class="side-card group text-left bg-white/5 hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 rounded-3xl p-6 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-kitchen-set text-white"></i>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                </div>
+                <h2 class="text-lg font-black tracking-tight">Kitchen</h2>
+                <p class="text-slate-400 text-xs font-semibold mt-1 leading-relaxed">Input order belanja & check-in penerimaan. Login per staf (multi-akun).</p>
+                <span class="inline-block mt-4 text-[10px] font-bold text-emerald-300/80 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">kitchen.laksamana.id</span>
+            </button>
+
+            <!-- Purchasing -->
+            <button onclick="goTo('purchasing')"
+                    class="side-card group text-left bg-white/5 hover:bg-white/[0.07] border border-white/10 hover:border-indigo-500/40 rounded-3xl p-6 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid fa-clipboard-list text-white"></i>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all"></i>
+                </div>
+                <h2 class="text-lg font-black tracking-tight">Purchasing</h2>
+                <p class="text-slate-400 text-xs font-semibold mt-1 leading-relaxed">Kelola antrian order, vendor, dan dispatch WhatsApp. Panel kendali pembelian.</p>
+                <span class="inline-block mt-4 text-[10px] font-bold text-indigo-300/80 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">purchase.laksamana.id</span>
+            </button>
+
+        </div>
+
+        <p class="text-center text-slate-500 text-[10px] sm:text-[11px] mt-8 font-semibold">
+            Anda bisa berpindah sisi kapan saja dari halaman login masing-masing.
+        </p>
+    </main>
+
+</body>
+</html>

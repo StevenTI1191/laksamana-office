@@ -119,6 +119,11 @@
                 </div>
             </div>
             <p class="text-center text-slate-500 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
+            <div class="text-center mt-3">
+                <a href="https://ordering.laksamana.id" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-indigo-300 transition-colors">
+                    <span>⇄</span> Pindah ke sisi Kitchen
+                </a>
+            </div>
         </div>
     </div>
 
@@ -850,7 +855,7 @@
             webAppUrlOrders:  "https://script.google.com/macros/s/AKfycbw3ZpXR10UJt8Jhw9sUdsinhAOLkzCBPfJQi69ZFgZAZnFp4CR0PIfaQ8h0NIDL5UdUaQ/exec",   // Orders (Pesanan Kitchen)
             webAppUrlVendors: "https://script.google.com/macros/s/AKfycbxmcasA83xbYE3SRt22fF1Uw5uKEukUTPxLkkAcHZf698_VpgO7EBIPeXlIHGywRTaUxQ/exec",   // Database Vendor
             webAppUrlItems:   "https://script.google.com/macros/s/AKfycbxRk-q2IoyJPLGAdKpFbJbo-wghP1JP5LSOx-3CRJJj1QFFTLyFYvKDB0eujxouHUHRag/exec",   // Database Item (Produk)
-            webAppUrlForecast:""    // Data Prakiraan Stok (isi bila sudah tersedia)
+            webAppUrlForecast:"https://script.google.com/macros/s/AKfycbykGmdR7mGiCQUXlJQv2QwHhkNatj6GeCL8JnbZ1WXeoOCWA5m_b7cMdiuPHge0s6rH/exec"    // Data Prakiraan Stok (isi bila sudah tersedia)
         };
 
         // Link App Script khusus DATABASE USER (Google Sheet "Users").
@@ -927,9 +932,16 @@
             renderDatabaseTab();
             updateConnectionUI();
             initRecapSelector();
-            if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
-                fetchSheetData();
-            }
+            // Muat prakiraan + STOK BERSAMA lebih dulu (mengisi forecastBook), BARU
+            // tarik orderan dari Sheet. Kalau paralel/terbalik, kartu orderan bisa
+            // ter-render sebelum stok siap -> rekomendasi & stok tak muncul.
+            loadForecastData()
+                .then(renderDashboard)
+                .then(function () {
+                    if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
+                        fetchSheetData();
+                    }
+                });
         }
 
         // ==========================================
@@ -2402,8 +2414,10 @@
             appState.webAppUrlForecast = fcEl ? fcEl.value.trim() : "";
             saveStateToStorage();
             updateConnectionUI();
-            fetchSheetData();
-            loadForecastData().then(renderDashboard);
+            // Sama seperti bootApp: stok bersama dulu, baru orderan.
+            loadForecastData()
+                .then(renderDashboard)
+                .then(function () { fetchSheetData(); });
         }
 
         async function fetchSheetData() {
