@@ -29,6 +29,9 @@
                         success: '#10b981',
                         warning: '#f59e0b',
                         danger: '#ef4444',
+                        gold: '#A9791F', 'gold-2': '#C8961F', 'gold-dim': '#7A560F', 'gold-soft': '#F2E9D3',
+                        ink: '#2A2620', paper: '#F7F6F4', line: '#E7E1D3',
+                        muted: '#5C574D', 'muted-2': '#928C80',
                     }
                 }
             }
@@ -90,12 +93,12 @@
             border-radius: 1rem;
             font-weight: 800;
             font-size: 1.25rem;
-            color: #fff;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.10);
+            color: #2A2620;
+            background: #F7F6F4;
+            border: 1px solid #E7E1D3;
             transition: all 0.15s ease;
         }
-        .pin-key:hover { background: rgba(255,255,255,0.18); }
+        .pin-key:hover { background: #F2E9D3; border-color: #C8961F; }
         .pin-key:active { transform: scale(0.94); }
 
         /* Modal Transition Utilities */
@@ -114,20 +117,20 @@
     <!-- ============================================== -->
     <!-- LOGIN SCREEN (PIN Akses)                        -->
     <!-- ============================================== -->
-    <div id="login-screen" class="fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 flex items-center justify-center p-4">
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-paper flex items-center justify-center p-4">
         <div class="w-full max-w-xs">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20 mb-3">
+                <div class="w-16 h-16 mx-auto bg-gradient-to-br from-gold-2 to-gold-dim rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-gold-dim/25 mb-3">
                     <i class="fa-solid fa-kitchen-set text-white"></i>
                 </div>
-                <h1 class="text-white text-lg font-black brand-font tracking-tight">LAKSAMANA KITCHEN</h1>
-                <p class="text-slate-400 text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
+                <h1 class="text-ink text-lg font-black brand-font tracking-tight">LAKSAMANA KITCHEN</h1>
+                <p class="text-muted text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
             </div>
 
-            <div class="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
-                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-white/10 border border-white/20 text-white text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500">
+            <div class="bg-white border border-line rounded-3xl p-5 shadow-sm">
+                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-paper border border-line text-ink text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-gold placeholder-muted-2">
 
-                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg py-2">
+                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg py-2">
                     <i class="fa-solid fa-circle-exclamation mr-1"></i> <span id="login-error-text">PIN salah.</span>
                 </div>
 
@@ -142,18 +145,18 @@
                     <button onclick="pinPad('7')" class="pin-key">7</button>
                     <button onclick="pinPad('8')" class="pin-key">8</button>
                     <button onclick="pinPad('9')" class="pin-key">9</button>
-                    <button onclick="pinPad('clear')" class="pin-key !bg-slate-700/40 !text-slate-300 text-sm"><i class="fa-solid fa-delete-left"></i></button>
+                    <button onclick="pinPad('clear')" class="pin-key !bg-paper !text-muted text-sm"><i class="fa-solid fa-delete-left"></i></button>
                     <button onclick="pinPad('0')" class="pin-key">0</button>
-                    <button onclick="attemptLogin()" class="pin-key !bg-emerald-600 hover:!bg-emerald-500 !text-white text-sm"><i class="fa-solid fa-arrow-right"></i></button>
+                    <button onclick="attemptLogin()" class="pin-key !bg-gradient-to-br !from-gold-2 !to-gold-dim hover:!from-gold hover:!to-gold-dim !text-white text-sm"><i class="fa-solid fa-arrow-right"></i></button>
                 </div>
             </div>
-            <p class="text-center text-slate-500 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
+            <p class="text-center text-muted-2 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
             <div class="text-center mt-3">
-                <a href="../purchasing/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-emerald-300 transition-colors">
+                <a href="../purchasing/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <i class="fa-solid fa-right-left"></i> Pindah ke sisi Purchasing
                 </a>
-                <span class="text-slate-600 mx-2">·</span>
-                <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-white transition-colors">
+                <span class="text-line mx-2">·</span>
+                <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <i class="fa-solid fa-arrow-left"></i> Office
                 </a>
             </div>
@@ -164,7 +167,7 @@
     <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center text-lg shadow-md shadow-emerald-500/20">
+                <div class="w-10 h-10 bg-gradient-to-br from-gold-2 to-gold-dim rounded-xl flex items-center justify-center text-lg shadow-md shadow-gold-dim/25">
                     <i class="fa-solid fa-kitchen-set text-white"></i>
                 </div>
                 <div>
