@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#f7f6f4">
-<title>COMS — Laksamana Muda Content Operations</title>
+<title>COMS - Laksamana Muda Content Operations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  /* Howandi-style — netral hangat, kartu putih, emas deep & mewah */
+  /* Howandi-style - netral hangat, kartu putih, emas deep & mewah */
   --ink-900:#ffffff; --ink-850:#f7f6f4; --ink-800:#efedea; --ink-750:#e7e4df;
   --ink-700:#ddd9d2; --ink-650:#cbc6bc; --ink-600:#b4aea1;
   --panel:#ffffff; --panel-2:#fbfaf9; --panel-3:#f4f2ee;
@@ -330,7 +330,7 @@ tbody tr:last-child td{border-bottom:none}
       <img class="login-logo" id="loginLogo" alt="Laksamana Muda">
       <h1>Content Operations<br>Management System</h1>
       <div class="tag">"Pagi Meeting, Malam Healing"</div>
-      <p class="sub">Satu dek komando untuk seluruh operasional konten — dari ide, produksi, approval, sampai analisa performa lintas brand.</p>
+      <p class="sub">Satu dek komando untuk seluruh operasional konten - dari ide, produksi, approval, sampai analisa performa lintas brand.</p>
       <div class="brand-meta" id="loginBrands"></div>
     </div>
     <div class="login-panel">
@@ -340,11 +340,10 @@ tbody tr:last-child td{border-bottom:none}
         <div class="login-users" id="loginUsers"></div>
       </div>
       <div class="field"><label>PIN Akses</label>
-        <input type="password" class="ctrl" id="loginPin" placeholder="Default: 1234" maxlength="8" autocomplete="off">
+        <input type="password" class="ctrl" id="loginPin" placeholder="Masukkan PIN akses" maxlength="8" autocomplete="off">
       </div>
       <div class="login-err" id="loginErr"></div>
       <button class="btn btn-gold btn-lg" id="loginBtn">⚓ Masuk Sistem</button>
-      <p style="text-align:center;color:var(--txt-3);font-size:11px;margin-top:16px">PIN default semua akun: <b style="color:var(--gold)">1234</b> · bisa diubah di Pengaturan</p>
       <p style="text-align:center;margin-top:14px"><a href="../" style="color:var(--txt-3);font-size:12px;font-weight:600;text-decoration:none">&larr; Kembali ke Office</a></p>
     </div>
   </div>
@@ -481,8 +480,8 @@ async function initAPI() {
     DB.prodTasks = DB.prodTasks || []; // tugas produksi mandiri (di luar konten)
     DB.kols = DB.kols || [];       // database KOL / influencer
     DB.visits = DB.visits || [];   // planning influencer visit
-    DB.ads = DB.ads || [];         // ads management — DANA KELUAR (rincian biaya iklan)
-    DB.adFunds = DB.adFunds || []; // DANA MASUK — budget/top-up (terpisah dari pembuatan iklan)
+    DB.ads = DB.ads || [];         // ads management - DANA KELUAR (rincian biaya iklan)
+    DB.adFunds = DB.adFunds || []; // DANA MASUK - budget/top-up (terpisah dari pembuatan iklan)
     // Pastikan setiap konten punya field prod (kebutuhan produksi)
     (DB.content||[]).forEach(c=>{ if(!c.prod)c.prod={}; });
     // Hak akses tersimpan: jika belum ada, pakai default (deep copy agar bisa diedit)
@@ -498,7 +497,7 @@ async function initAPI() {
     // Lanjutkan proses render UI
     renderLogin();
     
-    // Cek Session login dari LocalStorage (dengan token — logout = tidak bisa balik)
+    // Cek Session login dari LocalStorage (dengan token - logout = tidak bisa balik)
     const sess = readSession();
     if (sess) {
       SES = sess.uid;
@@ -617,7 +616,7 @@ const APPROVAL_FLOW=['Planner','Designer','Editor','Account Manager','Content Di
 // ===== KOL / MEDIA PARTNER =====
 // Kategori konten / niche KOL & Medpar (bisa multiple per partner)
 const KOL_CATEGORIES=['Food & Beverage','DJ','Batak','Minang','Lifestyle','Beauty','Fashion','Travel','Tech / Gadget','Parenting','Comedy / Entertainment','Sport & Fitness','Gaming','Edukasi','Music','Automotive','Family / Vlog'];
-// Kategori tipe partner — membedakan KOL dengan Media Partner
+// Kategori tipe partner - membedakan KOL dengan Media Partner
 const KOL_TYPES=['KOL','Media Partner'];
 // Pilihan lokasi event kunjungan (dropdown, bukan input bebas)
 const VISIT_LOCATIONS=['Outlet Pusat','Kantor Laksamana Muda','Studio Produksi','Cafe / Resto Partner','Hotel / Ballroom','Event Venue','Online / Virtual','Lainnya'];
@@ -647,7 +646,7 @@ const ADS_TAX=0.11;
 // Opsi Target (dropdown + bisa ketik manual via datalist)
 const ADS_TARGETS=['Umum / Semua Audiens','Pembeli Sebelumnya','Lookalike Audience','Retargeting Website','Interest - Kuliner','Interest - Lifestyle','Lokal (Radius Outlet)','Followers Sosmed','New Customer'];
 // Opsi Usia Range (dropdown + bisa ketik manual)
-const ADS_AGE_RANGES=['13–17','18–24','25–34','35–44','45–54','55–64','65+','18–35','25–45','Semua Usia'];
+const ADS_AGE_RANGES=['13-17','18-24','25-34','35-44','45-54','55-64','65+','18-35','25-45','Semua Usia'];
 // Total dana keluar sebuah iklan (termasuk pajak 11%)
 function adSpendTotal(a){if(a&&a.expenses&&a.expenses.length){const base=a.expenses.reduce((s,e)=>s+(+e.amount||0),0);return base+Math.round(base*ADS_TAX);}return a?(+a.spend||0):0;}
 
@@ -657,7 +656,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
 function avColor(str){str=str||'';let h=0;for(let i=0;i<str.length;i++)h=str.charCodeAt(i)+((h<<5)-h);const hue=Math.abs(h)%360;return `hsl(${hue},45%,46%)`;}
 
 // =========================================================================
-// KONTRAS OTOMATIS — jamin "terang tak bertemu terang, gelap tak bertemu gelap"
+// KONTRAS OTOMATIS - jamin "terang tak bertemu terang, gelap tak bertemu gelap"
 // =========================================================================
 // Ubah warna apa pun (#hex, hsl, nama) menjadi {r,g,b}
 function _toRGB(color){
@@ -679,7 +678,7 @@ function _hslToRGB(h,s,l){h/=360;let r,g,b;if(s===0){r=g=b=l;}else{const q=l<.5?
 function _lum(color){const {r,g,b}=_toRGB(color);return (0.299*r+0.587*g+0.114*b)/255;}
 // Apakah warna ini tergolong terang?
 function isLight(color){return _lum(color)>0.62;}
-// Gelapkan/terangkan warna sejumlah amt (-1..1) — dipakai agar teks warna tetap sewarna tapi kontras
+// Gelapkan/terangkan warna sejumlah amt (-1..1) - dipakai agar teks warna tetap sewarna tapi kontras
 function shade(color,amt){let {r,g,b}=_toRGB(color);const t=amt<0?0:255;const p=Math.abs(amt);r=Math.round((t-r)*p+r);g=Math.round((t-g)*p+g);b=Math.round((t-b)*p+b);return `rgb(${r},${g},${b})`;}
 // Warna teks aman DI ATAS latar solid `bg` (hitam/putih sesuai kontras)
 // Warna aman untuk dipakai sebagai TEKS di atas latar terang/putih.
@@ -692,16 +691,16 @@ function tint(color){
   const light=isLight(color);
   // teks: warna yang digelapkan; makin terang warna asli, makin banyak digelapkan
   const fg = light ? shade(color,-0.55) : shade(color,-0.15);
-  // latar: warna sangat pudar (dicampur putih) — selalu terang, jadi teks gelap di atasnya aman
+  // latar: warna sangat pudar (dicampur putih) - selalu terang, jadi teks gelap di atasnya aman
   const {r,g,b}=_toRGB(color);
   const bg = `rgba(${r},${g},${b},0.14)`;
   return {bg,fg};
 }
 function initials(n){return (n||'?').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 function avatar(name,cls){cls=cls||'';return `<span class="avatar ${cls}" style="background:${avColor(name)}" title="${esc(name)}">${initials(name)}</span>`;}
-function fmtDate(d){if(!d)return '—';const x=new Date(d);return x.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDate(d){if(!d)return '-';const x=new Date(d);return x.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDateShort(d){if(!d)return '';const x=new Date(d);return x.toLocaleDateString('id-ID',{day:'numeric',month:'short'});}
-function fmtDT(d){if(!d)return '—';return new Date(d).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
+function fmtDT(d){if(!d)return '-';return new Date(d).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
 function todayISO(){return new Date().toISOString().slice(0,10);}
 function daysDiff(d){if(!d)return null;const a=new Date(d);a.setHours(0,0,0,0);const b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5);}
 function relDay(d){const n=daysDiff(d);if(n==null)return '';if(n===0)return 'Hari ini';if(n===1)return 'Besok';if(n===-1)return 'Kemarin';if(n>0)return `H-${n}`;return `Telat ${-n}h`;}
@@ -723,7 +722,7 @@ function platformTag(p){const pl=PLATFORMS[p]||{c:'#888'};const t=tint(pl.c);ret
 function prioBadge(p){const pr=PRIORITY[p]||PRIORITY.medium;return `<span class="prio ${pr.cls}">${p==='urgent'?'🔴':p==='high'?'🟠':p==='medium'?'🔵':'⚪'} ${pr.label}</span>`;}
 function brandDot(bId){const b=getBrand(bId);return b?`<span class="bdot" style="background:${b.color}"></span>`:'';}
 // Badge brand dengan kontras terjamin (latar pudar, teks warna digelapkan)
-function brandBadge(b,extra){extra=extra||'';if(!b)return `<span class="kbrand" style="background:#eef0f4;color:#8a94a3;${extra}">—</span>`;const t=tint(b.color);return `<span class="kbrand" style="background:${t.bg};color:${t.fg};${extra}">${esc(b.name.split(' (')[0])}</span>`;}
+function brandBadge(b,extra){extra=extra||'';if(!b)return `<span class="kbrand" style="background:#eef0f4;color:#8a94a3;${extra}">-</span>`;const t=tint(b.color);return `<span class="kbrand" style="background:${t.bg};color:${t.fg};${extra}">${esc(b.name.split(' (')[0])}</span>`;}
 
 function dOff(days,h,m){const d=new Date();d.setDate(d.getDate()+days);if(h!=null)d.setHours(h,m||0,0,0);return d.toISOString();}
 function dISO(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
@@ -754,8 +753,8 @@ function getBrand(id){return DB.brands.find(b=>b.id===id);}
 function getUser(id){return DB.users.find(u=>u.id===id);}
 function getContent(id){return DB.content.find(c=>c.id===id);}
 function getCampaign(id){return DB.campaigns.find(c=>c.id===id);}
-function userName(id){const u=getUser(id);return u?u.name:'—';}
-function brandName(id){const b=getBrand(id);return b?b.name:'—';}
+function userName(id){const u=getUser(id);return u?u.name:'-';}
+function brandName(id){const b=getBrand(id);return b?b.name:'-';}
 function activeBrands(){return brandFilter==='all'?DB.brands:DB.brands.filter(b=>b.id===brandFilter);}
 function filterByBrand(arr,key){key=key||'brand';return brandFilter==='all'?arr:arr.filter(x=>x[key]===brandFilter);}
 
@@ -772,7 +771,7 @@ function canView(v){
   if(!mod)return true; // view umum (dashboard, profile, dll)
   const allowed=getPerm()[mod]||[]; return userRoles(u).some(r=>allowed.includes(r));
 }
-function roleLabels(u){return userRoles(u).map(r=>ROLES[r]?ROLES[r].label:r).join(' · ');}
+function roleLabels(u){return userRoles(u).map(r=>ROLES[r]?ROLES[r].label:r).join(' - ');}
 function roleShorts(u){return userRoles(u).map(r=>ROLES[r]?ROLES[r].short:r).join(' + ');}
 
 // =========================================================================
@@ -845,7 +844,7 @@ function doLogin(){
   bootApp(); toast('Selamat berlayar, '+u.name.split(' ')[0]+' ⚓','ok');
 }
 function logout(){
-  // Hapus sesi sepenuhnya — setelah logout tidak bisa balik lagi (termasuk via tombol Back)
+  // Hapus sesi sepenuhnya - setelah logout tidak bisa balik lagi (termasuk via tombol Back)
   localStorage.removeItem(SES_KEY);
   SES=null;
   try{ history.pushState(null,'',location.href); }catch(e){}
@@ -913,7 +912,7 @@ const ICONS={
 function icon(name){return `<svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;}
 
 // Status otomatis campaign & iklan berdasarkan tanggal:
-// masuk tanggal mulai -> Aktif/Berjalan · tanggal lewat -> Selesai. (paused/dibatalkan = kunci manual)
+// masuk tanggal mulai -> Aktif/Berjalan - tanggal lewat -> Selesai. (paused/dibatalkan = kunci manual)
 function autoUpdateStatuses(){
   const t=todayISO();let changed=false;
   (DB.ads||[]).forEach(a=>{
@@ -1045,7 +1044,7 @@ VIEWS.dashboard=function(){
   const st=(lbl,val,delta,dcls,ic)=>`<div class="stat"><div class="lbl">${lbl}</div><div class="val mono">${val}</div>${delta?`<div class="delta ${dcls}">${delta}</div>`:''}</div>`;
   return `
   <div style="margin-bottom:22px"><h2 class="serif" style="font-size:26px">Selamat datang, ${esc(u.name.split(' ')[0])} 👋</h2>
-    <p style="color:var(--txt-3)">Berikut kondisi anjungan hari ini · ${fmtDate(new Date())}</p></div>
+    <p style="color:var(--txt-3)">Berikut kondisi anjungan hari ini - ${fmtDate(new Date())}</p></div>
   ${brandBar()}
   <div class="grid g-4" style="margin-bottom:20px">
     ${st('Total Konten',num(cs.length),`${posted.length} tayang`,'flat')}
@@ -1055,20 +1054,20 @@ VIEWS.dashboard=function(){
   </div>
   <div class="grid g-2" style="margin-bottom:20px;align-items:start">
     <div class="card">
-      <div class="card-h"><h3>🗓️ Today's Schedule</h3><span class="sub">${todayEvents.length} agenda · ${fmtDateShort(new Date())}</span></div>
+      <div class="card-h"><h3>🗓️ Today's Schedule</h3><span class="sub">${todayEvents.length} agenda - ${fmtDateShort(new Date())}</span></div>
       ${todayEvents.length?`<div class="list-plain">${todayEvents.map(e=>{const t=tint(e.color);const dn=e.done?'opacity:.55;text-decoration:line-through':'';
         return `<div class="li-row row-click" style="${dn}" onclick="COMS.calOpenEvent(${esc(JSON.stringify({cid:e.cid,tid:e.tid,kind:e.kind,vid:e.vid})).replace(/"/g,'&quot;')})">
           <span class="pill" style="background:${t.bg};color:${t.fg};flex:0 0 auto"><span class="pd" style="background:${t.fg}"></span>${e.label}</span>
           <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(e.title)}</div></div>
           ${e.time?`<span class="mono" style="font-size:11px;color:var(--txt-3)">${esc(e.time)}</span>`:''}</div>`;}).join('')}</div>`
-        :`<div class="empty" style="padding:30px"><div class="ei">☕</div><h4>Tidak ada agenda hari ini</h4><p>Nikmati harimu — cek kembali besok.</p></div>`}
+        :`<div class="empty" style="padding:30px"><div class="ei">☕</div><h4>Tidak ada agenda hari ini</h4><p>Nikmati harimu - cek kembali besok.</p></div>`}
     </div>
     <div class="card">
       <div class="card-h"><h3>⏳ Menunggu Approval</h3><span class="sub">${approvalPending.length} item</span></div>
       ${approvalPending.length?`<div class="list-plain">${approvalPending.slice(0,7).map(c=>{const b=getBrand(c.brand);
         return `<div class="li-row row-click" onclick="COMS.openContent('${c.id}')">${brandDot(c.brand)}
           <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(c.title)}</div>
-          <div style="font-size:11px;color:var(--txt-3);margin-top:2px">${platformTag(c.platform)} · ${esc(b?b.name.split(' (')[0]:'')}</div></div>
+          <div style="font-size:11px;color:var(--txt-3);margin-top:2px">${platformTag(c.platform)} - ${esc(b?b.name.split(' (')[0]:'')}</div></div>
           <span class="pill" style="background:var(--purple-bg);color:var(--purple);flex:0 0 auto">Review</span></div>`;}).join('')}</div>
         ${can('approve')?`<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" onclick="COMS.route('approval')">Buka Halaman Approval →</button>`:''}`
         :`<div class="empty" style="padding:30px"><div class="ei">✅</div><h4>Tidak ada yang pending</h4><p>Semua konten sudah direview.</p></div>`}
@@ -1083,7 +1082,7 @@ VIEWS.dashboard=function(){
           <span class="pill" style="margin-left:auto;background:var(--ok-bg);color:var(--ok)">● Berjalan</span></div>
         <div style="font-weight:700;font-size:15px;margin-bottom:6px">${esc(c.name)}</div>
         <div style="display:flex;gap:14px;font-size:11.5px;color:var(--txt-2);flex-wrap:wrap">
-          <span>📅 ${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</span>
+          <span>📅 ${fmtDateShort(c.start)} - ${fmtDateShort(c.end)}</span>
           <span>📦 ${cc.length} konten</span>
           ${dLeft!=null?`<span style="color:${dLeft<0?'var(--bad)':dLeft<=3?'var(--warn)':'var(--txt-3)'};font-weight:600">${dLeft<0?'Lewat '+(-dLeft)+'h':'Sisa '+dLeft+'h'}</span>`:''}
         </div></div>`;}).join('')}</div>`
@@ -1105,7 +1104,7 @@ VIEWS.dashboard=function(){
         <div class="li-row row-click" onclick="COMS.openContent('${c.id}')">
           <span class="serif" style="font-size:18px;color:var(--gold);width:24px">${i+1}</span>${brandDot(c.brand)}
           <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(c.title)}</div>
-          <div style="font-size:11px;color:var(--txt-3)">${platformTag(c.platform)} · ER ${c.metrics?.er||0}%</div></div>
+          <div style="font-size:11px;color:var(--txt-3)">${platformTag(c.platform)} - ER ${c.metrics?.er||0}%</div></div>
           <span class="mono" style="font-weight:700;color:var(--gold)">${num(c.metrics?.reach||0)}</span></div>`).join('')}</div>`:'<div class="empty"><p>Belum ada konten tayang.</p></div>'}
     </div>
   </div>`;
@@ -1116,7 +1115,7 @@ let planFilters={status:'',platform:'',pillar:'',pic:'',q:''};
 VIEWS.planning=function(){
   return `${brandBar()}
   <div class="page-head">
-    <div><p style="color:var(--txt-3);font-size:13px">${DB.content.length} total konten · ${DB.content.filter(c=>c.status==='Posted').length} tayang</p></div>
+    <div><p style="color:var(--txt-3);font-size:13px">${DB.content.length} total konten - ${DB.content.filter(c=>c.status==='Posted').length} tayang</p></div>
     ${can('content')?`<button class="btn btn-gold" onclick="COMS.openContentForm()">＋ Konten Baru</button>`:''}
   </div>
   <div class="card" style="padding:14px;margin-bottom:16px">
@@ -1152,10 +1151,10 @@ function renderPlanTable(){
       <td><div style="font-weight:600">${esc(c.title||'(tanpa judul)')}</div><div style="font-size:11px;color:var(--txt-3)">${esc(c.contentType)}</div></td>
       <td><span style="display:flex;align-items:center;gap:6px">${brandDot(c.brand)}${esc(b?b.name.split(' (')[0]:'')}</span></td>
       <td>${platformTag(c.platform)}</td><td><span class="tag">${esc(c.pillar)}</span></td>
-      <td>${c.pic?`<span style="display:flex;align-items:center;gap:6px">${avatar(userName(c.pic),'sm')}<span style="font-size:12px">${esc(userName(c.pic).split(' ')[0])}</span></span>`:'<span class="tag">—</span>'}</td>
+      <td>${c.pic?`<span style="display:flex;align-items:center;gap:6px">${avatar(userName(c.pic),'sm')}<span style="font-size:12px">${esc(userName(c.pic).split(' ')[0])}</span></span>`:'<span class="tag">-</span>'}</td>
       <td>${statusPill(c.status)}</td><td>${prioBadge(c.priority)}</td>
       <td><span class="mono ${over?'':''}" style="font-size:12px;color:${over?'var(--bad)':'var(--txt-2)'};font-weight:${over?'700':'500'}">${relDay(c.deadline)}</span><div style="font-size:10px;color:var(--txt-3)">${fmtDateShort(c.deadline)}</div></td>
-      <td><span class="mono" style="font-size:12px">${fmtDateShort(c.publishDate)||'—'}</span></td></tr>`;}).join('')}
+      <td><span class="mono" style="font-size:12px">${fmtDateShort(c.publishDate)||'-'}</span></td></tr>`;}).join('')}
     </tbody></table></div>`;
 }
 
@@ -1171,7 +1170,7 @@ function openContentForm(id){
       <div class="form-grid">
         <div class="full field"><label>Judul / Hook</label><input class="ctrl" id="f_title" value="${esc(c?.title||'')}" placeholder="Judul kerja konten"></div>
         <div class="field"><label>Brand</label><select class="ctrl" id="f_brand">${DB.brands.map(b=>`<option value="${b.id}" ${c&&c.brand===b.id?'selected':(!c&&brandFilter===b.id?'selected':'')}>${esc(b.name)}</option>`).join('')}</select></div>
-        <div class="field"><label>Campaign</label><select class="ctrl" id="f_campaign"><option value="">— Tidak ada —</option>${campOpts}</select></div>
+        <div class="field"><label>Campaign</label><select class="ctrl" id="f_campaign"><option value="">- Tidak ada -</option>${campOpts}</select></div>
         <div class="field"><label>Platform</label><select class="ctrl" id="f_platform">${Object.keys(PLATFORMS).map(p=>`<option ${c&&c.platform===p?'selected':''}>${p}</option>`).join('')}</select></div>
         <div class="field"><label>Content Pillar</label><select class="ctrl" id="f_pillar">${['F&B','Event','Entertainment','Promo','Education','Behind The Scene','Community','Product','Tips','Corporate','Sport','Lifestyle','Testimonial','Meme','Achievement','Partnership'].map(p=>`<option ${c&&c.pillar===p?'selected':''}>${p}</option>`).join('')}</select></div>
         <div class="field"><label>Content Type</label><select class="ctrl" id="f_type">${CONTENT_TYPES.map(t=>`<option ${c&&c.contentType===t?'selected':''}>${t}</option>`).join('')}</select></div>
@@ -1184,7 +1183,7 @@ function openContentForm(id){
         <div class="full field"><label>Caption</label><textarea class="ctrl" id="f_caption" placeholder="Tulis caption...">${esc(c?.caption||'')}</textarea></div>
         <div class="full field"><label>Hashtag</label><div class="chip-input" id="f_chips">${renderChips()}<input placeholder="Ketik + Enter" onkeydown="COMS.chipKey(event)"></div></div>
         <div class="full field"><label>Script / Storyboard</label><textarea class="ctrl" id="f_script" placeholder="Naskah / shot list...">${esc(c?.script||'')}</textarea></div>
-        <div class="field"><label>PIC</label><select class="ctrl" id="f_pic"><option value="">— Belum ditentukan —</option>${DB.users.map(u=>`<option value="${u.id}" ${c&&c.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
+        <div class="field"><label>PIC</label><select class="ctrl" id="f_pic"><option value="">- Belum ditentukan -</option>${DB.users.map(u=>`<option value="${u.id}" ${c&&c.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
         <div class="field"><label>Prioritas</label><select class="ctrl" id="f_priority">${Object.keys(PRIORITY).map(p=>`<option value="${p}" ${c&&c.priority===p?'selected':(!c&&p==='medium'?'selected':'')}>${PRIORITY[p].label}</option>`).join('')}</select></div>
         <div class="field"><label>Status</label><select class="ctrl" id="f_status">${Object.keys(STATUS).map(s=>`<option ${c&&c.status===s?'selected':(!c&&s==='Idea'?'selected':'')}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Deadline Produksi</label><input type="date" class="ctrl" id="f_deadline" value="${c?.deadline||''}"></div>
@@ -1192,7 +1191,7 @@ function openContentForm(id){
         <div class="field"><label>Jam Tayang</label><input type="time" class="ctrl" id="f_publishTime" value="${c?.publishTime||'20:00'}"></div>
         <div class="full field" style="margin-top:4px">
           <label>Kebutuhan Produksi</label>
-          <div style="font-size:11.5px;color:var(--txt-3);margin:-2px 0 10px">Centang pekerjaan yang diperlukan — tanggal deadline langsung terisi rekomendasi (bisa diubah). Setiap kebutuhan otomatis muncul di queue & kalender.</div>
+          <div style="font-size:11.5px;color:var(--txt-3);margin:-2px 0 10px">Centang pekerjaan yang diperlukan - tanggal deadline langsung terisi rekomendasi (bisa diubah). Setiap kebutuhan otomatis muncul di queue & kalender.</div>
           <div id="prodNeeds" style="display:flex;flex-direction:column;gap:10px">
             ${Object.keys(PROD_TYPES).map(k=>{const p=PROD_TYPES[k];const cur=c&&c.prod&&c.prod[k];const on=!!cur;const t=tint(p.color);
               return `<div class="prod-need" style="border:1px solid var(--line-soft);border-radius:12px;padding:10px 12px;background:${on?t.bg:'var(--panel-2)'}">
@@ -1328,13 +1327,13 @@ function openContent(id){
       ${c.script?`<div class="card" style="margin-bottom:16px"><h3 style="font-size:14px;margin-bottom:8px">Script / Storyboard</h3><div style="font-size:13px;white-space:pre-wrap;line-height:1.6;color:var(--txt-2)">${esc(c.script)}</div></div>`:''}
 
       ${c.prod&&Object.keys(c.prod).length?`<div class="card" style="margin-bottom:16px">
-        <div class="card-h"><h3 style="font-size:14px">Kebutuhan Produksi</h3><span class="sub">shoot · desain · editing</span></div>
+        <div class="card-h"><h3 style="font-size:14px">Kebutuhan Produksi</h3><span class="sub">shoot - desain - editing</span></div>
         <div style="display:flex;flex-direction:column;gap:8px">
         ${Object.keys(PROD_TYPES).filter(k=>c.prod[k]).map(k=>{const p=PROD_TYPES[k];const task=c.prod[k];const done=task.status==='done';const t=tint(p.color);const od=daysDiff(task.date);const over=od!=null&&od<0&&!done;
           return `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:${t.bg}">
             <span style="font-size:18px">${p.emoji}</span>
             <div style="flex:1"><div style="font-weight:600;font-size:13px;color:${t.fg}">${p.label}</div>
-              <div style="font-size:11px;color:${over?'var(--bad)':'var(--txt-3)'};font-weight:${over?'700':'500'}">${task.date?'Deadline '+relDay(task.date)+' · '+fmtDate(task.date):'Tanpa deadline'}</div></div>
+              <div style="font-size:11px;color:${over?'var(--bad)':'var(--txt-3)'};font-weight:${over?'700':'500'}">${task.date?'Deadline '+relDay(task.date)+' - '+fmtDate(task.date):'Tanpa deadline'}</div></div>
             <span class="pill" style="background:${done?tint(PUBLISH_COLOR).bg:'var(--panel)'};color:${done?tint(PUBLISH_COLOR).fg:t.fg}">${done?'✓ Selesai':'Dikerjakan'}</span>
             ${can(p.view)?`<button class="btn ${done?'btn-ghost':'btn-gold'} btn-sm" onclick="COMS.toggleProdDone('${id}','${k}');COMS.openContent('${id}')">${done?'↺':'✓'}</button>`:''}
           </div>`;}).join('')}
@@ -1369,10 +1368,10 @@ function openContent(id){
       </div>
 
       ${c.revisions&&c.revisions.length?`<div class="card" style="margin-bottom:16px"><h3 style="font-size:14px;margin-bottom:10px">Riwayat Revisi</h3>
-        <div>${c.revisions.map(r=>`<div class="timeline-i"><div class="timeline-dot">↻</div><div><div style="font-size:12px;font-weight:600">${esc(userName(r.by))} <span style="color:var(--txt-3);font-weight:400">· ${timeAgo(r.at)}</span></div><div style="font-size:12px;color:var(--txt-2);margin-top:2px">${esc(r.note)}</div></div></div>`).join('')}</div></div>`:''}
+        <div>${c.revisions.map(r=>`<div class="timeline-i"><div class="timeline-dot">↻</div><div><div style="font-size:12px;font-weight:600">${esc(userName(r.by))} <span style="color:var(--txt-3);font-weight:400">- ${timeAgo(r.at)}</span></div><div style="font-size:12px;color:var(--txt-2);margin-top:2px">${esc(r.note)}</div></div></div>`).join('')}</div></div>`:''}
 
       <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--txt-3);margin-bottom:16px">
-        <span class="tag">Dibuat ${esc(userName(c.createdBy))} · ${timeAgo(c.createdAt)}</span>
+        <span class="tag">Dibuat ${esc(userName(c.createdBy))} - ${timeAgo(c.createdAt)}</span>
         ${c.pic?`<span class="tag">PIC: ${esc(userName(c.pic))}</span>`:''}
       </div>
     </div>
@@ -1427,13 +1426,13 @@ function copyText(t){navigator.clipboard.writeText(t).then(()=>toast('Disalin ke
 /* ===== PIPELINE ===== */
 VIEWS.pipeline=function(){
   return `${brandBar()}
-  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">Geser kartu antar kolom untuk update status · ${filterByBrand(DB.content).filter(c=>c.status!=='Cancelled').length} konten aktif</p></div>
+  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">Geser kartu antar kolom untuk update status - ${filterByBrand(DB.content).filter(c=>c.status!=='Cancelled').length} konten aktif</p></div>
     ${can('content')?`<button class="btn btn-gold" onclick="COMS.openContentForm()">＋ Konten Baru</button>`:''}</div>
   <div class="kanban" id="kanban">${PIPELINE.map(col=>{
     const items=filterByBrand(DB.content).filter(c=>c.status===col);
     return `<div class="kcol" data-col="${col}" ondragover="COMS.kDragOver(event)" ondragleave="COMS.kDragLeave(event)" ondrop="COMS.kDrop(event,'${col}')">
       <div class="kcol-h"><span class="kdot" style="background:${STATUS[col].c}"></span><span class="kt">${col}</span><span class="kc">${items.length}</span></div>
-      <div class="kcol-body">${items.map(c=>contentCard(c)).join('')||'<div style="text-align:center;color:var(--txt-3);font-size:11px;padding:16px">—</div>'}</div>
+      <div class="kcol-body">${items.map(c=>contentCard(c)).join('')||'<div style="text-align:center;color:var(--txt-3);font-size:11px;padding:16px">-</div>'}</div>
     </div>`;}).join('')}</div>`;
 };
 AFTER.pipeline=bindKanban;
@@ -1481,7 +1480,7 @@ function collectCalEvents(){
   // kunjungan influencer (planning influencer visit)
   if(calFilter.visit)filterByBrand(DB.visits||[]).forEach(v=>{
     if(!v.date)return;const st=VISIT_STATUS[v.status]||VISIT_STATUS.planned;const nInv=visitInvitees(v).length;
-    evs.push({date:v.date,type:'visit',color:st.c,title:visitLabel(v)+(nInv?' · '+nInv+' undangan':''),vid:v.id,time:v.time||'',
+    evs.push({date:v.date,type:'visit',color:st.c,title:visitLabel(v)+(nInv?' - '+nInv+' undangan':''),vid:v.id,time:v.time||'',
       label:'Kunjungan',done:v.status==='came'||v.status==='done'});
   });
   return evs;
@@ -1561,7 +1560,7 @@ function calDay(ds){const evs=(collectCalEvents()).filter(e=>e.date===ds);
 VIEWS.bank=function(){
   const list=filterByBrand(DB.bank);
   return `${brandBar()}
-  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${list.length} ide tersimpan · jangan biarkan ide hilang</p></div>
+  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${list.length} ide tersimpan - jangan biarkan ide hilang</p></div>
     <button class="btn btn-gold" onclick="COMS.openBankForm()">💡 Tambah Ide</button></div>
   <div class="grid g-3">${list.length?list.map(b=>{const br=getBrand(b.brand);const diffC={easy:'var(--ok)',medium:'var(--warn)',hard:'var(--bad)'}[b.difficulty]||'var(--txt-3)';
     return `<div class="card" style="cursor:pointer" onclick="COMS.openBankForm('${b.id}')">
@@ -1669,7 +1668,7 @@ VIEWS.campaigns=function(){
       <h3 style="font-size:18px;margin-bottom:6px">${esc(c.name)}</h3>
       <p style="font-size:12px;color:var(--txt-2);line-height:1.5;margin-bottom:12px">${esc(c.brief||'')}</p>
       <div style="display:flex;gap:16px;font-size:12px;flex-wrap:wrap">
-        <div><span style="color:var(--txt-3)">Periode</span><br><b>${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</b></div>
+        <div><span style="color:var(--txt-3)">Periode</span><br><b>${fmtDateShort(c.start)} - ${fmtDateShort(c.end)}</b></div>
         <div><span style="color:var(--txt-3)">Budget</span><br><b class="mono">Rp ${num(c.budget)}</b></div>
         <div><span style="color:var(--txt-3)">Konten</span><br><b>${cc.length} item</b></div>
         <div><span style="color:var(--txt-3)">Objective</span><br><b>${esc(c.objective)}</b></div>
@@ -1701,7 +1700,7 @@ function delCamp(id){if(!confirm('Hapus campaign?'))return;DB.campaigns=DB.campa
 let formRoles=[];
 VIEWS.team=function(){
   const multi=DB.users.filter(u=>userRoles(u).length>1);
-  return `<div class="page-head"><div><h2 style="font-size:22px">Kru & Rangkap Kerja</h2><p style="color:var(--txt-3);font-size:13px">${DB.users.length} kru · ${multi.length} orang pegang lebih dari 1 role</p></div>
+  return `<div class="page-head"><div><h2 style="font-size:22px">Kru & Rangkap Kerja</h2><p style="color:var(--txt-3);font-size:13px">${DB.users.length} kru - ${multi.length} orang pegang lebih dari 1 role</p></div>
     ${can('team')?`<button class="btn btn-gold" onclick="COMS.openUserForm()">＋ Tambah Kru</button>`:''}</div>
   <div class="card" style="padding:14px;margin-bottom:18px;background:linear-gradient(135deg,rgba(229,168,35,.08),transparent);border-color:var(--line)">
     <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚓</span>
@@ -1715,7 +1714,7 @@ VIEWS.team=function(){
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
         ${avatar(u.name,'lg')}
         <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px">${esc(u.name)}${u.id===SES?' <span style="font-size:10px;color:var(--gold)">(kamu)</span>':''}</div>
-          <div style="font-size:11px;color:var(--txt-3)">${esc(u.division)} · ${esc(u.email||'')}</div></div>
+          <div style="font-size:11px;color:var(--txt-3)">${esc(u.division)} - ${esc(u.email||'')}</div></div>
         ${rr.length>1?`<span class="pill" style="background:var(--gold-glow);color:var(--gold)">×${rr.length} role</span>`:''}
       </div>
       <div style="font-size:10px;text-transform:uppercase;color:var(--txt-3);font-weight:700;margin-bottom:6px">Role ${rr.length>1?'(rangkap)':''}</div>
@@ -1742,11 +1741,11 @@ function openUserForm(id){
       <div class="field"><label>Email</label><input class="ctrl" id="us_email" value="${esc(u?.email||'')}"></div>
       <div class="field"><label>PIN Akses</label><input class="ctrl" id="us_pin" value="${esc(u?.pin||'1234')}" maxlength="8"></div>
       <div class="field"><label>Kapasitas Task</label><input type="number" class="ctrl" id="us_capacity" value="${u?.capacity||24}"></div>
-      <div class="field"><label>Jam Kerja</label><input class="ctrl" id="us_workHours" value="${esc(u?.workHours||'09.00–18.00')}"></div>
+      <div class="field"><label>Jam Kerja</label><input class="ctrl" id="us_workHours" value="${esc(u?.workHours||'09.00-18.00')}"></div>
       <div class="field"><label>Ketersediaan</label><select class="ctrl" id="us_avail"><option value="available" ${u&&u.avail==='available'?'selected':''}>Tersedia</option><option value="busy" ${u&&u.avail==='busy'?'selected':''}>Sibuk</option></select></div>
       <div class="full field"><label>Skill (pisah koma)</label><input class="ctrl" id="us_skills" value="${esc((u?.skills||[]).join(', '))}"></div>
     </div>
-    <div class="field"><label>Role — Bisa Rangkap (pilih 1 atau lebih)</label>
+    <div class="field"><label>Role - Bisa Rangkap (pilih 1 atau lebih)</label>
       <div class="role-grid" id="roleGrid">${ROLE_KEYS.map(r=>{const ro=ROLES[r];const on=formRoles.includes(r);
         return `<div class="chk-row ${on?'on':''}" data-r="${r}" onclick="COMS.toggleRole('${r}')">
           <div class="chk-box">${on?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a1420" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>':''}</div>
@@ -1864,9 +1863,9 @@ function prodQueue(kind,title,roleNote){
       return `<tr><td>${prioBadge(r.priority)}</td>
       <td class="row-click" onclick="${openFn}"><div style="font-weight:600">${esc(r.title)}${r.src==='task'?' <span class="tag" style="font-size:9px">mandiri</span>':''}</div><div style="font-size:11px;color:var(--txt-3)">${esc(r.sub||'')}</div></td>
       <td><span style="display:flex;align-items:center;gap:6px">${brandDot(r.brand)}${esc(b?b.name.split(' (')[0]:'')}</span></td>
-      <td>${r.platform?platformTag(r.platform):(r.sub&&kind==='shoot'?'<span style="font-size:11px;color:var(--txt-3)">—</span>':'—')}</td>
-      <td>${r.pic?avatar(userName(r.pic),'sm'):'—'}</td>
-      <td><span class="mono" style="color:${over?'var(--bad)':'var(--txt-2)'};font-weight:${over?'700':'500'}">${r.date?relDay(r.date):'—'}</span></td>
+      <td>${r.platform?platformTag(r.platform):(r.sub&&kind==='shoot'?'<span style="font-size:11px;color:var(--txt-3)">-</span>':'-')}</td>
+      <td>${r.pic?avatar(userName(r.pic),'sm'):'-'}</td>
+      <td><span class="mono" style="color:${over?'var(--bad)':'var(--txt-2)'};font-weight:${over?'700':'500'}">${r.date?relDay(r.date):'-'}</span></td>
       <td><span class="pill" style="background:${done?tint(PUBLISH_COLOR).bg:t.bg};color:${done?tint(PUBLISH_COLOR).fg:t.fg}"><span class="pd" style="background:${done?tint(PUBLISH_COLOR).fg:t.fg}"></span>${done?'Selesai':'Dikerjakan'}</span></td>
       <td>${can(p.view)?`<button class="btn ${done?'btn-ghost':'btn-gold'} btn-sm" onclick="${toggleFn}">${done?'↺ Buka':'✓ Selesai'}</button>`:''}</td></tr>`;}).join('')}
   </tbody></table></div>`:`<div class="empty"><div class="ei">${p.emoji}</div><h4>${total>0?'Tidak ada yang cocok':'Antrian kosong'}</h4><p>${total>0?'Ubah / reset filter untuk melihat pekerjaan lain.':'Belum ada pekerjaan '+p.label.toLowerCase()+'. Tambahkan lewat konten atau tombol di atas.'}</p></div>`}`;
@@ -1887,7 +1886,7 @@ function openTaskForm(kind,id){
     <div class="full field"><label>Judul Pekerjaan</label><input class="ctrl" id="tk_title" value="${esc(x?.title||'')}" placeholder="${kind==='shoot'?'mis. Rekam b-roll toko':kind==='design'?'mis. Desain banner promo':'mis. Edit video testimoni'}"></div>
     <div class="field"><label>Brand</label><select class="ctrl" id="tk_brand">${DB.brands.map(b=>`<option value="${b.id}" ${x&&x.brand===b.id?'selected':(!x&&brandFilter===b.id?'selected':'')}>${esc(b.name)}</option>`).join('')}</select></div>
     <div class="field"><label>Prioritas</label><select class="ctrl" id="tk_priority">${Object.keys(PRIORITY).map(pr=>`<option value="${pr}" ${x&&x.priority===pr?'selected':(!x&&pr==='medium'?'selected':'')}>${PRIORITY[pr].label}</option>`).join('')}</select></div>
-    <div class="field"><label>PIC</label><select class="ctrl" id="tk_pic"><option value="">— Belum ditentukan —</option>${DB.users.map(u=>`<option value="${u.id}" ${x&&x.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
+    <div class="field"><label>PIC</label><select class="ctrl" id="tk_pic"><option value="">- Belum ditentukan -</option>${DB.users.map(u=>`<option value="${u.id}" ${x&&x.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
     <div class="field"><label>Deadline</label><input type="date" class="ctrl" id="tk_date" value="${defDate}"></div>
     <div class="full field"><label>Catatan / Brief</label><textarea class="ctrl" id="tk_note" placeholder="Detail pekerjaan...">${esc(x?.note||'')}</textarea></div>
   </div></div>
@@ -1902,7 +1901,7 @@ function saveTask(kind,id){const g=k=>$('#tk_'+k)?$('#tk_'+k).value:'';
 function delTask(id){if(!confirm('Hapus tugas ini?'))return;DB.prodTasks=DB.prodTasks.filter(t=>t.id!==id);save();closeDrawer();route(currentView);}
 function toggleTaskDone(id){const x=DB.prodTasks.find(t=>t.id===id);if(!x)return;x.status=x.status==='done'?'todo':'done';save();route(currentView);}
 
-VIEWS.shooting=()=>prodQueue('shoot','Shooting Schedule','Jadwal rekam — dari kebutuhan konten & jadwal mandiri. Tandai selesai bila sudah dieksekusi.');
+VIEWS.shooting=()=>prodQueue('shoot','Shooting Schedule','Jadwal rekam - dari kebutuhan konten & jadwal mandiri. Tandai selesai bila sudah dieksekusi.');
 
 function queueView(statusKeys,title,emoji,roleNote){
   const list=filterByBrand(DB.content).filter(c=>statusKeys.includes(c.status)).sort((a,b)=>PRIORITY[b.priority].n-PRIORITY[a.priority].n||new Date(a.deadline||'2099')-new Date(b.deadline||'2099'));
@@ -1913,16 +1912,16 @@ function queueView(statusKeys,title,emoji,roleNote){
       return `<tr class="row-click" onclick="COMS.openContent('${c.id}')"><td>${prioBadge(c.priority)}</td>
       <td><div style="font-weight:600">${esc(c.title)}</div><div style="font-size:11px;color:var(--txt-3)">${esc(c.contentType)}</div></td>
       <td><span style="display:flex;align-items:center;gap:6px">${brandDot(c.brand)}${esc(b?b.name.split(' (')[0]:'')}</span></td>
-      <td>${platformTag(c.platform)}</td><td>${c.pic?avatar(userName(c.pic),'sm'):'—'}</td>
+      <td>${platformTag(c.platform)}</td><td>${c.pic?avatar(userName(c.pic),'sm'):'-'}</td>
       <td><span class="mono" style="color:${over?'var(--bad)':'var(--txt-2)'};font-weight:${over?'700':'500'}">${relDay(c.deadline)}</span></td>
       <td>${statusPill(c.status)}</td><td><span style="color:var(--gold)">→</span></td></tr>`;}).join('')}
   </tbody></table></div>`:`<div class="empty"><div class="ei">${emoji}</div><h4>Antrian kosong</h4><p>Tidak ada pekerjaan di antrian ini.</p></div>`}`;
 }
-VIEWS.design=()=>prodQueue('design','Design Queue','Antrian desain — konten yang ditandai butuh desain. Tandai selesai bila sudah dikerjakan.');
-VIEWS.editing=()=>prodQueue('edit','Editing Queue','Antrian video — konten yang ditandai butuh editing. Tandai selesai bila video final siap.');
+VIEWS.design=()=>prodQueue('design','Design Queue','Antrian desain - konten yang ditandai butuh desain. Tandai selesai bila sudah dikerjakan.');
+VIEWS.editing=()=>prodQueue('edit','Editing Queue','Antrian video - konten yang ditandai butuh editing. Tandai selesai bila video final siap.');
 
 /* =========================================================================
-   KOL MANAGEMENT — Database KOL + Planning Influencer Visit
+   KOL MANAGEMENT - Database KOL + Planning Influencer Visit
    ========================================================================= */
 let kolTab='db';
 let kolFilters={q:'',category:'',type:''};
@@ -1930,7 +1929,7 @@ let visitFilters={q:'',status:'',brand:'',kol:''};
 let _kolRateImg=null; // buffer gambar rate card saat form terbuka
 function setKolTab(t){kolTab=t;route('kol');}
 function getKol(id){return (DB.kols||[]).find(k=>k.id===id);}
-function kolName(id){const k=getKol(id);return k?k.name:'—';}
+function kolName(id){const k=getKol(id);return k?k.name:'-';}
 // Kategori niche partner (dukung data lama yang masih single `category`)
 function kolCats(k){return k?(k.categories||(k.category?[k.category]:[])):[];}
 function kolType(k){return (k&&k.type)||'KOL';}
@@ -1939,7 +1938,7 @@ function waDigits(n){let d=String(n||'').replace(/[^0-9]/g,'');if(d.startsWith('
 function waLink(n){const d=waDigits(n);return d?`https://wa.me/${d}`:'';}
 // Preview gambar rate card di modal
 function viewImage(src,title){if(!src)return;modal(`<div class="modal-h"><h3>${esc(title||'Gambar')}</h3><button class="x-btn" onclick="COMS.closeModal()">✕</button></div><div class="modal-b" style="text-align:center;background:var(--panel-3)"><img src="${esc(src)}" style="max-width:100%;border-radius:10px"></div>`,true);}
-function viewKolRate(id){const k=getKol(id);if(!k||!k.rateImage){toast('Belum ada gambar rate card','err');return;}viewImage(k.rateImage,'Rate Card — '+k.name);}
+function viewKolRate(id){const k=getKol(id);if(!k||!k.rateImage){toast('Belum ada gambar rate card','err');return;}viewImage(k.rateImage,'Rate Card - '+k.name);}
 
 VIEWS.kol=function(){
   const seg=`<div class="seg" style="margin-bottom:18px">
@@ -1959,7 +1958,7 @@ function kolDatabaseView(){
   list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   const addBtn=can('kol')?`<button class="btn btn-gold" onclick="COMS.openKolForm()">＋ Tambah KOL / Medpar</button>`:'';
   const nKol=(DB.kols||[]).filter(k=>kolType(k)==='KOL').length,nMp=(DB.kols||[]).filter(k=>kolType(k)==='Media Partner').length;
-  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">🧑‍🎤 ${nKol} KOL · 📰 ${nMp} Media Partner · database talent & partner</p></div>${addBtn}</div>`;
+  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">🧑‍🎤 ${nKol} KOL - 📰 ${nMp} Media Partner - database talent & partner</p></div>${addBtn}</div>`;
   const filterBar=`<div class="card" style="padding:12px;margin-bottom:16px">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <input class="ctrl" style="max-width:230px" placeholder="Cari nama / IG / TikTok / WA / niche..." value="${esc(f.q)}" oninput="COMS.kolF('q',this.value)">
@@ -1973,12 +1972,12 @@ function kolDatabaseView(){
     return `<tr>
       <td class="row-click" onclick="COMS.openKolForm('${k.id}')"><div style="display:flex;align-items:center;gap:8px">${avatar(k.name,'sm')}<span style="font-weight:600">${esc(k.name)}</span></div></td>
       <td><span class="pill" style="background:${tt.bg};color:${tt.fg}">${isMp?'📰':'🧑‍🎤'} ${esc(kolType(k))}</span></td>
-      <td>${k.whatsapp?`<a href="${wl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--ok);font-weight:600">${esc(k.whatsapp)}</a>`:'<span style="color:var(--txt-3)">—</span>'}</td>
-      <td>${k.instagram?`<a href="https://instagram.com/${esc(String(k.instagram).replace(/^@/,''))}" target="_blank" rel="noopener" style="color:var(--purple)">@${esc(String(k.instagram).replace(/^@/,''))}</a>`:'<span style="color:var(--txt-3)">—</span>'}</td>
-      <td>${k.tiktok?`<a href="https://tiktok.com/@${esc(String(k.tiktok).replace(/^@/,''))}" target="_blank" rel="noopener" style="color:var(--info)">@${esc(String(k.tiktok).replace(/^@/,''))}</a>`:'<span style="color:var(--txt-3)">—</span>'}</td>
-      <td>${k.rateImage?`<img src="${esc(k.rateImage)}" onclick="event.stopPropagation();COMS.viewKolRate('${k.id}')" title="Lihat rate card" style="width:44px;height:32px;object-fit:cover;border-radius:6px;border:1px solid var(--line-soft);cursor:zoom-in">`:(k.rateDrive?`<a href="${esc(k.rateDrive)}" target="_blank" rel="noopener" class="tag" style="color:var(--info)" onclick="event.stopPropagation()">📎 Drive</a>`:'<span style="color:var(--txt-3)">—</span>')}</td>
-      <td class="mono" style="font-weight:600">${k.rateValue?rupiah(k.rateValue):(k.rateTier?`<span class="tag">${esc(k.rateTier)}</span>`:'<span style="color:var(--txt-3)">—</span>')}</td>
-      <td>${cats.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${cats.map(c=>`<span class="pill" style="background:${t.bg};color:${t.fg}">${esc(c)}</span>`).join('')}</div>`:'<span style="color:var(--txt-3)">—</span>'}</td>
+      <td>${k.whatsapp?`<a href="${wl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--ok);font-weight:600">${esc(k.whatsapp)}</a>`:'<span style="color:var(--txt-3)">-</span>'}</td>
+      <td>${k.instagram?`<a href="https://instagram.com/${esc(String(k.instagram).replace(/^@/,''))}" target="_blank" rel="noopener" style="color:var(--purple)">@${esc(String(k.instagram).replace(/^@/,''))}</a>`:'<span style="color:var(--txt-3)">-</span>'}</td>
+      <td>${k.tiktok?`<a href="https://tiktok.com/@${esc(String(k.tiktok).replace(/^@/,''))}" target="_blank" rel="noopener" style="color:var(--info)">@${esc(String(k.tiktok).replace(/^@/,''))}</a>`:'<span style="color:var(--txt-3)">-</span>'}</td>
+      <td>${k.rateImage?`<img src="${esc(k.rateImage)}" onclick="event.stopPropagation();COMS.viewKolRate('${k.id}')" title="Lihat rate card" style="width:44px;height:32px;object-fit:cover;border-radius:6px;border:1px solid var(--line-soft);cursor:zoom-in">`:(k.rateDrive?`<a href="${esc(k.rateDrive)}" target="_blank" rel="noopener" class="tag" style="color:var(--info)" onclick="event.stopPropagation()">📎 Drive</a>`:'<span style="color:var(--txt-3)">-</span>')}</td>
+      <td class="mono" style="font-weight:600">${k.rateValue?rupiah(k.rateValue):(k.rateTier?`<span class="tag">${esc(k.rateTier)}</span>`:'<span style="color:var(--txt-3)">-</span>')}</td>
+      <td>${cats.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${cats.map(c=>`<span class="pill" style="background:${t.bg};color:${t.fg}">${esc(c)}</span>`).join('')}</div>`:'<span style="color:var(--txt-3)">-</span>'}</td>
       <td style="text-align:right;white-space:nowrap">${can('kol')?`<button class="btn btn-ghost btn-sm" onclick="COMS.openKolForm('${k.id}')">✎</button> <button class="btn btn-danger btn-sm" onclick="COMS.delKol('${k.id}')">🗑</button>`:''}</td>
     </tr>`;}).join('');
   return head+filterBar+`<div class="tbl-wrap"><table><thead><tr>
@@ -2001,10 +2000,10 @@ function openKolForm(id){
     <div class="field"><label>Username TikTok</label><input class="ctrl" id="k_tiktok" value="${esc(k?.tiktok||'')}" placeholder="tanpa @"></div>
     <div class="full field"><label>Kategori Konten / Niche (bisa pilih lebih dari satu)</label>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:2px">${KOL_CATEGORIES.map(c=>`<label class="chk-row" style="width:auto;padding:7px 10px"><input type="checkbox" class="k_cat" value="${esc(c)}" ${cats.includes(c)?'checked':''} style="accent-color:var(--gold);width:16px;height:16px"> ${esc(c)}</label>`).join('')}</div></div>
-    <div class="full field"><label>Rate Card — Upload Gambar (maks 10 MB)</label>
+    <div class="full field"><label>Rate Card - Upload Gambar (maks 10 MB)</label>
       <input type="file" accept="image/*" class="ctrl" style="padding:8px" onchange="COMS.onKolRateFile(this)">
       <img id="k_ratePreview" src="${k?.rateImage||''}" style="${k?.rateImage?'':'display:none;'}max-width:100%;margin-top:10px;border-radius:10px;border:1px solid var(--line-soft)"></div>
-    <div class="field"><label>Rate Card — Nominal (Rp)</label><input type="number" min="0" class="ctrl" id="k_rateValue" value="${k?.rateValue||''}" placeholder="mis. 1500000"></div>
+    <div class="field"><label>Rate Card - Nominal (Rp)</label><input type="number" min="0" class="ctrl" id="k_rateValue" value="${k?.rateValue||''}" placeholder="mis. 1500000"></div>
     <div class="full field"><label>Catatan</label><textarea class="ctrl" id="k_note" placeholder="Catatan tambahan (pengalaman, jangkauan, dsb)">${esc(k?.note||'')}</textarea></div>
   </div></div>
   <div class="modal-f">${isEdit?`<button class="btn btn-danger" onclick="COMS.delKol('${k.id}')">Hapus</button>`:''}<button class="btn btn-ghost" onclick="COMS.closeDrawer()">Batal</button><button class="btn btn-gold" onclick="COMS.saveKol('${id||''}')">${isEdit?'Simpan Perubahan':'⚓ Simpan'}</button></div>`);
@@ -2034,21 +2033,21 @@ function delKol(id){const k=getKol(id);if(!k)return;if(!confirm('Hapus "'+k.name
 /* ---------- Sub-tab: PLANNING KUNJUNGAN (EVENT ACTIVITY) ---------- */
 // Daftar undangan (dukung data lama single kolId)
 function visitInvitees(v){return v?(v.invitees&&v.invitees.length?v.invitees:(v.kolId?[v.kolId]:[])):[];}
-function visitLabel(v){const names=visitInvitees(v).map(kolName).filter(x=>x&&x!=='—');return v.title||names[0]||'Event';}
+function visitLabel(v){const names=visitInvitees(v).map(kolName).filter(x=>x&&x!=='-');return v.title||names[0]||'Event';}
 // Template pesan undangan otomatis dari detail event
 function visitMsg(v,name){
   const dt=fmtDate(v.date);
   return `Halo ${name}! 👋\nKami dari Laksamana Muda ingin mengundang kamu ke acara:\n\n📌 ${v.title||'Event Activity'}\n🗓️ ${dt}${v.time?'\n⏰ '+v.time+' WIB':''}${v.location?'\n📍 '+v.location:''}${v.desc?'\n\n'+v.desc:''}\n\nDitunggu konfirmasi kehadirannya ya 🙏 Terima kasih!`;
 }
-// Buka DM (IG/WA/TikTok) dengan template otomatis — sekali klik langsung kirim
+// Buka DM (IG/WA/TikTok) dengan template otomatis - sekali klik langsung kirim
 function dmInvitee(vid,kid,platform){
   const v=(DB.visits||[]).find(x=>x.id===vid);const k=getKol(kid);if(!v||!k)return;
   const msg=visitMsg(v,k.name);
   if(platform==='wa'){const d=waDigits(k.whatsapp);if(!d){toast('Nomor WhatsApp kosong','err');return;}window.open(`https://wa.me/${d}?text=${encodeURIComponent(msg)}`,'_blank');return;}
   // IG & TikTok tidak mendukung teks otomatis di URL -> salin template lalu buka DM
   if(navigator.clipboard)navigator.clipboard.writeText(msg).catch(()=>{});
-  if(platform==='ig'){const u=String(k.instagram||'').replace(/^@/,'');if(!u){toast('Username Instagram kosong','err');return;}toast('Template disalin — tinggal paste di DM Instagram','ok');window.open(`https://ig.me/m/${u}`,'_blank');}
-  if(platform==='tt'){const u=String(k.tiktok||'').replace(/^@/,'');if(!u){toast('Username TikTok kosong','err');return;}toast('Template disalin — tinggal paste di DM TikTok','ok');window.open(`https://www.tiktok.com/@${u}`,'_blank');}
+  if(platform==='ig'){const u=String(k.instagram||'').replace(/^@/,'');if(!u){toast('Username Instagram kosong','err');return;}toast('Template disalin - tinggal paste di DM Instagram','ok');window.open(`https://ig.me/m/${u}`,'_blank');}
+  if(platform==='tt'){const u=String(k.tiktok||'').replace(/^@/,'');if(!u){toast('Username TikTok kosong','err');return;}toast('Template disalin - tinggal paste di DM TikTok','ok');window.open(`https://www.tiktok.com/@${u}`,'_blank');}
 }
 function kolVisitView(){
   let list=filterByBrand(DB.visits||[]).slice();
@@ -2058,7 +2057,7 @@ function kolVisitView(){
   if(f.kol)list=list.filter(v=>visitInvitees(v).includes(f.kol));
   list.sort((a,b)=>new Date(a.date||'2099')-new Date(b.date||'2099'));
   const addBtn=can('kol')?`<button class="btn btn-gold" onclick="COMS.openVisitForm()">＋ Buat Kunjungan (Event)</button>`:'';
-  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">📅 ${(DB.visits||[]).length} event · kunjungan KOL & Medpar masuk ke Kalender</p></div>${addBtn}</div>`;
+  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">📅 ${(DB.visits||[]).length} event - kunjungan KOL & Medpar masuk ke Kalender</p></div>${addBtn}</div>`;
   const filterBar=`<div class="card" style="padding:12px;margin-bottom:16px">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <input class="ctrl" style="max-width:230px" placeholder="Cari event / lokasi / undangan..." value="${esc(f.q)}" oninput="COMS.visitF('q',this.value)">
@@ -2067,15 +2066,15 @@ function kolVisitView(){
       <button class="btn btn-ghost btn-sm" onclick="COMS.visitReset()">Reset</button>
       <span style="margin-left:auto;font-size:12px;color:var(--txt-3)">${list.length} ditampilkan</span>
     </div></div>`;
-  if(!list.length)return brandBar()+head+filterBar+`<div class="empty"><div class="ei">📅</div><h4>${(DB.visits||[]).length?'Tidak ada yang cocok':'Belum ada event kunjungan'}</h4><p>${(DB.visits||[]).length?'Ubah / reset filter.':'Buat event activity & undang KOL / Medpar — otomatis masuk Kalender.'}</p></div>`;
+  if(!list.length)return brandBar()+head+filterBar+`<div class="empty"><div class="ei">📅</div><h4>${(DB.visits||[]).length?'Tidak ada yang cocok':'Belum ada event kunjungan'}</h4><p>${(DB.visits||[]).length?'Ubah / reset filter.':'Buat event activity & undang KOL / Medpar - otomatis masuk Kalender.'}</p></div>`;
   const rows=list.map(v=>{const s=VISIT_STATUS[v.status]||VISIT_STATUS.planned;const ts=tint(s.c);const b=getBrand(v.brand);
-    const od=daysDiff(v.date);const isDay=od===0;const inv=visitInvitees(v);const invTxt=inv.map(kolName).filter(x=>x&&x!=='—').join(', ');
+    const od=daysDiff(v.date);const isDay=od===0;const inv=visitInvitees(v);const invTxt=inv.map(kolName).filter(x=>x&&x!=='-').join(', ');
     return `<tr>
       <td class="row-click" onclick="COMS.openVisitForm('${v.id}')"><div style="font-weight:600">${esc(v.title||'Event Activity')}</div><div style="font-size:11px;color:var(--txt-3)">👥 ${inv.length} undangan${invTxt?': '+esc(invTxt):''}</div></td>
-      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(v.brand)}${esc(b?b.name.split(' (')[0]:'—')}</span></td>
-      <td><span class="mono" style="font-size:12px;color:${od!=null&&od<0&&!['came','noshow','done'].includes(v.status)?'var(--bad)':'var(--txt-2)'};font-weight:600">${v.date?relDay(v.date):'—'}</span><div style="font-size:10px;color:var(--txt-3)">${fmtDateShort(v.date)}${v.time?' · '+v.time:''}</div></td>
-      <td style="font-size:12px">${esc(v.location||'—')}</td>
-      <td>${v.pic?avatar(userName(v.pic),'sm'):'—'}</td>
+      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(v.brand)}${esc(b?b.name.split(' (')[0]:'-')}</span></td>
+      <td><span class="mono" style="font-size:12px;color:${od!=null&&od<0&&!['came','noshow','done'].includes(v.status)?'var(--bad)':'var(--txt-2)'};font-weight:600">${v.date?relDay(v.date):'-'}</span><div style="font-size:10px;color:var(--txt-3)">${fmtDateShort(v.date)}${v.time?' - '+v.time:''}</div></td>
+      <td style="font-size:12px">${esc(v.location||'-')}</td>
+      <td>${v.pic?avatar(userName(v.pic),'sm'):'-'}</td>
       <td>${can('kol')?`<select class="ctrl" style="padding:6px 8px;font-size:12px;min-width:150px;${isDay?'box-shadow:0 0 0 2px var(--gold-glow)':''}" onchange="COMS.setVisitStatus('${v.id}',this.value)">${Object.keys(VISIT_STATUS).map(s=>`<option value="${s}" ${v.status===s?'selected':''}>${VISIT_STATUS[s].label}</option>`).join('')}</select>`:`<span class="pill" style="background:${ts.bg};color:${ts.fg}">${s.label}</span>`}</td>
       <td style="text-align:right;white-space:nowrap">${isDay&&can('kol')?`<button class="btn btn-gold btn-sm" title="Hari-H: tandai hadir" onclick="COMS.setVisitStatus('${v.id}','came')">✓ Hadir</button> <button class="btn btn-danger btn-sm" title="Tandai tidak hadir" onclick="COMS.setVisitStatus('${v.id}','noshow')">✕</button>`:(can('kol')?`<button class="btn btn-ghost btn-sm" onclick="COMS.openVisitForm('${v.id}')">✎</button>`:'')}</td>
     </tr>`;}).join('');
@@ -2091,12 +2090,12 @@ function openVisitForm(id){
   if(!(DB.kols||[]).length){toast('Tambahkan KOL / Medpar di Database dulu','err');setKolTab('db');return;}
   const defDate=v?v.date:(()=>{const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);})();
   const inv=visitInvitees(v);const loc=v?.location||'';
-  // Bagian Direct Message — hanya muncul saat event sudah dibuat (mode edit/view)
+  // Bagian Direct Message - hanya muncul saat event sudah dibuat (mode edit/view)
   let dmBlock='';
   if(isEdit){
     const invited=inv.map(kid=>getKol(kid)).filter(Boolean);
     dmBlock=`<div class="full field"><label>📨 Direct Message Undangan (template otomatis)</label>
-      <div style="font-size:11.5px;color:var(--txt-3);margin:-2px 0 8px">Sekali klik — template acara (nama, tanggal, jam, lokasi, deskripsi) langsung terisi. WhatsApp otomatis; IG & TikTok template disalin ke clipboard.</div>
+      <div style="font-size:11.5px;color:var(--txt-3);margin:-2px 0 8px">Sekali klik - template acara (nama, tanggal, jam, lokasi, deskripsi) langsung terisi. WhatsApp otomatis; IG & TikTok template disalin ke clipboard.</div>
       <div style="display:flex;flex-direction:column;gap:8px">${invited.length?invited.map(k=>`<div class="li-row" style="padding:9px 12px">
         <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(k.name)} <span class="tag" style="margin-left:4px">${esc(kolType(k))}</span></div></div>
         <button class="btn btn-sm" style="background:var(--ok-bg);color:var(--ok)" ${k.whatsapp?'':'disabled'} title="${k.whatsapp?'':'Nomor WA kosong'}" onclick="COMS.dmInvitee('${v.id}','${k.id}','wa')">🟢 WhatsApp</button>
@@ -2116,7 +2115,7 @@ function openVisitForm(id){
       <div style="max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line-soft);border-radius:10px;padding:8px;background:var(--panel-2)">
         ${(DB.kols||[]).map(k=>`<label class="chk-row"><input type="checkbox" class="v_inv" value="${k.id}" ${inv.includes(k.id)?'checked':''} style="accent-color:var(--gold);width:16px;height:16px"><span style="flex:1">${esc(k.name)}</span><span class="tag">${kolType(k)==='Media Partner'?'📰':'🧑‍🎤'} ${esc(kolType(k))}</span></label>`).join('')||'<div style="color:var(--txt-3);font-size:12px">Belum ada KOL / Medpar di database.</div>'}
       </div></div>
-    <div class="field"><label>PIC Pendamping</label><select class="ctrl" id="v_pic"><option value="">— Belum ditentukan —</option>${DB.users.map(u=>`<option value="${u.id}" ${v&&v.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
+    <div class="field"><label>PIC Pendamping</label><select class="ctrl" id="v_pic"><option value="">- Belum ditentukan -</option>${DB.users.map(u=>`<option value="${u.id}" ${v&&v.pic===u.id?'selected':''}>${esc(u.name)} (${esc(roleShorts(u))})</option>`).join('')}</select></div>
     <div class="field"><label>Status Kehadiran</label><select class="ctrl" id="v_status">${Object.keys(VISIT_STATUS).map(s=>`<option value="${s}" ${v&&v.status===s?'selected':(!v&&s==='planned'?'selected':'')}>${VISIT_STATUS[s].label}</option>`).join('')}</select></div>
     <div class="full field"><label>Objective / Deliverables</label><input class="ctrl" id="v_objective" value="${esc(v?.objective||'')}" placeholder="mis. 1 Reels + 3 Story per undangan"></div>
     ${dmBlock}
@@ -2130,7 +2129,7 @@ function saveVisit(id){
   const data={title,brand:g('brand'),date:g('date'),time:g('time'),location:g('location'),
     desc:g('desc').trim(),invitees,kolId:invitees[0]||'',pic:g('pic'),status:g('status')||'planned',objective:g('objective').trim(),note:g('desc').trim()};
   if(id){Object.assign((DB.visits||[]).find(x=>x.id===id),data);logAct('mengubah event kunjungan',title);toast('Event kunjungan diperbarui','ok');}
-  else{DB.visits.push(Object.assign({id:uid('vs'),createdAt:Date.now()},data));logAct('membuat event kunjungan',title);toast('Event kunjungan dibuat — cek di Kalender','ok');}
+  else{DB.visits.push(Object.assign({id:uid('vs'),createdAt:Date.now()},data));logAct('membuat event kunjungan',title);toast('Event kunjungan dibuat - cek di Kalender','ok');}
   save();closeDrawer();route('kol');
 }
 function delVisit(id){const v=(DB.visits||[]).find(x=>x.id===id);if(!v)return;if(!confirm('Hapus rencana kunjungan ini?'))return;
@@ -2140,7 +2139,7 @@ function setVisitStatus(id,status){const v=(DB.visits||[]).find(x=>x.id===id);if
   toast(visitLabel(v)+': '+VISIT_STATUS[status].label,status==='noshow'?'err':'ok');route('kol');}
 
 /* =========================================================================
-   ADS MANAGEMENT — kelola & pantau Meta / Google / TikTok Ads
+   ADS MANAGEMENT - kelola & pantau Meta / Google / TikTok Ads
    ========================================================================= */
 let adsFilters={q:'',platform:'',status:''};
 let adsPerPage=25,adsPage=1;
@@ -2171,7 +2170,7 @@ VIEWS.ads=function(){
   const totIn=fundScope.reduce((s,x)=>s+(+x.amount||0),0);
   const totOut=scope.reduce((s,a)=>s+adSpendTotal(a),0);
   const active=scope.filter(a=>a.status==='active').length;
-  // Sisa dana keseluruhan (akumulatif — SELURUH brand, semua waktu)
+  // Sisa dana keseluruhan (akumulatif - SELURUH brand, semua waktu)
   const allIn=(DB.adFunds||[]).reduce((s,x)=>s+(+x.amount||0),0);
   const allOut=(DB.ads||[]).reduce((s,a)=>s+adSpendTotal(a),0);
   const sisaAll=allIn-allOut;
@@ -2183,7 +2182,7 @@ VIEWS.ads=function(){
   </div>`;
   // ===== SISA DANA KESELURUHAN (akumulatif) =====
   const sisaAllCard=`<div class="card" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,rgba(229,168,35,.10),transparent)">
-    <div><div style="font-size:12px;color:var(--txt-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">🏦 Sisa Dana Keseluruhan (Akumulatif · Semua Brand)</div>
+    <div><div style="font-size:12px;color:var(--txt-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">🏦 Sisa Dana Keseluruhan (Akumulatif - Semua Brand)</div>
     <div style="font-size:12px;color:var(--txt-3);margin-top:4px">Masuk <b class="mono" style="color:var(--ok)">${rupiah(allIn)}</b> − Keluar <b class="mono" style="color:var(--bad)">${rupiah(allOut)}</b></div></div>
     <div class="mono serif" style="font-size:30px;font-weight:800;color:${sisaAll<0?'var(--bad)':'var(--gold-dim)'}">${rupiah(sisaAll)}</div></div>`;
   // ===== REPORT PER BULAN (dana masuk & keluar) + export =====
@@ -2202,9 +2201,9 @@ VIEWS.ads=function(){
   const funds=fundScope.slice().sort((a,b)=>new Date(b.date||'1970')-new Date(a.date||'1970'));
   const fundRows=funds.map(x=>{const b=getBrand(x.brand);return `<tr>
       <td style="font-size:12px">${fmtDate(x.date)}</td>
-      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(x.brand)}${esc(b?b.name.split(' (')[0]:'—')}</span></td>
+      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(x.brand)}${esc(b?b.name.split(' (')[0]:'-')}</span></td>
       <td class="mono" style="font-weight:600;color:var(--ok)">${rupiah(x.amount)}</td>
-      <td style="font-size:12px;color:var(--txt-2)">${esc(x.note||'—')}</td>
+      <td style="font-size:12px;color:var(--txt-2)">${esc(x.note||'-')}</td>
       <td style="text-align:right;white-space:nowrap">${can('ads')?`<button class="btn btn-ghost btn-sm" onclick="COMS.openFundForm('${x.id}')">✎</button> <button class="btn btn-danger btn-sm" onclick="COMS.delFund('${x.id}')">🗑</button>`:''}</td>
     </tr>`;}).join('');
   const fundCard=`<div class="card" style="margin-bottom:16px">
@@ -2223,7 +2222,7 @@ VIEWS.ads=function(){
       <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt-3)">Per halaman
         <select class="ctrl" style="padding:5px 8px;font-size:12px;width:auto" onchange="COMS.adsPerPageSet(this.value)">${[10,20,50,100].map(n=>`<option value="${n}" ${adsPerPage===n?'selected':''}>${n}</option>`).join('')}</select></span>
     </div></div>`;
-  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">📢 Dana Masuk = budget · Buat Iklan = rincian dana keluar (incl. PPN 11%)</p></div><div style="display:flex;gap:8px;flex-wrap:wrap">${addFundBtn}${addBtn}</div></div>`;
+  const head=`<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">📢 Dana Masuk = budget - Buat Iklan = rincian dana keluar (incl. PPN 11%)</p></div><div style="display:flex;gap:8px;flex-wrap:wrap">${addFundBtn}${addBtn}</div></div>`;
   let body;
   if(!list.length){body=`<div class="empty"><div class="ei">📢</div><h4>${scope.length?'Tidak ada yang cocok':'Belum ada iklan'}</h4><p>${scope.length?'Ubah / reset filter.':'Klik "Buat Iklan" untuk mencatat rincian dana keluar.'}</p></div>`;}
   else{
@@ -2231,20 +2230,20 @@ VIEWS.ads=function(){
       const s=ADS_STATUS[a.status]||ADS_STATUS.draft;const ss=tint(s.c);const b=getBrand(a.brand);
       const nItem=(a.expenses||[]).length;
       return `<tr>
-        <td class="row-click" onclick="COMS.openAdForm('${a.id}')"><div style="font-weight:600">${esc(a.name||'(tanpa nama)')}</div><div style="font-size:11px;color:var(--txt-3)">${esc(a.objective||'')}${nItem?` · ${nItem} rincian`:''}</div></td>
-        <td><span style="display:flex;align-items:center;gap:6px">${brandDot(a.brand)}${esc(b?b.name.split(' (')[0]:'—')}</span></td>
+        <td class="row-click" onclick="COMS.openAdForm('${a.id}')"><div style="font-weight:600">${esc(a.name||'(tanpa nama)')}</div><div style="font-size:11px;color:var(--txt-3)">${esc(a.objective||'')}${nItem?` - ${nItem} rincian`:''}</div></td>
+        <td><span style="display:flex;align-items:center;gap:6px">${brandDot(a.brand)}${esc(b?b.name.split(' (')[0]:'-')}</span></td>
         <td><span class="tag" style="background:${pt.bg};color:${pt.fg};border-color:transparent">${esc(a.platform)}</span></td>
-        <td style="font-size:12px">${a.target?`<span class="tag">${esc(a.target)}</span>`:'<span style="color:var(--txt-3)">—</span>'}</td>
-        <td style="font-size:12px">${esc(a.ageRange||'—')}</td>
+        <td style="font-size:12px">${a.target?`<span class="tag">${esc(a.target)}</span>`:'<span style="color:var(--txt-3)">-</span>'}</td>
+        <td style="font-size:12px">${esc(a.ageRange||'-')}</td>
         <td style="font-size:12px"><span style="color:var(--info);font-weight:600">💬 ${num(a.chats||0)}</span> <span style="color:var(--txt-3)">/ 👁 ${num(a.impressions||0)}</span></td>
         <td class="mono" style="font-size:12px;font-weight:600;color:var(--bad)" title="Termasuk PPN 11%">${rupiah(adSpendTotal(a))}</td>
-        <td style="font-size:11px;color:var(--txt-2)">${fmtDateShort(a.startDate)||'—'} – ${fmtDateShort(a.endDate)||'—'}</td>
+        <td style="font-size:11px;color:var(--txt-2)">${fmtDateShort(a.startDate)||'-'} - ${fmtDateShort(a.endDate)||'-'}</td>
         <td>${can('ads')?`<select class="ctrl" style="padding:6px 8px;font-size:12px;min-width:120px" onchange="COMS.setAdStatus('${a.id}',this.value)">${Object.keys(ADS_STATUS).map(k=>`<option value="${k}" ${a.status===k?'selected':''}>${ADS_STATUS[k].label}</option>`).join('')}</select>`:`<span class="pill" style="background:${ss.bg};color:${ss.fg}">${s.label}</span>`}</td>
         <td style="text-align:right;white-space:nowrap">${can('ads')?`<button class="btn btn-ghost btn-sm" onclick="COMS.openAdForm('${a.id}')">✎</button> <button class="btn btn-danger btn-sm" onclick="COMS.delAd('${a.id}')">🗑</button>`:''}</td>
       </tr>`;}).join('');
     const pager=totalPages>1?`<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px">
       <button class="btn btn-ghost btn-sm" ${adsPage<=1?'disabled':''} onclick="COMS.adsPageSet(${adsPage-1})">‹ Sebelumnya</button>
-      <span style="font-size:12.5px;color:var(--txt-2)">Halaman <b>${adsPage}</b> / ${totalPages} · ${list.length} iklan</span>
+      <span style="font-size:12.5px;color:var(--txt-2)">Halaman <b>${adsPage}</b> / ${totalPages} - ${list.length} iklan</span>
       <button class="btn btn-ghost btn-sm" ${adsPage>=totalPages?'disabled':''} onclick="COMS.adsPageSet(${adsPage+1})">Berikutnya ›</button>
     </div>`:'';
     body=`<div class="tbl-wrap"><table><thead><tr>
@@ -2253,7 +2252,7 @@ VIEWS.ads=function(){
   }
   return brandBar()+head+stats+sisaAllCard+monthCard+fundCard+filterBar+body;
 };
-// ===== REPORT PERCAKAPAN — tab tersendiri (chat hasil dari iklan) =====
+// ===== REPORT PERCAKAPAN - tab tersendiri (chat hasil dari iklan) =====
 VIEWS.chats=function(){
   const scope=filterByBrand(DB.ads||[]);
   const totChats=scope.reduce((s,a)=>s+(+a.chats||0),0);
@@ -2264,9 +2263,9 @@ VIEWS.chats=function(){
     return `<span class="tag" style="background:${t.bg};color:${t.fg};border-color:transparent;font-size:12px">${esc(p)}: <b>${num(byPlat[p])}</b></span>`;}).join(' ');
   const chatRows=chatAds.map(a=>{const b=getBrand(a.brand);const pl=ADS_PLATFORMS[a.platform]||{c:'#888'};const pt=tint(pl.c);return `<tr>
       <td class="row-click" style="font-weight:600" onclick="COMS.openAdForm('${a.id}')">${esc(a.name||'(tanpa nama)')}</td>
-      <td><span class="tag" style="background:${pt.bg};color:${pt.fg};border-color:transparent">${esc(a.platform||'—')}</span></td>
-      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(a.brand)}${esc(b?b.name.split(' (')[0]:'—')}</span></td>
-      <td style="font-size:12px">${esc(a.target||'—')}</td>
+      <td><span class="tag" style="background:${pt.bg};color:${pt.fg};border-color:transparent">${esc(a.platform||'-')}</span></td>
+      <td><span style="display:flex;align-items:center;gap:6px">${brandDot(a.brand)}${esc(b?b.name.split(' (')[0]:'-')}</span></td>
+      <td style="font-size:12px">${esc(a.target||'-')}</td>
       <td class="mono" style="font-weight:700;color:var(--info)">💬 ${num(a.chats)}</td></tr>`;}).join('');
   const st=(l,v,c)=>`<div class="stat"><div class="lbl">${l}</div><div class="val mono" style="${c?'color:'+c:''}">${v}</div></div>`;
   return `${brandBar()}
@@ -2276,7 +2275,7 @@ VIEWS.chats=function(){
   ${platRows?`<div class="card" style="margin-bottom:16px;padding:14px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-3);font-weight:700;margin-bottom:8px">Percakapan per Platform</div><div style="display:flex;gap:7px;flex-wrap:wrap">${platRows}</div></div>`:''}
   <div class="card">
     <div class="card-h"><h3>💬 Report Percakapan (Chat dari Iklan)</h3><span class="sub">Total: <b class="mono" style="color:var(--info)">${num(totChats)} chat</b></span></div>
-    ${chatAds.length?`<div class="tbl-wrap"><table><thead><tr><th>Nama Iklan</th><th>Platform</th><th>Brand</th><th>Target</th><th>Chats</th></tr></thead><tbody>${chatRows}</tbody></table></div>`:'<div class="empty"><div class="ei">💬</div><h4>Belum ada percakapan</h4><p>Isi kolom "Hasil — Chats" saat Buat Iklan agar tercatat di sini.</p></div>'}</div>`;
+    ${chatAds.length?`<div class="tbl-wrap"><table><thead><tr><th>Nama Iklan</th><th>Platform</th><th>Brand</th><th>Target</th><th>Chats</th></tr></thead><tbody>${chatRows}</tbody></table></div>`:'<div class="empty"><div class="ei">💬</div><h4>Belum ada percakapan</h4><p>Isi kolom "Hasil - Chats" saat Buat Iklan agar tercatat di sini.</p></div>'}</div>`;
 };
 function adsF(k,v){adsFilters[k]=v;adsPage=1;route('ads');}
 function adsReset(){adsFilters={q:'',platform:'',status:''};adsPage=1;route('ads');}
@@ -2293,7 +2292,7 @@ function exportAdsMonth(ym){
   downloadFile('COMS_ads_'+ym+'.csv',rows.map(r=>r.map(csvSafe).join(',')).join('\n'),'text/csv');
   logAct('ekspor laporan ads',ymLabel(ym));
 }
-// ===== DANA MASUK (input terpisah — bukan pembuatan iklan) =====
+// ===== DANA MASUK (input terpisah - bukan pembuatan iklan) =====
 function getFund(id){return (DB.adFunds||[]).find(x=>x.id===id);}
 function openFundForm(id){
   if(!can('ads')){toast('Kamu tidak punya akses mengelola dana','err');return;}
@@ -2339,7 +2338,7 @@ function openAdForm(id){
   const a=id?getAd(id):null;const isEdit=!!a;
   // Buat Iklan = DANA KELUAR saja. Inisialisasi rincian (migrasi dari spend lama bila perlu)
   _adExp=(a&&a.expenses)?a.expenses.map(x=>({...x})):((a&&a.spend)?[{date:a.startDate||todayISO(),purpose:'Penggunaan awal',amount:a.spend}]:[]);
-  drawer(`<div class="drawer-h"><h3>${isEdit?'Edit Iklan':'Buat Iklan'} <span style="font-size:12px;color:var(--bad);font-weight:600">· Dana Keluar</span></h3><button class="x-btn" onclick="COMS.closeDrawer()">✕</button></div>
+  drawer(`<div class="drawer-h"><h3>${isEdit?'Edit Iklan':'Buat Iklan'} <span style="font-size:12px;color:var(--bad);font-weight:600">- Dana Keluar</span></h3><button class="x-btn" onclick="COMS.closeDrawer()">✕</button></div>
   <div class="drawer-b"><div class="form-grid">
     <div class="full field"><label>Nama Iklan / Kampanye *</label><input class="ctrl" id="a_name" value="${esc(a?.name||'')}" placeholder="mis. Promo Ramadhan - Conversion"></div>
     <div class="field"><label>Brand</label><select class="ctrl" id="a_brand">${DB.brands.map(b=>`<option value="${b.id}" ${a&&a.brand===b.id?'selected':(!a&&brandFilter===b.id?'selected':'')}>${esc(b.name)}</option>`).join('')}</select></div>
@@ -2350,15 +2349,15 @@ function openAdForm(id){
       <input class="ctrl" id="a_target" list="a_targetList" value="${esc(a?.target||'')}" placeholder="Pilih atau ketik target baru">
       <datalist id="a_targetList">${ADS_TARGETS.map(t=>`<option value="${esc(t)}"></option>`).join('')}</datalist></div>
     <div class="field"><label>Usia Range <span style="color:var(--txt-3);font-weight:400">(pilih / ketik manual)</span></label>
-      <input class="ctrl" id="a_ageRange" list="a_ageList" value="${esc(a?.ageRange||'')}" placeholder="mis. 25–34">
+      <input class="ctrl" id="a_ageRange" list="a_ageList" value="${esc(a?.ageRange||'')}" placeholder="mis. 25-34">
       <datalist id="a_ageList">${ADS_AGE_RANGES.map(t=>`<option value="${esc(t)}"></option>`).join('')}</datalist></div>
     <div class="field"><label>Mulai</label><input type="date" class="ctrl" id="a_startDate" value="${a?.startDate||''}"></div>
     <div class="field"><label>Selesai</label><input type="date" class="ctrl" id="a_endDate" value="${a?.endDate||''}"></div>
-    <div class="field"><label>Hasil — Chats</label><input type="number" min="0" class="ctrl" id="a_chats" value="${a?.chats||''}" placeholder="0"></div>
-    <div class="field"><label>Hasil — Impression</label><input type="number" min="0" class="ctrl" id="a_impressions" value="${a?.impressions||''}" placeholder="0"></div>
+    <div class="field"><label>Hasil - Chats</label><input type="number" min="0" class="ctrl" id="a_chats" value="${a?.chats||''}" placeholder="0"></div>
+    <div class="field"><label>Hasil - Impression</label><input type="number" min="0" class="ctrl" id="a_impressions" value="${a?.impressions||''}" placeholder="0"></div>
     <div class="full field" style="border:1px solid var(--line-soft);border-radius:12px;padding:14px;background:var(--panel-2)">
       <label>📉 Dana Keluar (Penggunaan Ads)</label>
-      <div style="font-size:11.5px;color:var(--txt-3);margin:2px 0 6px">Rincian breakdown penggunaan — untuk keperluan apa saja. Pajak PPN 11% dihitung otomatis.</div>
+      <div style="font-size:11.5px;color:var(--txt-3);margin:2px 0 6px">Rincian breakdown penggunaan - untuk keperluan apa saja. Pajak PPN 11% dihitung otomatis.</div>
       <div id="a_exp" style="margin-top:4px">${_adExpRows()}</div>
       <button class="btn btn-ghost btn-sm" onclick="COMS._adAdd()" style="margin-top:6px">＋ Tambah Rincian Dana Keluar</button>
       <div style="margin-top:12px;border-top:1px solid var(--line-soft);padding-top:10px;font-size:12.5px">
@@ -2393,7 +2392,7 @@ VIEWS.assets=function(){
   let list=filterByBrand(DB.assets);if(assetCat)list=list.filter(a=>a.category===assetCat);
   const cats=[...new Set(DB.assets.map(a=>a.category))];
   return `${brandBar()}
-  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${DB.assets.length} asset tersimpan · foto, video, desain, template</p></div>
+  <div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${DB.assets.length} asset tersimpan - foto, video, desain, template</p></div>
     ${can('assets')?`<button class="btn btn-gold" onclick="COMS.openAssetForm()">＋ Tambah Asset</button>`:''}</div>
   <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">
     <button class="bf ${!assetCat?'active':''}" onclick="COMS.setAssetCat('')">Semua</button>
@@ -2402,7 +2401,7 @@ VIEWS.assets=function(){
     return `<div class="card" style="cursor:pointer" onclick="window.open('${esc(a.link)}','_blank')">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <div style="width:44px;height:44px;border-radius:11px;background:var(--ink-800);display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto">${icons[a.category]||'📁'}</div>
-        <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;line-height:1.3">${esc(a.name)}</div><div style="font-size:10px;color:var(--txt-3)">${esc(a.category)} · ${esc(a.version||'v1')}</div></div>
+        <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;line-height:1.3">${esc(a.name)}</div><div style="font-size:10px;color:var(--txt-3)">${esc(a.category)} - ${esc(a.version||'v1')}</div></div>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${brandDot(a.brand)}<span style="font-size:10px;color:var(--txt-3)">${esc(b?b.name.split(' (')[0]:'')}</span>${(a.tags||[]).slice(0,3).map(t=>`<span class="tag" style="font-size:9.5px">#${esc(t)}</span>`).join('')}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--txt-3)"><span>${avatar(userName(a.by),'sm')} ${esc(userName(a.by).split(' ')[0])}</span><span>${timeAgo(a.at)}</span></div>
@@ -2432,7 +2431,7 @@ VIEWS.approval=function(){
   const list=filterByBrand(DB.content).filter(c=>c.status==='Approval');
   const canAppr=can('approve');
   return `${brandBar()}
-  <div class="card" style="padding:12px;margin-bottom:16px;font-size:12px;color:var(--txt-2)">✅ Approval sekali — cukup review <b>hasil akhir/final</b> lalu setujui. Tidak ada approval bertahap. ${canAppr?'Kamu punya wewenang approve.':'Hanya Account Manager & Content Director yang bisa approve. Kamu bisa memantau statusnya.'}</div>
+  <div class="card" style="padding:12px;margin-bottom:16px;font-size:12px;color:var(--txt-2)">✅ Approval sekali - cukup review <b>hasil akhir/final</b> lalu setujui. Tidak ada approval bertahap. ${canAppr?'Kamu punya wewenang approve.':'Hanya Account Manager & Content Director yang bisa approve. Kamu bisa memantau statusnya.'}</div>
   ${list.length?`<div class="grid g-2">${list.map(c=>{const b=getBrand(c.brand);
     return `<div class="card">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">${brandDot(c.brand)}<span style="font-size:11px;color:var(--txt-3)">${esc(b?b.name.split(' (')[0]:'')}</span>${platformTag(c.platform)}
@@ -2449,7 +2448,7 @@ VIEWS.approval=function(){
         <button class="btn btn-danger btn-sm" onclick="COMS.reqRevision('${c.id}')">↻ Tolak / Revisi</button></div>`:'<div style="font-size:11.5px;color:var(--txt-3)">Menunggu persetujuan dari Account Manager / Content Director.</div>'}
     </div>`;}).join('')}</div>`:'<div class="empty"><div class="ei">✅</div><h4>Tidak ada yang menunggu approval</h4><p>Semua konten sudah direview.</p></div>'}`;
 };
-// Approval sekali — langsung setujui hasil final & jadwalkan
+// Approval sekali - langsung setujui hasil final & jadwalkan
 function approveFinal(id){const c=getContent(id);c.approvals=c.approvals||[];
   c.approvals.push({stage:'Final Review',by:SES,ok:true,at:Date.now()});
   c.status='Scheduled';logAct('approve final & jadwalkan',c.title);notify('approval','Disetujui & dijadwalkan: '+c.title);save();updateApprovalBadge();route('approval');toast('Konten disetujui & dijadwalkan 🚀','ok');}
@@ -2463,14 +2462,14 @@ VIEWS.publishing=function(){
       ${scheduled.length?`<div class="list-plain">${scheduled.map(c=>{const dd=daysDiff(c.publishDate);
         return `<div class="li-row"><div style="flex:1;min-width:0" class="row-click" onclick="COMS.openContent('${c.id}')">
           <div style="font-weight:600;font-size:13px">${esc(c.title)}</div>
-          <div style="font-size:11px;color:var(--txt-3)">${brandDot(c.brand)} ${platformTag(c.platform)} · ${fmtDate(c.publishDate)} ${c.publishTime||''}</div></div>
+          <div style="font-size:11px;color:var(--txt-3)">${brandDot(c.brand)} ${platformTag(c.platform)} - ${fmtDate(c.publishDate)} ${c.publishTime||''}</div></div>
           <span class="pill" style="background:var(--gold-glow);color:var(--gold)">${relDay(c.publishDate)}</span>
           ${can('publish')?`<button class="btn btn-gold btn-sm" onclick="COMS.markPublished('${c.id}')">Tayang ✓</button>`:''}</div>`;}).join('')}</div>`:'<div class="empty" style="padding:24px"><p>Tidak ada yang terjadwal.</p></div>'}
     </div>
     <div class="card"><div class="card-h"><h3>✅ Sudah Tayang (${posted.length})</h3></div>
       ${posted.length?`<div class="list-plain">${posted.slice(0,10).map(c=>`<div class="li-row row-click" onclick="COMS.openContent('${c.id}')">
         <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(c.title)}</div>
-        <div style="font-size:11px;color:var(--txt-3)">${brandDot(c.brand)} ${platformTag(c.platform)} · ${fmtDT(c.publishRecord.at)}</div></div>
+        <div style="font-size:11px;color:var(--txt-3)">${brandDot(c.brand)} ${platformTag(c.platform)} - ${fmtDT(c.publishRecord.at)}</div></div>
         ${c.metrics?`<span class="mono" style="font-size:11px;color:var(--gold)">${num(c.metrics.reach)} reach</span>`:''}
         <a href="${esc(c.publishRecord.url)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--info)">↗</a></div>`).join('')}</div>`:'<div class="empty" style="padding:24px"><p>Belum ada yang tayang.</p></div>'}
     </div>
@@ -2492,7 +2491,7 @@ VIEWS.analytics=function(){
   <div class="grid g-2" style="align-items:start;margin-bottom:20px">
     <div class="card"><div class="card-h"><h3>Reach per Platform</h3></div>
       <div class="list-plain">${Object.entries(byPlat).sort((a,b)=>b[1].reach-a[1].reach).map(([p,d])=>{const pl=PLATFORMS[p]||{c:'#888'};
-        return `<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:600">${esc(p)} <span style="color:var(--txt-3)">· ${d.n} post</span></span><span class="mono">${num(d.reach)}</span></div>
+        return `<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:600">${esc(p)} <span style="color:var(--txt-3)">- ${d.n} post</span></span><span class="mono">${num(d.reach)}</span></div>
         <div class="progress"><i style="width:${pct(d.reach,maxPlat)}%;background:${pl.c}"></i></div></div>`;}).join('')}</div></div>
     <div class="card"><div class="card-h"><h3>Follower Growth</h3><span class="sub">dari konten</span></div>
       <div style="text-align:center;padding:20px"><div class="serif" style="font-size:44px;color:var(--ok)">+${num(agg.followers)}</div><div style="color:var(--txt-3);font-size:12px">total pertambahan follower dari ${posted.length} konten</div></div></div>
@@ -2507,10 +2506,10 @@ VIEWS.analytics=function(){
 };
 
 VIEWS.activity=function(){
-  return `<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${DB.logs.length} aktivitas tercatat · jejak audit</p></div></div>
+  return `<div class="page-head"><div><p style="color:var(--txt-3);font-size:13px">${DB.logs.length} aktivitas tercatat - jejak audit</p></div></div>
   <div class="card"><div>${DB.logs.slice(0,80).map(l=>`<div class="timeline-i"><div class="timeline-dot" style="background:${avColor(userName(l.by))}22;border-color:${avColor(userName(l.by))}">${initials(userName(l.by))[0]}</div>
     <div style="flex:1"><div style="font-size:13px"><b>${esc(userName(l.by))}</b> ${esc(l.action)}${l.target?` <span style="color:var(--gold)">${esc(l.target)}</span>`:''}</div>
-    <div style="font-size:11px;color:var(--txt-3)">${fmtDT(l.at)} · ${timeAgo(l.at)}</div></div></div>`).join('')}</div></div>`;
+    <div style="font-size:11px;color:var(--txt-3)">${fmtDT(l.at)} - ${timeAgo(l.at)}</div></div></div>`).join('')}</div></div>`;
 };
 
 VIEWS.reports=function(){
@@ -2594,7 +2593,7 @@ function permEditorCard(){
   const editableRoles=ROLE_KEYS.filter(r=>r!=='super_admin'); // super admin selalu penuh
   const mods=permModuleKeys();
   return `<div class="card" style="grid-column:1/-1"><div class="card-h">
-      <h3>Editor Hak Akses</h3><span class="sub">centang modul yang boleh diakses tiap role · Super Admin selalu penuh</span></div>
+      <h3>Editor Hak Akses</h3><span class="sub">centang modul yang boleh diakses tiap role - Super Admin selalu penuh</span></div>
     <p style="font-size:12px;color:var(--txt-2);margin-bottom:12px">Perubahan langsung memengaruhi menu sidebar & tombol tiap kru. Klik <b>Simpan Hak Akses</b> untuk menerapkan.</p>
     <div class="tbl-wrap"><table class="perm-matrix"><thead><tr>
       <th style="text-align:left;min-width:120px">Modul</th>
@@ -2635,7 +2634,7 @@ VIEWS.profile=function(){
     <button class="btn btn-danger" onclick="COMS.logout()">⎋ Keluar</button></div>
   <div class="card pad-lg" style="max-width:640px">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">${avatar(u.name,'lg')}
-      <div><h2 style="font-size:22px">${esc(u.name)}</h2><div style="color:var(--txt-3);font-size:13px">${esc(u.division)} · ${esc(u.email||'')}</div></div></div>
+      <div><h2 style="font-size:22px">${esc(u.name)}</h2><div style="color:var(--txt-3);font-size:13px">${esc(u.division)} - ${esc(u.email||'')}</div></div></div>
     <div style="font-size:10px;text-transform:uppercase;color:var(--txt-3);font-weight:700;margin-bottom:8px">Role Kamu ${userRoles(u).length>1?'(rangkap kerja)':''}</div>
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px">${userRoles(u).map(r=>{const ro=ROLES[r];
       return `<div style="padding:9px 12px;background:var(--ink-800);border-radius:8px;border-left:3px solid ${ro.color}"><b style="color:${readable(ro.color)}">${ro.label}</b><div style="font-size:11.5px;color:var(--txt-3)">${ro.desc}</div></div>`;}).join('')}</div>
@@ -2662,10 +2661,10 @@ function markAllRead(){DB.notifs.forEach(n=>n.read=true);save();refreshNotifDot(
 function initSearch(){const inp=$('#globalSearch');const box=$('#searchResults');
   inp.addEventListener('input',()=>{const q=inp.value.trim().toLowerCase();if(!q){box.innerHTML='';box.style.display='none';return;}
     const res=[];
-    DB.content.filter(c=>(c.title+c.caption+(c.hashtags||[]).join(' ')).toLowerCase().includes(q)).slice(0,5).forEach(c=>res.push({t:c.title,s:'Konten · '+c.platform,fn:`COMS.openContent('${c.id}')`}));
+    DB.content.filter(c=>(c.title+c.caption+(c.hashtags||[]).join(' ')).toLowerCase().includes(q)).slice(0,5).forEach(c=>res.push({t:c.title,s:'Konten - '+c.platform,fn:`COMS.openContent('${c.id}')`}));
     DB.brands.filter(b=>b.name.toLowerCase().includes(q)).slice(0,3).forEach(b=>res.push({t:b.name,s:'Brand',fn:`COMS.route('brands')`}));
     DB.bank.filter(b=>b.title.toLowerCase().includes(q)).slice(0,3).forEach(b=>res.push({t:b.title,s:'Ide',fn:`COMS.openBankForm('${b.id}')`}));
-    DB.users.filter(u=>u.name.toLowerCase().includes(q)).slice(0,3).forEach(u=>res.push({t:u.name,s:'Kru · '+roleShorts(u),fn:`COMS.route('team')`}));
+    DB.users.filter(u=>u.name.toLowerCase().includes(q)).slice(0,3).forEach(u=>res.push({t:u.name,s:'Kru - '+roleShorts(u),fn:`COMS.route('team')`}));
     box.innerHTML=res.length?res.map(r=>`<div class="li-row row-click" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--line-soft)" onclick="${r.fn};COMS.clearSearch()"><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(r.t)}</div><div style="font-size:11px;color:var(--txt-3)">${esc(r.s)}</div></div></div>`).join(''):'<div style="padding:14px;color:var(--txt-3);font-size:12px">Tidak ada hasil</div>';
     box.style.display='block';});
   document.addEventListener('click',e=>{if(!e.target.closest('.top-search'))clearSearch();});

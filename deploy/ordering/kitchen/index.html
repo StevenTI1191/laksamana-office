@@ -155,7 +155,7 @@
                 <a href="../purchasing/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <i class="fa-solid fa-right-left"></i> Pindah ke sisi Purchasing
                 </a>
-                <span class="text-line mx-2">·</span>
+                <span class="text-line mx-2">-</span>
                 <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <i class="fa-solid fa-arrow-left"></i> Office
                 </a>
@@ -591,7 +591,7 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">PIN (angka)</label>
-                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="cth: 1111" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="3-8 digit angka" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Hak Akses</label>
@@ -869,7 +869,7 @@
             document.getElementById('btn-manage-users').classList.toggle('hidden', !isAdmin);
             document.getElementById('btn-config').classList.toggle('hidden', !isAdmin);
 
-            // Tab & halaman Order Belanja — switchTab dulu, baru sembunyikan
+            // Tab & halaman Order Belanja - switchTab dulu, baru sembunyikan
             // (switchTab menimpa className tab, jadi 'hidden' harus diterapkan setelahnya)
             switchTab(canOrder ? 'order' : 'checkin');
             document.getElementById('tab-order').classList.toggle('hidden', !canOrder);
@@ -1372,13 +1372,13 @@
                 : (a.daysCover == null ? '<span class="text-slate-400 italic font-medium">perlu stok</span>'
                    : `<span style="color:${st.color}">${F.fmtDays(a.daysCover)}</span>`);
             const lastsTxt = noUsage ? naText
-                : (lasts == null ? '—' : `<span class="font-bold">${F.fmtDays(lasts)}</span>`);
+                : (lasts == null ? '-' : `<span class="font-bold">${F.fmtDays(lasts)}</span>`);
             // Saat status AMAN, tak perlu tampilkan "Saran pesan".
             const showSuggest = st.key !== 'safe' && a.suggestOrderPacks != null;
 
             // Semua sel dalam SATU baris (nowrap); bila layar sempit boleh
-            // di-scroll horizontal. Urutan: Stok kini · Cukup untuk · Saran pesan
-            // · Isi N tahan · AKURASI (paling kanan).
+            // di-scroll horizontal. Urutan: Stok kini - Cukup untuk - Saran pesan
+            // - Isi N tahan - AKURASI (paling kanan).
             panel.classList.remove('hidden');
             panel.innerHTML = `
                 <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -1450,7 +1450,7 @@
                     method: 'POST',
                     body: JSON.stringify({ type: 'stock', as_of: asOf || null, stock: stockMap })
                 });
-                showToast("Stok Tersinkron", "Stok tersimpan di server — staf lain bisa melihatnya.", "info");
+                showToast("Stok Tersinkron", "Stok tersimpan di server - staf lain bisa melihatnya.", "info");
             } catch (err) {
                 console.warn("Gagal push stok ke server; stok tetap tersimpan lokal.", err);
             }
@@ -1941,7 +1941,7 @@
                         <div class="text-[11px] font-black uppercase tracking-wider text-emerald-800 flex items-center gap-2">
                             <i class="fa-solid fa-calendar-day"></i> ${judul}
                         </div>
-                        <span class="text-[10px] font-bold text-slate-500">${totalPo} PO · ${totalItem} item</span>
+                        <span class="text-[10px] font-bold text-slate-500">${totalPo} PO - ${totalItem} item</span>
                     </div>
                     <div class="space-y-3 pt-3">
                         ${byDate[d].map(cardHTML).join('')}

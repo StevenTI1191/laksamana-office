@@ -126,7 +126,7 @@
                 <a href="../kitchen/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <span>⇄</span> Pindah ke sisi Kitchen
                 </a>
-                <span class="text-line mx-2">·</span>
+                <span class="text-line mx-2">-</span>
                 <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
                     <span>←</span> Office
                 </a>
@@ -282,7 +282,7 @@
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h3 class="text-lg font-bold text-slate-900">Rekap & Analitik Order Bulanan</h3>
-                    <p class="text-xs text-slate-500">Ringkasan volume, tren, konsentrasi vendor, kontribusi tim, dan status stok — dalam satu halaman.</p>
+                    <p class="text-xs text-slate-500">Ringkasan volume, tren, konsentrasi vendor, kontribusi tim, dan status stok - dalam satu halaman.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-slate-500">Bulan:</label>
@@ -335,7 +335,7 @@
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between mb-1">
                         <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
-                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Tren Volume Order — 6 Bulan
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Tren Volume Order - 6 Bulan
                         </h4>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Qty / Bulan</span>
                     </div>
@@ -349,7 +349,7 @@
                         </h4>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-rata Qty</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 mb-3">Kapan permintaan datang — akhir pekan disorot agar stok bisa disiapkan lebih awal.</p>
+                    <p class="text-[11px] text-slate-400 mb-3">Kapan permintaan datang - akhir pekan disorot agar stok bisa disiapkan lebih awal.</p>
                     <div id="chart-dow" class="w-full"></div>
                 </div>
             </div>
@@ -377,7 +377,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                     <h4 class="font-bold text-slate-900 flex items-center gap-2">
                         <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707v12a2 2 0 01-2 2H7"></path></svg>
-                        Rincian per Bahan — Akumulasi, Tren & Stok
+                        Rincian per Bahan - Akumulasi, Tren & Stok
                     </h4>
                     <div id="movers-summary" class="text-[11px] text-slate-500"></div>
                 </div>
@@ -880,7 +880,7 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">PIN (angka)</label>
-                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="cth: 1111" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="user-form-pin" inputmode="numeric" placeholder="3-8 digit angka" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Hak Akses</label>
@@ -994,7 +994,7 @@
             else document.getElementById('login-pin').focus();
         };
 
-        // Boot aplikasi utama (sekali) — dipanggil setelah login sukses / sesi valid.
+        // Boot aplikasi utama (sekali) - dipanggil setelah login sukses / sesi valid.
         function bootApp() {
             if (appBooted) return;
             appBooted = true;
@@ -1468,7 +1468,7 @@
         //  REKAP / ANALITIK BULANAN
         // ==========================================
         // Semua analitik di bawah berbasis KUANTITAS (qty) & frekuensi order, bukan
-        // rupiah — data order belum punya kolom harga. Bila kelak sheet Items memuat
+        // rupiah - data order belum punya kolom harga. Bila kelak sheet Items memuat
         // harga/unit (products[item].harga), estimasi spend bisa ditambahkan di sini.
 
         const RECAP_MONTH_NAMES = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -1658,7 +1658,7 @@
                 return `<div>
                     <div class="flex items-center justify-between text-[11px] mb-0.5">
                         <span class="font-bold ${muted ? 'text-slate-400 italic' : 'text-slate-700'} truncate pr-2">${name}</span>
-                        <span class="font-black text-slate-500 whitespace-nowrap">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">· ${pctOfTotal}%</span></span>
+                        <span class="font-black text-slate-500 whitespace-nowrap">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">- ${pctOfTotal}%</span></span>
                     </div>
                     <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                         <div class="h-full rounded-full" style="width:${w}%;background:${muted ? '#cbd5e1' : palette[i % palette.length]}"></div>
@@ -1696,7 +1696,7 @@
                 acc += pct;
                 return `<div class="flex items-center justify-between gap-3 text-[11px]">
                     <span class="flex items-center gap-1.5 font-bold text-slate-700"><span class="w-2.5 h-2.5 rounded-sm" style="background:${col}"></span>${name}</span>
-                    <span class="font-black text-slate-500">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">· ${Math.round(pct)}%</span></span>
+                    <span class="font-black text-slate-500">${Math.round(qty).toLocaleString()} <span class="text-slate-400 font-bold">- ${Math.round(pct)}%</span></span>
                 </div>`;
             }).join('');
             el.innerHTML = `
@@ -1730,13 +1730,13 @@
         function recapStockBadge(item) {
             let a;
             try { a = forecastBook.assess(item); } catch (e) { a = null; }
-            if (!a || !a.hasForecast) return `<span class="text-[10px] text-slate-300">—</span>`;
+            if (!a || !a.hasForecast) return `<span class="text-[10px] text-slate-300">-</span>`;
             const st = a.status || {};
             const days = a.daysCover;
             const label = st.label || st.key || '';
             const daysTxt = (days != null && isFinite(days) && LaksForecast.fmtDays) ? LaksForecast.fmtDays(days) : '';
             const color = st.color || '#4b5563', bg = st.bg || '#F1F5F9';
-            return `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${color};background:${bg}">${label}${daysTxt ? ' · ' + daysTxt : ''}</span>`;
+            return `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${color};background:${bg}">${label}${daysTxt ? ' - ' + daysTxt : ''}</span>`;
         }
 
         function recapEmpty(msg) {
