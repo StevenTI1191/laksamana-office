@@ -737,13 +737,20 @@
         window.onload = function() {
             loadStateFromStorage();
             initFilters();
-            loadForecastData().then(renderDashboard);
             renderDatabaseTab();
             updateConnectionUI();
             initRecapSelector();
-            if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
-                fetchSheetData();
-            }
+            // Muat prakiraan + STOK BERSAMA lebih dulu (mengisi forecastBook),
+            // BARU tarik orderan dari Sheet. Kalau dibalik/paralel, kartu orderan
+            // bisa ter-render sebelum stok siap -> rekomendasi & stok tak muncul
+            // (dan tak ada yang me-render ulang setelah stok masuk).
+            loadForecastData()
+                .then(renderDashboard)
+                .then(function () {
+                    if (appState.webAppUrlOrders || appState.webAppUrlVendors || appState.webAppUrlItems) {
+                        fetchSheetData();
+                    }
+                });
         };
 
         // Muat data prakiraan (App Script -> cache -> embedded), sama pola dgn
