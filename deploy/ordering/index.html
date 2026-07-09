@@ -34,16 +34,23 @@
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white flex flex-col items-center justify-center p-5">
 
     <!-- ==== KONFIGURASI TUJUAN ====
-         Ubah URL di bawah bila subdomain berubah. -->
+         Kitchen & Purchasing dilayani dari domain yang sama (subfolder). -->
     <script>
         const SIDES = {
-            kitchen:    "https://kitchen.laksamana.id",
-            purchasing: "https://purchase.laksamana.id"
+            kitchen:    "./kitchen/",
+            purchasing: "./purchasing/"
         };
         function goTo(side) { window.location.href = SIDES[side]; }
     </script>
 
     <main class="w-full max-w-3xl">
+
+        <!-- Kembali ke Office -->
+        <div class="mb-6 text-center sm:text-left">
+            <a href="../" class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Office
+            </a>
+        </div>
 
         <!-- Brand -->
         <div class="text-center mb-8 sm:mb-10">
@@ -69,7 +76,7 @@
                 </div>
                 <h2 class="text-lg font-black tracking-tight">Kitchen</h2>
                 <p class="text-slate-400 text-xs font-semibold mt-1 leading-relaxed">Input order belanja & check-in penerimaan. Login per staf (multi-akun).</p>
-                <span class="inline-block mt-4 text-[10px] font-bold text-emerald-300/80 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">kitchen.laksamana.id</span>
+                <span class="inline-block mt-4 text-[10px] font-bold text-emerald-300/80 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">/ordering/kitchen</span>
             </button>
 
             <!-- Purchasing -->
@@ -83,7 +90,7 @@
                 </div>
                 <h2 class="text-lg font-black tracking-tight">Purchasing</h2>
                 <p class="text-slate-400 text-xs font-semibold mt-1 leading-relaxed">Kelola antrian order, vendor, dan dispatch WhatsApp. Panel kendali pembelian.</p>
-                <span class="inline-block mt-4 text-[10px] font-bold text-indigo-300/80 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">purchase.laksamana.id</span>
+                <span class="inline-block mt-4 text-[10px] font-bold text-indigo-300/80 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2.5 py-1 uppercase tracking-wider">/ordering/purchasing</span>
             </button>
 
         </div>

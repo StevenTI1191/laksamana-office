@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Test Panel Prakiraan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="laksamana-forecast.js"></script>
+<script src="forecast_export.js"></script>
+<style>body{font-family:'Plus Jakarta Sans',sans-serif}</style>
+</head>
+<body class="bg-slate-50 p-6 max-w-3xl mx-auto">
+<h1 class="text-lg font-black text-slate-800 mb-1">Uji Panel Prakiraan (standalone)</h1>
+<p class="text-xs text-slate-500 mb-4">Memuat modul + data forecast asli, mensimulasikan pilih bahan. Unggah "Stock Today.xlsx" untuk mengisi stok.</p>
+
+<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+  <label class="text-xs font-bold text-amber-700">Unggah Stok Hari Ini: </label>
+  <input type="file" accept=".xlsx" onchange="upload(this)" class="text-xs">
+  <span id="stat" class="text-xs font-bold text-amber-600 ml-2"></span>
+</div>
+
+<label class="text-xs font-bold text-slate-600">Pilih bahan:</label>
+<select id="pick" onchange="render()" class="w-full border rounded-lg p-2 text-sm mb-2"></select>
+<label class="text-xs font-bold text-slate-600">Qty order: </label>
+<input id="qty" type="number" value="5" oninput="render()" class="border rounded-lg p-1 w-20 text-sm">
+<select id="unit" onchange="render()" class="border rounded-lg p-1 text-sm"><option>Kg</option><option>Gram</option><option>Pcs</option><option>Karung</option><option>Jerigen</option></select>
+
+<div id="panel" class="mt-4"></div>
+
+<script>
+let book = new LaksForecast.ForecastBook(window.LAKSAMANA_FORECAST, null);
+// populate select with a spread of items (some A, some B, some C, some no-stock)
+const names = Object.keys(window.LAKSAMANA_FORECAST.items).sort();
+document.getElementById('pick').innerHTML = names.map(n=>`<option>${n}</option>`).join('');
+document.getElementById('pick').value = 'Bawang Putih Kupas (Kg)';
+
+function upload(input){
+  const f=input.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{const res=LaksForecast.parseStockWorkbook(e.target.result);
+    if(res.error){document.getElementById('stat').textContent='ERR: '+res.error;return;}
+    book.setStock(res.stock);
+    document.getElementById('stat').textContent=`${res.count} bahan (per ${res.as_of||'?'})`;
+    render();};
+  r.readAsArrayBuffer(f);
+}
+
+function render(){
+  const name=document.getElementById('pick').value;
+  const qty=parseFloat(document.getElementById('qty').value)||0;
+  const unit=document.getElementById('unit').value;
+  const a=book.assess(name);
+  const F=LaksForecast;
+  if(!a.hasForecast){document.getElementById('panel').innerHTML='<div class="text-slate-500 text-sm">Belum ada prakiraan.</div>';return;}
+  const lasts=book.howLongWillLast(name,qty,unit);
+  const st=a.status;
+  const tc=a.tier==='A'?'#15803d':a.tier==='B'?'#b45309':'#b91c1c';
+  document.getElementById('panel').innerHTML=`
+   <div class="rounded-xl border bg-white shadow-sm overflow-hidden flex flex-wrap text-[11px]">
+    ${cell('Stok kini', a.stockNow==null?'<span class="text-slate-400 italic">belum ada</span>':F.fmtNum(a.stockNow)+' '+a.unit)}
+    <div class="px-3.5 py-2 border-r min-w-[110px] flex items-center"><span class="px-2 py-1 rounded-lg font-black text-[10px] uppercase" style="background:${st.bg};color:${st.color}">${st.label}</span></div>
+    ${cell('Cukup untuk', a.daysCover==null?'—':F.fmtDays(a.daysCover))}
+    ${cell('Saran pesan', a.suggestOrderPacks==null?'—':(a.suggestOrderPacks>0?F.fmtNum(a.suggestOrderPacks)+' '+a.purchaseUnit:'cukup'))}
+    ${cell('Ketepatan', `<span style="color:${tc}" class="font-black">${a.tier}</span> ${a.tierLabel}`)}
+    ${cell('Isi '+qty+' '+unit+' tahan', lasts==null?'—':'<b>'+F.fmtDays(lasts)+'</b>', true)}
+   </div>
+   <pre class="text-[10px] text-slate-400 mt-3 bg-slate-100 p-2 rounded">${JSON.stringify(a,null,1)}</pre>`;
+}
+function cell(l,v,g){return `<div class="px-3.5 py-2 border-r ${g?'flex-1 bg-indigo-50/40':''}"><div class="text-[9px] font-black uppercase text-slate-400 mb-1">${l}</div><div class="font-bold text-slate-700">${v}</div></div>`;}
+render();
+</script>
+</body>
+</html>

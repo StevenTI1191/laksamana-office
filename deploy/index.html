@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office — Laksamana Muda</title>
+    <meta name="description" content="Portal internal Laksamana Muda — pusat aplikasi operasional kantor.">
+    <meta name="theme-color" content="#A9791F">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#A9791F', 'gold-2': '#C8961F', 'gold-dim': '#7A560F', 'gold-soft': '#F2E9D3',
+                        ink: '#2A2620', 'ink-2': '#3A3428', paper: '#F7F6F4', line: '#E7E1D3',
+                        muted: '#5C574D', 'muted-2': '#928C80'
+                    },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        .tile { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+        .tile:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(122,86,15,.45); border-color: #C8961F; }
+        @media (prefers-reduced-motion: reduce){ .tile{transition:none} .tile:hover{transform:none} }
+    </style>
+</head>
+<body class="min-h-screen bg-paper text-ink">
+
+    <!-- ==== REGISTRI CABANG (BRANCH REGISTRY) ====
+         Tambah modul baru cukup dengan menambah satu objek di sini.
+         `href` = folder relatif; `live:false` menandai placeholder "segera". -->
+    <script>
+        const BRANCHES = [
+            {
+                key: 'ordering', href: './ordering/', live: true,
+                icon: 'fa-solid fa-box-open',
+                title: 'Ordering', tag: 'Kitchen · Purchasing',
+                desc: 'Order belanja & check-in dapur, plus panel purchasing: antrian order, vendor, dan dispatch WhatsApp.'
+            },
+            {
+                key: 'konten', href: './konten/', live: true,
+                icon: 'fa-solid fa-bullhorn',
+                title: 'Konten (COMS)', tag: 'Content Operations',
+                desc: 'Perencanaan, penjadwalan, dan produksi konten media sosial Laksamana Muda.'
+            },
+            {
+                key: 'reservasi', href: './reservasi/', live: true,
+                icon: 'fa-solid fa-calendar-check',
+                title: 'Reservasi', tag: 'Booking & Tamu',
+                desc: 'Kelola reservasi meja, data tamu, dan jadwal kunjungan lintas outlet.'
+            }
+        ];
+
+        function renderBranches() {
+            const grid = document.getElementById('branch-grid');
+            grid.innerHTML = BRANCHES.map(b => {
+                const inner = `
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-xl text-white shadow-lg shadow-gold-dim/20 bg-gradient-to-br from-gold-2 to-gold-dim">
+                            <i class="${b.icon}"></i>
+                        </div>
+                        ${b.live
+                            ? '<i class="fa-solid fa-arrow-right text-muted-2 group-hover:text-gold group-hover:translate-x-1 transition-all"></i>'
+                            : '<span class="text-[10px] font-bold uppercase tracking-wider text-muted-2 border border-line rounded-full px-2 py-0.5">Segera</span>'}
+                    </div>
+                    <h2 class="text-lg font-extrabold tracking-tight text-ink">${b.title}</h2>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gold-dim mt-1">${b.tag}</p>
+                    <p class="text-muted text-[13px] font-medium mt-2 leading-relaxed">${b.desc}</p>`;
+                return b.live
+                    ? `<a href="${b.href}" class="tile group block bg-surface border border-line rounded-3xl p-6 bg-white focus:outline-none focus:ring-2 focus:ring-gold">${inner}</a>`
+                    : `<div class="tile group block bg-white/60 border border-dashed border-line rounded-3xl p-6 opacity-70 cursor-default">${inner}</div>`;
+            }).join('');
+        }
+        document.addEventListener('DOMContentLoaded', renderBranches);
+    </script>
+
+    <div class="max-w-5xl mx-auto px-5 py-10 sm:py-16">
+
+        <!-- Header -->
+        <header class="flex items-center gap-4 mb-10 sm:mb-14">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-2 to-gold-dim flex items-center justify-center shadow-lg shadow-gold-dim/25">
+                <i class="fa-solid fa-anchor text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none">Laksamana Muda</h1>
+                <p class="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-gold mt-1.5">Office · Sistem Internal</p>
+            </div>
+        </header>
+
+        <!-- Intro -->
+        <div class="mb-8">
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Pusat Aplikasi Kantor</h2>
+            <p class="text-muted text-sm font-medium mt-2 max-w-xl">Pilih modul untuk mulai bekerja. Setiap modul punya login sendiri — masuk dengan PIN tim Anda.</p>
+        </div>
+
+        <!-- Branch grid -->
+        <div id="branch-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
+
+        <!-- Footer -->
+        <footer class="mt-14 pt-6 border-t border-line flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p class="text-muted-2 text-[11px] font-semibold">© Laksamana Muda · Portal internal. Akses hanya untuk kru.</p>
+            <p class="text-muted-2 text-[11px] font-semibold">office.laksamanamuda.id</p>
+        </footer>
+    </div>
+
+</body>
+</html>

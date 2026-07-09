@@ -120,8 +120,12 @@
             </div>
             <p class="text-center text-slate-500 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
             <div class="text-center mt-3">
-                <a href="https://ordering.laksamana.id" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-indigo-300 transition-colors">
+                <a href="../kitchen/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-indigo-300 transition-colors">
                     <span>⇄</span> Pindah ke sisi Kitchen
+                </a>
+                <span class="text-slate-600 mx-2">·</span>
+                <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-white transition-colors">
+                    <span>←</span> Office
                 </a>
             </div>
         </div>
@@ -948,13 +952,13 @@
         //  AUTH: USER STORE (lokal + Google Sheet)
         // ==========================================
         function loadUsersLocal() {
-            try { return JSON.parse(localStorage.getItem('laksamana_users')) || []; }
+            try { return JSON.parse(localStorage.getItem('purchasing_users')) || []; }
             catch(e){ return []; }
         }
-        function saveUsersLocal(users) { usersCache = users; localStorage.setItem('laksamana_users', JSON.stringify(users)); }
+        function saveUsersLocal(users) { usersCache = users; localStorage.setItem('purchasing_users', JSON.stringify(users)); }
         function ensureUsersLocal() {
             let users = loadUsersLocal();
-            if (!users || users.length === 0) { users = JSON.parse(JSON.stringify(SEED_USERS)); localStorage.setItem('laksamana_users', JSON.stringify(users)); }
+            if (!users || users.length === 0) { users = JSON.parse(JSON.stringify(SEED_USERS)); localStorage.setItem('purchasing_users', JSON.stringify(users)); }
             usersCache = users;
             return users;
         }
@@ -1023,18 +1027,18 @@
         // ==========================================
         function getSession() {
             try {
-                const sRaw = localStorage.getItem('laksamana_session');
+                const sRaw = localStorage.getItem('purchasing_session');
                 if (!sRaw) return null;
                 const s = JSON.parse(sRaw);
                 if (!s || !s.userId || !s.expiry) return null;
-                if (Date.now() > s.expiry) { localStorage.removeItem('laksamana_session'); return null; }
+                if (Date.now() > s.expiry) { localStorage.removeItem('purchasing_session'); return null; }
                 return usersCache.find(x => x.id === s.userId) || null;
             } catch(e){ return null; }
         }
         function setSession(user) {
-            localStorage.setItem('laksamana_session', JSON.stringify({ userId: user.id, expiry: Date.now() + SESSION_HOURS*3600*1000 }));
+            localStorage.setItem('purchasing_session', JSON.stringify({ userId: user.id, expiry: Date.now() + SESSION_HOURS*3600*1000 }));
         }
-        function logout() { localStorage.removeItem('laksamana_session'); location.reload(); }
+        function logout() { localStorage.removeItem('purchasing_session'); location.reload(); }
 
         function pinPad(val) {
             const input = document.getElementById('login-pin');
@@ -1216,13 +1220,13 @@
         }
 
         function loadStateFromStorage() {
-            appState.cafeName = localStorage.getItem('cafeName') || "Laksamana Space";
-            appState.webAppUrlOrders = localStorage.getItem('webAppUrlOrders') || "";
-            appState.webAppUrlVendors = localStorage.getItem('webAppUrlVendors') || "";
-            appState.webAppUrlItems = localStorage.getItem('webAppUrlItems') || "";
-            appState.webAppUrlForecast = localStorage.getItem('webAppUrlForecast') || "";
+            appState.cafeName = localStorage.getItem('purchasing_cafeName') || "Laksamana Space";
+            appState.webAppUrlOrders = localStorage.getItem('purchasing_webAppUrlOrders') || "";
+            appState.webAppUrlVendors = localStorage.getItem('purchasing_webAppUrlVendors') || "";
+            appState.webAppUrlItems = localStorage.getItem('purchasing_webAppUrlItems') || "";
+            appState.webAppUrlForecast = localStorage.getItem('purchasing_webAppUrlForecast') || "";
 
-            let legacyAppUrl = localStorage.getItem('webAppUrl') || "";
+            let legacyAppUrl = localStorage.getItem('purchasing_webAppUrl') || "";
             if (legacyAppUrl && !appState.webAppUrlOrders) appState.webAppUrlOrders = legacyAppUrl;
             if (legacyAppUrl && !appState.webAppUrlVendors) appState.webAppUrlVendors = legacyAppUrl;
             if (legacyAppUrl && !appState.webAppUrlItems) appState.webAppUrlItems = legacyAppUrl;
@@ -1234,19 +1238,19 @@
             if (EMBEDDED_CONFIG.webAppUrlItems)    appState.webAppUrlItems = EMBEDDED_CONFIG.webAppUrlItems;
             if (EMBEDDED_CONFIG.webAppUrlForecast) appState.webAppUrlForecast = EMBEDDED_CONFIG.webAppUrlForecast;
 
-            const savedVendors = localStorage.getItem('vendors');
+            const savedVendors = localStorage.getItem('purchasing_vendors');
             appState.vendors = savedVendors ? JSON.parse(savedVendors) : {};
-            
-            const savedProducts = localStorage.getItem('products');
+
+            const savedProducts = localStorage.getItem('purchasing_products');
             appState.products = savedProducts ? JSON.parse(savedProducts) : {};
-            
-            appState.templateText = localStorage.getItem('templateText') || DEFAULT_TEMPLATE;
-            appState.templateConsolidated = localStorage.getItem('templateConsolidated') || DEFAULT_TEMPLATE_CONSOLIDATED;
-            
-            const savedOrders = localStorage.getItem('orders');
+
+            appState.templateText = localStorage.getItem('purchasing_templateText') || DEFAULT_TEMPLATE;
+            appState.templateConsolidated = localStorage.getItem('purchasing_templateConsolidated') || DEFAULT_TEMPLATE_CONSOLIDATED;
+
+            const savedOrders = localStorage.getItem('purchasing_orders');
             appState.orders = savedOrders ? JSON.parse(savedOrders) : [];
-            
-            const savedArchivedIds = localStorage.getItem('archivedOrderIds');
+
+            const savedArchivedIds = localStorage.getItem('purchasing_archivedOrderIds');
             appState.archivedOrderIds = savedArchivedIds ? JSON.parse(savedArchivedIds) : [];
 
             document.getElementById('input-cafe-name').value = appState.cafeName;
@@ -1262,19 +1266,19 @@
         }
 
         function saveStateToStorage() {
-            localStorage.setItem('cafeName', appState.cafeName);
-            localStorage.setItem('webAppUrlOrders', appState.webAppUrlOrders);
-            localStorage.setItem('webAppUrlVendors', appState.webAppUrlVendors);
-            localStorage.setItem('webAppUrlItems', appState.webAppUrlItems);
-            localStorage.setItem('webAppUrlForecast', appState.webAppUrlForecast);
-            
-            localStorage.setItem('vendors', JSON.stringify(appState.vendors));
-            localStorage.setItem('products', JSON.stringify(appState.products));
-            
-            localStorage.setItem('templateText', appState.templateText);
-            localStorage.setItem('templateConsolidated', appState.templateConsolidated);
-            localStorage.setItem('orders', JSON.stringify(appState.orders));
-            localStorage.setItem('archivedOrderIds', JSON.stringify(appState.archivedOrderIds));
+            localStorage.setItem('purchasing_cafeName', appState.cafeName);
+            localStorage.setItem('purchasing_webAppUrlOrders', appState.webAppUrlOrders);
+            localStorage.setItem('purchasing_webAppUrlVendors', appState.webAppUrlVendors);
+            localStorage.setItem('purchasing_webAppUrlItems', appState.webAppUrlItems);
+            localStorage.setItem('purchasing_webAppUrlForecast', appState.webAppUrlForecast);
+
+            localStorage.setItem('purchasing_vendors', JSON.stringify(appState.vendors));
+            localStorage.setItem('purchasing_products', JSON.stringify(appState.products));
+
+            localStorage.setItem('purchasing_templateText', appState.templateText);
+            localStorage.setItem('purchasing_templateConsolidated', appState.templateConsolidated);
+            localStorage.setItem('purchasing_orders', JSON.stringify(appState.orders));
+            localStorage.setItem('purchasing_archivedOrderIds', JSON.stringify(appState.archivedOrderIds));
         }
 
         function normalizeDateToYYYYMMDD(dateVal) {
