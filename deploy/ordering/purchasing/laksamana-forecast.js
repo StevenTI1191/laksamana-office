@@ -1,5 +1,5 @@
 /*
- * laksamana-forecast.js — shared restock/forecast logic for the Laksamana apps.
+ * laksamana-forecast.js. Shared restock/forecast logic for the Laksamana apps.
  *
  * ONE place for the restock math so the Kitchen and Purchasing HTML files don't
  * each re-implement it. This is the JavaScript twin of the Python dashboard's
@@ -24,7 +24,7 @@
   // Days of usage a suggested order should top the shelf up to.
   var TARGET_COVER_DAYS = 14;
 
-  // Status palette — mirrors the Python dashboard (RISK/WARN/OK) so the two
+  // Status palette. Mirrors the Python dashboard (RISK/WARN/OK) so the two
   // systems read identically. { key, label (id), color, bg }.
   var STATUS = {
     order:  { key: "order",  label: "Pesan sekarang",   color: "#b91c1c", bg: "#FBE4E2" },
@@ -50,11 +50,11 @@
   }
 
   /*
-   * NAME_ALIASES — the Laksamana item DB and the forecast (Master Product Data)
+   * NAME_ALIASES. The Laksamana item DB and the forecast (Master Product Data)
    * are two independently-maintained name lists, and some materials genuinely
    * use different vocabulary in each (e.g. kitchen staff type "Basil Fresh",
    * the forecast/BoM data calls it "Daun Basil (30Gr)"). Exact/loose matching
-   * (above) only handles casing/spacing/unit-suffix differences — it can't
+   * (above) only handles casing/spacing/unit-suffix differences, it can't
    * guess that two completely different strings mean the same ingredient.
    *
    * This table is the fix for THAT case: item-DB name (left, normalised
@@ -63,7 +63,7 @@
    * from the Kitchen app showing "Belum ada data prakiraan" for something you
    * know IS forecast, just under another name).
    *
-   * This is the JS twin of NAME_ALIASES in Code/bom_explode.py — that one
+   * This is the JS twin of NAME_ALIASES in Code/bom_explode.py, that one
    * reconciles names INSIDE the BoM/forecast build; this one reconciles the
    * forecast against the Laksamana item DB at lookup time. Edit this file
    * directly; no Python re-run needed, takes effect on next page load.
@@ -109,7 +109,7 @@
   }
 
   /*
-   * ForecastBook — wraps the forecast payload + current stock and answers
+   * ForecastBook. Wraps the forecast payload + current stock and answers
    * per-item questions. Construct once, reuse for every row.
    */
   function ForecastBook(forecastPayload, stockMap) {
@@ -219,7 +219,7 @@
   };
 
   /*
-   * UNIVERSAL_FACTORS — fixed, unambiguous conversions to a BASE unit that hold
+   * UNIVERSAL_FACTORS. Fixed, unambiguous conversions to a BASE unit that hold
    * for ANY material (unlike "Pack"/"Dus"/"Sack", which vary by item and are
    * only convertible via that item's own per_purchase pack size). Keyed by
    * [dropdown unit][item's base unit] -> multiplier. Covers the Kitchen order
@@ -235,7 +235,7 @@
   // Convert `qty` of `unit` into the item's BASE unit. Tries, in order: (1) the
   // universal Kg/Gram/Pcs/Ikat table (safe for ANY item), (2) the item-specific
   // purchase-pack size when `unit` matches its purchase_unit (Pack/Dus/Sack/
-  // Btl/etc — ambiguous in general, but exact for THIS item), (3) as-is if the
+  // Btl/etc, ambiguous in general, but exact for THIS item), (3) as-is if the
   // unit already equals the base unit, (4) otherwise left unconverted (flagged
   // by the caller via the returned `converted` flag so it isn't silently wrong).
   function toBaseUnit(qty, unit, fc) {
@@ -316,13 +316,13 @@
   // ---- formatting helpers (used by both apps for consistent display) --------
 
   function fmtNum(n, dp) {
-    if (n == null || isNaN(n)) return "—";
+    if (n == null || isNaN(n)) return "-";
     dp = dp == null ? 0 : dp;
     return Number(n).toLocaleString("id-ID", { maximumFractionDigits: dp });
   }
 
   function fmtDays(d) {
-    if (d == null || isNaN(d)) return "—";
+    if (d == null || isNaN(d)) return "-";
     if (!isFinite(d)) return "∞";
     return d >= 10 ? Math.round(d) + " hari" : (Math.round(d * 10) / 10) + " hari";
   }

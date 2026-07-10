@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#f7f6f4">
 <title>COMS - Laksamana Muda Content Operations</title>
+<!-- Guard SSO: tanpa sesi Office yang berhak buka konten, langsung ke login Office. -->
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('lm_session')||'null');
+  var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='konten';});
+  if(!ok)location.replace('../');}catch(e){location.replace('../');}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -358,8 +364,11 @@ tbody tr:last-child td{border-bottom:none}
         <div><div class="t1">Laksamana Muda</div><div class="t2">COMS</div></div>
       </div>
       <nav class="sb-nav" id="sbNav"></nav>
-      <div class="sb-foot">
-        <div class="sb-user" id="sbUser" onclick="COMS.route('profile')"></div>
+      <div class="sb-foot" style="display:flex;align-items:center;gap:6px">
+        <div class="sb-user" id="sbUser" onclick="COMS.route('profile')" style="flex:1;min-width:0"></div>
+        <button class="logout-x" title="Keluar" onclick="COMS.logout()" style="background:var(--panel-3);border:1px solid var(--line-soft);color:var(--txt-3);width:32px;height:32px;border-radius:9px;flex:none;display:inline-flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v10"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg>
+        </button>
       </div>
     </aside>
     <div class="main">
@@ -448,6 +457,9 @@ async function save() {
 async function initAPI() {
   const loadingText = document.getElementById('api-loading-text');
 
+  // Gerbang SSO: tanpa sesi Office yang berhak, jangan memuat data. Ke login Office.
+  if (!readLmSession()) { location.replace('../'); return; }
+
   // KODE PEMBLOKIR TELAH DIHAPUS DARI SINI
 
   try {
@@ -497,17 +509,16 @@ async function initAPI() {
     // Lanjutkan proses render UI
     renderLogin();
     
-    // Cek Session login dari LocalStorage (dengan token - logout = tidak bisa balik)
-    const sess = readSession();
-    if (sess) {
-      SES = sess.uid;
+    // Identitas berasal dari Office (lm_session). Petakan ke kru Konten lalu masuk.
+    const office = readLmSession();
+    if (office) {
+      SES = resolveKontenUser(office).id;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       bootApp();
     } else {
-      // Pastikan tampilan login bersih bila tidak ada sesi valid
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
+      // Seharusnya sudah dicegat gerbang SSO di atas; jaga-jaga -> login Office.
+      location.replace('../');
     }
 
     document.getElementById('loginBtn').addEventListener('click', doLogin);
@@ -518,7 +529,7 @@ async function initAPI() {
     applyLockUI();
     // Cegah kembali ke aplikasi lewat tombol Back / bfcache setelah logout
     window.addEventListener('pageshow', function(e){
-      if (e.persisted && !readSession()) { location.reload(); }
+      if (e.persisted && !readLmSession()) { location.reload(); }
     });
 
     initSearch();
@@ -546,6 +557,15 @@ const ROLES={
   analyst:{label:'Analyst',short:'Analis',desc:'Lihat analytics & susun laporan performa',color:'#8ba0b5'}
 };
 const ROLE_KEYS=Object.keys(ROLES);
+
+// Peta role Office -> role default Konten untuk kru yang baru pertama masuk lewat
+// Office. Kru yang sudah terdaftar di Kelola Kru tetap memakai role konten mereka
+// sendiri (Office hanya menentukan siapa dan boleh/tidaknya membuka Konten).
+const OFFICE_TO_KONTEN_ROLES = {
+  owner:['super_admin'], admin:['super_admin'],
+  marketing:['content_planner'], konten:['content_planner']
+};
+const KONTEN_DEFAULT_ROLES = ['content_planner'];
 
 // PERM default (dipakai kalau DB.perms belum ada). Bisa diedit Super Admin via Pengaturan.
 const PERM_DEFAULT={
@@ -805,6 +825,32 @@ function readSession(){
   }catch(e){return null;}
 }
 
+// ===== Integrasi identitas Office (SSO) =====
+// Baca lm_session dan pastikan user berhak membuka Konten. null bila tidak.
+function readLmSession(){
+  try{
+    const s=JSON.parse(localStorage.getItem('lm_session')||'null');
+    if(!s||!s.expiry||Date.now()>s.expiry) return null;
+    const m=s.modules||[];
+    if(!(m.includes('*')||m.includes('konten'))) return null;
+    return s;
+  }catch(e){ return null; }
+}
+// Petakan identitas Office ke kru Konten. Cocokkan berdasarkan id lalu nama; bila
+// belum ada, buat kru sementara (in-memory) dengan role default dari role Office.
+// Owner dapat menambah/menyetel role kru secara permanen lewat Kelola Kru.
+function resolveKontenUser(s){
+  let u = DB.users.find(x=>x.id===s.userId)
+        || DB.users.find(x=>String(x.name).toLowerCase()===String(s.name).toLowerCase());
+  if(!u){
+    const roles = (OFFICE_TO_KONTEN_ROLES[s.role] || KONTEN_DEFAULT_ROLES).slice();
+    u = { id:s.userId, name:s.name, roles:roles, pin:'', division:'', email:'',
+          skills:[], capacity:20, workHours:'Fleksibel', avail:'available', brands:['all'] };
+    DB.users.push(u);   // in-memory; ikut tersimpan ke Sheet saat ada save() berikutnya
+  }
+  return u;
+}
+
 let pendingLoginUser=null;
 function renderLogin(){
   $('#loginLogo').src=LOGO_FULL; $('#loginLogo').onerror=function(){this.style.display='none'};
@@ -844,12 +890,12 @@ function doLogin(){
   bootApp(); toast('Selamat berlayar, '+u.name.split(' ')[0]+' ⚓','ok');
 }
 function logout(){
-  // Hapus sesi sepenuhnya - setelah logout tidak bisa balik lagi (termasuk via tombol Back)
+  // Kembali ke pemilih modul Office. Sesi Office (lm_session) TIDAK dihapus
+  // di sini secara sengaja, supaya user bisa pindah modul tanpa login ulang.
+  // Sign-out penuh hanya lewat tombol Keluar di Office sendiri.
   localStorage.removeItem(SES_KEY);
   SES=null;
-  try{ history.pushState(null,'',location.href); }catch(e){}
-  $('#app').style.display='none';
-  location.reload();
+  location.replace('../');
 }
 
 function logAct(action,target){DB.logs.unshift({id:uid('lg'),by:SES,action,target,at:Date.now()});if(DB.logs.length>300)DB.logs.pop();save();}
@@ -2643,10 +2689,9 @@ VIEWS.profile=function(){
       <div class="stat"><div class="lbl">Selesai</div><div class="val mono">${tasks.filter(c=>c.status==='Posted').length}</div></div>
       <div class="stat"><div class="lbl">Kapasitas</div><div class="val mono">${u.capacity}</div></div>
     </div>
-    <div class="field" style="max-width:280px"><label>Ganti PIN Akses</label><div style="display:flex;gap:8px"><input class="ctrl" id="newPin" placeholder="PIN baru" maxlength="8" value="${esc(u.pin)}"><button class="btn btn-gold btn-sm" onclick="COMS.changePin()">Simpan</button></div></div>
+    <div class="field" style="max-width:320px"><label>PIN Akses</label><div style="font-size:12.5px;color:var(--txt-3);line-height:1.6">Login kini dikelola lewat Office. Hubungi admin untuk mengubah PIN Anda.</div></div>
   </div>`;
 };
-function changePin(){const p=$('#newPin').value.trim();if(p.length<4){toast('PIN minimal 4 digit','err');return;}getUser(SES).pin=p;save();toast('PIN diperbarui','ok');}
 
 function refreshNotifDot(){const unread=DB.notifs.filter(n=>!n.read).length;const d=$('#notifDot');if(d)d.classList.toggle('hidden',unread===0);}
 function toggleNotif(){const p=$('#notifPanel');const open=p.classList.contains('open');if(open){p.classList.remove('open');return;}
@@ -2695,7 +2740,7 @@ const API={
   openUserForm,toggleRole,saveUser,delUser,
   setAssetCat,openAssetForm,saveAsset,delAsset,
   approveFinal,
-  exportCSV,backupJSON,restoreJSON,saveSettings,changePin,savePerms,resetPerms,
+  exportCSV,backupJSON,restoreJSON,saveSettings,savePerms,resetPerms,
   toggleNotif,markAllRead,clearSearch,
   closeModal,closeDrawer,
   initAPI // Pastikan fungsi dipanggil

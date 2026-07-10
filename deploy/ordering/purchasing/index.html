@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laksamana Space - Kitchen Order Control Panel Pro</title>
-    
+
+    <!-- Guard SSO: tanpa sesi Office yang berhak buka purchasing, langsung ke login Office.
+         Jalan sebelum body render agar tidak ada kedipan layar login lama. -->
+    <script>
+    (function(){try{var s=JSON.parse(localStorage.getItem('lm_session')||'null');
+      var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='purchasing';});
+      if(!ok)location.replace('../../');}catch(e){location.replace('../../');}})();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- Modul prakiraan/restock bersama (dipakai Kitchen & Purchasing) -->
@@ -88,52 +96,6 @@
     <!-- ============================================== -->
     <!-- LOGIN SCREEN (PIN Akses)                        -->
     <!-- ============================================== -->
-    <div id="login-screen" class="fixed inset-0 z-[100] bg-paper flex items-center justify-center p-4">
-        <div class="w-full max-w-xs">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto bg-gradient-to-br from-gold-2 to-gold-dim rounded-2xl flex items-center justify-center shadow-lg shadow-gold-dim/25 mb-3">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                </div>
-                <h1 class="text-ink text-lg font-black tracking-tight">LAKSAMANA CONTROL PANEL</h1>
-                <p class="text-muted text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
-            </div>
-
-            <div class="bg-white border border-line rounded-3xl p-5 shadow-sm">
-                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-paper border border-line text-ink text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-gold placeholder-muted-2">
-
-                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg py-2">
-                    <span id="login-error-text">PIN salah.</span>
-                </div>
-
-                <!-- Keypad -->
-                <div class="grid grid-cols-3 gap-2 mt-4">
-                    <button onclick="pinPad('1')" class="pin-key">1</button>
-                    <button onclick="pinPad('2')" class="pin-key">2</button>
-                    <button onclick="pinPad('3')" class="pin-key">3</button>
-                    <button onclick="pinPad('4')" class="pin-key">4</button>
-                    <button onclick="pinPad('5')" class="pin-key">5</button>
-                    <button onclick="pinPad('6')" class="pin-key">6</button>
-                    <button onclick="pinPad('7')" class="pin-key">7</button>
-                    <button onclick="pinPad('8')" class="pin-key">8</button>
-                    <button onclick="pinPad('9')" class="pin-key">9</button>
-                    <button onclick="pinPad('clear')" class="pin-key !bg-paper !text-muted text-sm">⌫</button>
-                    <button onclick="pinPad('0')" class="pin-key">0</button>
-                    <button onclick="attemptLogin()" class="pin-key !bg-gradient-to-br !from-gold-2 !to-gold-dim hover:!from-gold hover:!to-gold-dim !text-white text-sm">➜</button>
-                </div>
-            </div>
-            <p class="text-center text-muted-2 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
-            <div class="text-center mt-3">
-                <a href="../kitchen/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
-                    <span>⇄</span> Pindah ke sisi Kitchen
-                </a>
-                <span class="text-line mx-2">-</span>
-                <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
-                    <span>←</span> Office
-                </a>
-            </div>
-        </div>
-    </div>
-
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -987,11 +949,12 @@
         let stockAsOf = null;
 
         window.onload = function() {
-            ensureUsersLocal();          // seed lokal bila kosong (agar login langsung jalan)
-            refreshUsersFromSheet();     // sinkron dari Sheet di background (bila URL diatur)
-            const sess = getSession();
-            if (sess) enterApp(sess);    // sesi valid -> langsung masuk
-            else document.getElementById('login-pin').focus();
+            ensureUsersLocal();          // daftar lokal tetap dipakai untuk lookup tim/keterangan PIC
+            refreshUsersFromSheet();     // sinkron daftar (tim) dari Sheet di background, bila URL diatur
+            // Identitas kini berasal dari Office (lm_session), bukan login PIN lokal.
+            const sess = officeUser();
+            if (sess) enterApp(sess);
+            else window.location.replace('../../');
         };
 
         // Boot aplikasi utama (sekali) - dipanggil setelah login sukses / sesi valid.
@@ -1105,38 +1068,35 @@
         function setSession(user) {
             localStorage.setItem('purchasing_session', JSON.stringify({ userId: user.id, expiry: Date.now() + SESSION_HOURS*3600*1000 }));
         }
-        function logout() { localStorage.removeItem('purchasing_session'); location.reload(); }
-
-        function pinPad(val) {
-            const input = document.getElementById('login-pin');
-            if (val === 'clear') input.value = input.value.slice(0, -1);
-            else input.value += val;
+        function logout() {
+            // Kembali ke pemilih modul Office. Sesi Office (lm_session) TIDAK dihapus
+            // di sini secara sengaja, supaya user bisa pindah modul tanpa login ulang.
+            // Sign-out penuh hanya lewat tombol Keluar di Office sendiri.
+            localStorage.removeItem('purchasing_session');   // bersihkan sesi legacy bila ada
+            window.location.replace('../../');
         }
-        function attemptLogin() {
-            const pin = document.getElementById('login-pin').value.trim();
-            const errBox = document.getElementById('login-error');
-            if (!pin) return;
-            const user = usersCache.find(u => u.pin === pin);
-            if (!user) {
-                document.getElementById('login-error-text').innerText = "PIN tidak dikenali. Coba lagi.";
-                errBox.classList.remove('hidden');
-                document.getElementById('login-pin').value = "";
-                return;
-            }
-            errBox.classList.add('hidden');
-            setSession(user);
-            enterApp(user);
+
+        // Ambil identitas dari sesi Office (lm_session), lalu petakan role Office
+        // ke role internal purchasing: owner/admin -> admin, selain itu -> full.
+        // Mengembalikan null bila belum login Office atau tak berhak buka ordering.
+        function officeUser() {
+            try {
+                const s = JSON.parse(localStorage.getItem('lm_session'));
+                if (!s || !s.expiry || Date.now() > s.expiry) return null;
+                const mods = s.modules || [];
+                if (!(mods.includes('*') || mods.includes('purchasing'))) return null;
+                const role = (s.role === 'owner' || s.role === 'admin') ? 'admin' : 'full';
+                return { id: s.userId, name: s.name, role: role, keterangan: '' };
+            } catch (e) { return null; }
         }
 
         function enterApp(user) {
             currentUser = user;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('login-pin').value = "";
             const badge = document.getElementById('user-badge');
             badge.classList.remove('hidden'); badge.classList.add('flex');
             document.getElementById('user-badge-name').innerText = user.name + (user.role === 'admin' ? ' (Admin)' : '');
             document.getElementById('btn-logout').classList.remove('hidden');
-            document.getElementById('btn-manage-users').classList.toggle('hidden', user.role !== 'admin');
+            document.getElementById('btn-manage-users').classList.add('hidden'); // Kelola user kini di Office/Sheet
             bootApp();
         }
 

@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Laksamana Office - Kitchen</title>
-    
+
+    <!-- Guard SSO: tanpa sesi Office yang berhak buka kitchen, langsung ke login Office.
+         Jalan sebelum body render agar tidak ada kedipan layar login lama. -->
+    <script>
+    (function(){try{var s=JSON.parse(localStorage.getItem('lm_session')||'null');
+      var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='kitchen';});
+      if(!ok)location.replace('../../');}catch(e){location.replace('../../');}})();
+    </script>
+
     <!-- PWA Meta Tag -->
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,52 +125,6 @@
     <!-- ============================================== -->
     <!-- LOGIN SCREEN (PIN Akses)                        -->
     <!-- ============================================== -->
-    <div id="login-screen" class="fixed inset-0 z-[100] bg-paper flex items-center justify-center p-4">
-        <div class="w-full max-w-xs">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto bg-gradient-to-br from-gold-2 to-gold-dim rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-gold-dim/25 mb-3">
-                    <i class="fa-solid fa-kitchen-set text-white"></i>
-                </div>
-                <h1 class="text-ink text-lg font-black brand-font tracking-tight">LAKSAMANA KITCHEN</h1>
-                <p class="text-muted text-[11px] font-bold mt-1">Masukkan PIN Akses Anda</p>
-            </div>
-
-            <div class="bg-white border border-line rounded-3xl p-5 shadow-sm">
-                <input type="password" id="login-pin" inputmode="numeric" maxlength="8" onkeyup="if(event.key==='Enter')attemptLogin()" placeholder="• • • •" class="w-full bg-paper border border-line text-ink text-center text-2xl font-black tracking-[0.5em] rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-gold placeholder-muted-2">
-
-                <div id="login-error" class="hidden mt-3 text-center text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg py-2">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <span id="login-error-text">PIN salah.</span>
-                </div>
-
-                <!-- Keypad -->
-                <div class="grid grid-cols-3 gap-2 mt-4">
-                    <button onclick="pinPad('1')" class="pin-key">1</button>
-                    <button onclick="pinPad('2')" class="pin-key">2</button>
-                    <button onclick="pinPad('3')" class="pin-key">3</button>
-                    <button onclick="pinPad('4')" class="pin-key">4</button>
-                    <button onclick="pinPad('5')" class="pin-key">5</button>
-                    <button onclick="pinPad('6')" class="pin-key">6</button>
-                    <button onclick="pinPad('7')" class="pin-key">7</button>
-                    <button onclick="pinPad('8')" class="pin-key">8</button>
-                    <button onclick="pinPad('9')" class="pin-key">9</button>
-                    <button onclick="pinPad('clear')" class="pin-key !bg-paper !text-muted text-sm"><i class="fa-solid fa-delete-left"></i></button>
-                    <button onclick="pinPad('0')" class="pin-key">0</button>
-                    <button onclick="attemptLogin()" class="pin-key !bg-gradient-to-br !from-gold-2 !to-gold-dim hover:!from-gold hover:!to-gold-dim !text-white text-sm"><i class="fa-solid fa-arrow-right"></i></button>
-                </div>
-            </div>
-            <p class="text-center text-muted-2 text-[10px] mt-4 font-semibold">Hubungi Admin bila lupa PIN akses.</p>
-            <div class="text-center mt-3">
-                <a href="../purchasing/" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
-                    <i class="fa-solid fa-right-left"></i> Pindah ke sisi Purchasing
-                </a>
-                <span class="text-line mx-2">-</span>
-                <a href="../../" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted hover:text-gold-dim transition-colors">
-                    <i class="fa-solid fa-arrow-left"></i> Office
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- Header Area -->
     <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
@@ -752,12 +714,14 @@
             window.addEventListener('online', updateNetworkStatus);
             window.addEventListener('offline', updateNetworkStatus);
 
-            ensureUsers();          // siapkan daftar user (seed bila kosong)
-            const sess = getSession();
+            ensureUsers();          // daftar lokal tetap dipakai untuk lookup keterangan/tim
+            // Identitas kini berasal dari Office (lm_session), bukan login PIN lokal.
+            const sess = officeUser();
             if (sess) {
-                enterApp(sess);     // sudah login -> langsung masuk
+                enterApp(sess);     // sudah login di Office -> langsung masuk
             } else {
-                document.getElementById('login-pin').focus();
+                // Belum login Office atau tak berhak -> ke halaman login Office.
+                window.location.replace('../../');
             }
         });
 
@@ -803,39 +767,30 @@
             }));
         }
         function logout() {
-            localStorage.removeItem('kitchen_session');
-            location.reload();
+            // Kembali ke pemilih modul Office. Sesi Office (lm_session) TIDAK dihapus
+            // di sini secara sengaja, supaya user bisa pindah modul tanpa login ulang.
+            // Sign-out penuh hanya lewat tombol Keluar di Office sendiri.
+            localStorage.removeItem('kitchen_session');   // bersihkan sesi legacy bila ada
+            window.location.replace('../../');
         }
 
-        // ==========================================
-        //  AUTH: LOGIN FLOW
-        // ==========================================
-        function pinPad(val) {
-            const input = document.getElementById('login-pin');
-            if (val === 'clear') { input.value = input.value.slice(0, -1); }
-            else { input.value += val; }
-        }
-        function attemptLogin() {
-            const pin = document.getElementById('login-pin').value.trim();
-            const errBox = document.getElementById('login-error');
-            if (!pin) return;
-            const user = loadUsers().find(u => u.pin === pin);
-            if (!user) {
-                document.getElementById('login-error-text').innerText = "PIN tidak dikenali. Coba lagi.";
-                errBox.classList.remove('hidden');
-                document.getElementById('login-pin').value = "";
-                return;
-            }
-            errBox.classList.add('hidden');
-            setSession(user);
-            enterApp(user);
+        // Ambil identitas dari sesi Office (lm_session), lalu petakan role Office
+        // ke role internal kitchen: owner/admin -> admin, selain itu -> full.
+        // Mengembalikan null bila belum login Office atau tak berhak buka ordering.
+        function officeUser() {
+            try {
+                const s = JSON.parse(localStorage.getItem('lm_session'));
+                if (!s || !s.expiry || Date.now() > s.expiry) return null;
+                const mods = s.modules || [];
+                if (!(mods.includes('*') || mods.includes('kitchen'))) return null;
+                const role = (s.role === 'owner' || s.role === 'admin') ? 'admin' : 'full';
+                return { id: s.userId, name: s.name, role: role, keterangan: '' };
+            } catch (e) { return null; }
         }
 
-        // Masuk aplikasi setelah login sukses / sesi valid
+        // Masuk aplikasi setelah sesi Office valid
         function enterApp(user) {
             currentUser = user;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('login-pin').value = "";
 
             // Badge user + tombol logout
             const badge = document.getElementById('user-badge');
@@ -865,8 +820,8 @@
             const isAdmin   = user.role === 'admin';
             const canOrder  = user.role === 'admin' || user.role === 'full';
 
-            // Tombol Admin
-            document.getElementById('btn-manage-users').classList.toggle('hidden', !isAdmin);
+            // Tombol Admin. Kelola user kini di Office/Sheet, jadi selalu disembunyikan.
+            document.getElementById('btn-manage-users').classList.add('hidden');
             document.getElementById('btn-config').classList.toggle('hidden', !isAdmin);
 
             // Tab & halaman Order Belanja - switchTab dulu, baru sembunyikan

@@ -4,114 +4,449 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laksamana Muda Office</title>
-    <meta name="description" content="Portal internal Laksamana Muda — pusat aplikasi operasional kantor.">
+    <meta name="description" content="Portal internal Laksamana Muda, pusat aplikasi operasional kantor.">
     <meta name="theme-color" content="#A9791F">
 
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gold: '#A9791F', 'gold-2': '#C8961F', 'gold-dim': '#7A560F', 'gold-soft': '#F2E9D3',
-                        ink: '#2A2620', 'ink-2': '#3A3428', paper: '#F7F6F4', line: '#E7E1D3',
-                        muted: '#5C574D', 'muted-2': '#928C80'
-                    },
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] }
-                }
-            }
-        };
-    </script>
+    <!-- Sistem desain bersama. Sumber token, tipografi, animasi, komponen dasar. -->
+    <link rel="stylesheet" href="./assets/laksamana.css">
+
     <style>
-        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        .tile { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-        .tile:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(122,86,15,.45); border-color: #C8961F; }
-        @media (prefers-reduced-motion: reduce){ .tile{transition:none} .tile:hover{transform:none} }
+    /* Gaya khusus halaman landing. Token dan komponen dasar ada di laksamana.css. */
+
+    .shell{max-width:960px; margin:0 auto; padding:26px 22px 40px}
+
+    /* ---------- LOGIN ---------- */
+    .auth-wrap{
+        min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .auth-card{
+        width:100%; max-width:400px; background:var(--surface); border:1px solid var(--line);
+        border-radius:22px; box-shadow:var(--shadow-lg); padding:34px 30px;
+    }
+    .auth-brand{display:flex; align-items:center; gap:12px; margin-bottom:24px}
+    .auth-brand .mark{
+        width:46px; height:46px; border-radius:13px; flex:none; display:flex; align-items:center; justify-content:center;
+        background:linear-gradient(135deg,var(--gold-2),var(--gold-dim)); box-shadow:0 8px 20px rgba(122,86,15,.26); padding:9px;
+    }
+    .auth-brand .mark img{width:100%; height:100%; object-fit:contain}
+    .auth-brand b{display:block; font-family:var(--serif); font-weight:800; font-size:16px; color:var(--ink)}
+    .auth-brand span{display:block; font-size:10px; font-weight:700; letter-spacing:2.4px; text-transform:uppercase; color:var(--gold); margin-top:2px}
+    .auth-title{font-size:22px; font-weight:800}
+    .auth-sub{color:var(--muted); font-size:13px; margin:5px 0 22px}
+    .auth-err{color:var(--danger); font-size:13px; font-weight:600; min-height:18px; margin:2px 0 10px}
+    .auth-foot{text-align:center; color:var(--muted-2); font-size:11px; font-weight:600; margin-top:18px}
+
+    /* ---------- TOPBAR ---------- */
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:38px}
+    .brand{display:flex; align-items:center; gap:13px; min-width:0}
+    .brand .mark{
+        width:46px; height:46px; border-radius:13px; flex:none; display:flex; align-items:center; justify-content:center;
+        background:linear-gradient(135deg,var(--gold-2),var(--gold-dim));
+        box-shadow:0 8px 20px rgba(122,86,15,.26); padding:9px;
+        transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .brand:hover .mark{transform:rotate(-4deg) scale(1.04); box-shadow:0 12px 26px rgba(122,86,15,.34)}
+    .brand .mark img{width:100%; height:100%; object-fit:contain}
+    .brand .txt b{display:block; font-family:var(--serif); font-weight:800; font-size:17px; color:var(--ink); letter-spacing:-.01em}
+    .brand .txt span{display:block; font-size:10px; font-weight:700; letter-spacing:2.4px; text-transform:uppercase; color:var(--gold); margin-top:2px}
+
+    .topbar-right{display:flex; align-items:center; gap:12px}
+    .clock{
+        text-align:right; flex:none; padding:7px 14px; border:1px solid var(--line); border-radius:12px;
+        background:rgba(255,255,255,.6); backdrop-filter:blur(4px);
+    }
+    .clock .time{font-family:var(--serif); font-weight:700; font-size:16px; color:var(--ink); line-height:1.1}
+    .clock .date{font-size:11px; font-weight:600; color:var(--muted); margin-top:2px}
+    .logout{
+        display:inline-flex; align-items:center; gap:7px; padding:9px 12px; border:1px solid var(--line);
+        border-radius:12px; background:var(--surface); color:var(--muted); font-size:12.5px; font-weight:600;
+        transition:border-color .2s var(--ease), color .2s var(--ease), background .2s var(--ease);
+    }
+    .logout:hover{border-color:var(--danger); color:var(--danger); background:var(--danger-bg)}
+    .logout svg{width:15px; height:15px}
+    @media(max-width:560px){ .clock .date{display:none} .logout span{display:none} }
+
+    /* ---------- GREETING ---------- */
+    .greet{margin-bottom:26px}
+    .greet h1{font-size:clamp(22px,4.5vw,28px); font-weight:800}
+    .greet p{color:var(--muted); font-size:14px; margin-top:7px; max-width:560px}
+
+    .eyebrow{
+        display:flex; align-items:center; gap:10px; margin:0 0 14px;
+        font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted-2);
+    }
+    .eyebrow::after{content:""; flex:1; height:1px; background:var(--line)}
+
+    /* ---------- BRANCH GRID ---------- */
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px}
+
+    .tile{
+        position:relative; display:flex; flex-direction:column; text-align:left; text-decoration:none; color:inherit;
+        background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius);
+        padding:20px; box-shadow:var(--shadow); overflow:hidden;
+        transition:border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease);
+    }
+    /* Sapuan cahaya halus mengikuti kursor saat hover, memberi kesan hidup. */
+    .tile::after{
+        content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+        background:radial-gradient(360px 180px at var(--mx,50%) 0%, rgba(200,150,31,.10), transparent 70%);
+        transition:opacity .3s var(--ease);
+    }
+    .tile:hover{border-color:var(--gold-2); background:#FEFCF6; transform:translateY(-4px); box-shadow:var(--shadow-lg)}
+    .tile:hover::after{opacity:1}
+    .tile:focus-visible{outline:none; border-color:var(--gold); box-shadow:var(--ring)}
+
+    .tile .head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
+    .tile .ico{
+        width:48px; height:48px; border-radius:13px; flex:none; display:flex; align-items:center; justify-content:center;
+        color:#fff; background:linear-gradient(135deg,var(--gold-2),var(--gold-dim)); box-shadow:0 6px 16px rgba(122,86,15,.22);
+        transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .tile:hover .ico{transform:scale(1.07); box-shadow:0 10px 22px rgba(122,86,15,.3)}
+    .tile .ico svg{width:24px; height:24px}
+    .tile .go{color:var(--muted-2); transition:color .2s var(--ease), transform .2s var(--ease)}
+    .tile:hover .go{color:var(--gold); transform:translateX(4px)}
+
+    .tile h2{font-size:17px; font-weight:800; color:var(--ink)}
+    .tile .kicker{font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--gold-dim); margin-top:3px}
+    .tile .desc{color:var(--muted); font-size:13px; line-height:1.55; margin-top:10px; flex:1}
+
+    /* .pill dan .badge diambil dari laksamana.css. Di sini hanya tata letak wadah. */
+    .scope{display:flex; flex-wrap:wrap; gap:6px; margin-top:15px; padding-top:14px; border-top:1px solid var(--line)}
+
+    .empty{
+        border:1.5px dashed var(--line); border-radius:var(--radius); padding:34px 24px; text-align:center; color:var(--muted);
+    }
+    .empty b{display:block; color:var(--ink); font-family:var(--serif); font-size:16px; margin-bottom:4px}
+
+    /* ---------- FOOTER ---------- */
+    footer{
+        margin-top:34px; padding-top:18px; border-top:1px solid var(--line);
+        display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;
+    }
+    footer p{color:var(--muted-2); font-size:11.5px; font-weight:600}
+
+    /* Hormati preferensi kurangi gerak. Animasi global dimatikan di laksamana.css. */
+    @media (prefers-reduced-motion: reduce){
+        .tile, .tile .go, .tile .ico, .brand .mark{transition:none}
+        .tile:hover, .tile:hover .ico, .brand:hover .mark{transform:none}
+        .tile::after{display:none}
+    }
     </style>
 </head>
-<body class="min-h-screen bg-paper text-ink">
+<body>
 
-    <!-- ==== REGISTRI CABANG (BRANCH REGISTRY) ====
-         Tambah modul baru cukup dengan menambah satu objek di sini.
-         `href` = folder relatif; `live:false` menandai placeholder "segera". -->
-    <script>
-        const BRANCHES = [
-            {
-                key: 'ordering', href: './ordering/', live: true,
-                icon: 'fa-solid fa-box-open',
-                title: 'Ordering', tag: 'Kitchen dan Purchasing',
-                desc: 'Order belanja & check-in dapur, plus panel purchasing: antrian order, vendor, dan dispatch WhatsApp.'
-            },
-            {
-                key: 'konten', href: './konten/', live: true,
-                icon: 'fa-solid fa-bullhorn',
-                title: 'Konten', tag: 'Content Operations',
-                desc: 'Perencanaan, penjadwalan, dan produksi konten media sosial Laksamana Muda.'
-            },
-            {
-                key: 'reservasi', href: './reservasi/', live: true,
-                icon: 'fa-solid fa-calendar-check',
-                title: 'Reservasi', tag: 'Booking dan Tamu',
-                desc: 'Kelola reservasi meja, data tamu, dan jadwal kunjungan lintas outlet.'
-            }
-        ];
-
-        function renderBranches() {
-            const grid = document.getElementById('branch-grid');
-            grid.innerHTML = BRANCHES.map(b => {
-                const inner = `
-                    <div class="flex items-center justify-between mb-5">
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-xl text-white shadow-lg shadow-gold-dim/20 bg-gradient-to-br from-gold-2 to-gold-dim">
-                            <i class="${b.icon}"></i>
-                        </div>
-                        ${b.live
-                            ? '<i class="fa-solid fa-arrow-right text-muted-2 group-hover:text-gold group-hover:translate-x-1 transition-all"></i>'
-                            : '<span class="text-[10px] font-bold uppercase tracking-wider text-muted-2 border border-line rounded-full px-2 py-0.5">Segera</span>'}
-                    </div>
-                    <h2 class="text-lg font-extrabold tracking-tight text-ink">${b.title}</h2>
-                    <p class="text-[11px] font-bold uppercase tracking-wider text-gold-dim mt-1">${b.tag}</p>
-                    <p class="text-muted text-[13px] font-medium mt-2 leading-relaxed">${b.desc}</p>`;
-                return b.live
-                    ? `<a href="${b.href}" class="tile group block bg-surface border border-line rounded-3xl p-6 bg-white focus:outline-none focus:ring-2 focus:ring-gold">${inner}</a>`
-                    : `<div class="tile group block bg-white/60 border border-dashed border-line rounded-3xl p-6 opacity-70 cursor-default">${inner}</div>`;
-            }).join('');
-        }
-        document.addEventListener('DOMContentLoaded', renderBranches);
-    </script>
-
-    <div class="max-w-5xl mx-auto px-5 py-10 sm:py-16">
-
-        <!-- Header -->
-        <header class="flex items-center gap-4 mb-10 sm:mb-14">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-2 to-gold-dim flex items-center justify-center shadow-lg shadow-gold-dim/25">
-                <i class="fa-solid fa-anchor text-white text-xl"></i>
+    <!-- ============================ LOGIN ============================ -->
+    <div id="login" class="auth-wrap hidden">
+        <div class="auth-card rise">
+            <div class="auth-brand">
+                <div class="mark" aria-hidden="true"><img src="./assets/logo.png" alt=""></div>
+                <div>
+                    <b>Laksamana Muda</b>
+                    <span>Internal Office</span>
+                </div>
             </div>
-            <div>
-                <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none">Laksamana Muda</h1>
-                <p class="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-gold mt-1.5">Internal Office</p>
+            <h1 class="auth-title">Masuk</h1>
+            <p class="auth-sub"></p>
+            <form id="login-form" autocomplete="off">
+                <div class="field">
+                    <label for="f-name">Nama Pengguna</label>
+                    <input id="f-name" type="text" autocomplete="username" placeholder="Masukkan nama pengguna">
+                </div>
+                <div class="field">
+                    <label for="f-pin">PIN Akses</label>
+                    <input id="f-pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Masukkan PIN">
+                </div>
+                <p class="auth-err" id="auth-err" role="alert"></p>
+                <button class="btn btn-primary btn-block" type="submit" id="login-btn">Masuk</button>
+            </form>
+            <p class="auth-foot">office.laksamanamuda.id</p>
+        </div>
+    </div>
+
+    <!-- ============================ LAUNCHER ============================ -->
+    <div id="app" class="shell hidden">
+
+        <!-- Topbar: identitas, jam/tanggal langsung, dan keluar. -->
+        <header class="topbar rise">
+            <div class="brand">
+                <div class="mark" aria-hidden="true">
+                    <img src="./assets/logo.png" alt="">
+                </div>
+                <div class="txt">
+                    <b>Laksamana Muda</b>
+                    <span>Internal Office</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="clock" aria-label="Waktu dan tanggal saat ini">
+                    <div class="time mono" id="clock-time">--:--</div>
+                    <div class="date" id="clock-date">&nbsp;</div>
+                </div>
+                <button class="logout" id="logout-btn" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+                    <span>Keluar</span>
+                </button>
             </div>
         </header>
 
-        <!-- Intro -->
-        <div class="mb-8">
-            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Selamat Datang di Portal Laksamana Muda Office</h2>
-            <p class="text-muted text-sm font-medium mt-2 max-w-xl">Pilih modul untuk mulai bekerja.</p>
-        </div>
+        <main>
+            <!-- Salam kontekstual (mengikuti waktu dan nama pengguna). -->
+            <div class="greet rise" style="animation-delay:.06s">
+                <h1 id="greeting">Selamat datang</h1>
+                <p id="greeting-sub">Pilih modul di bawah untuk mulai bekerja.</p>
+            </div>
 
-        <!-- Branch grid -->
-        <div id="branch-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
+            <p class="eyebrow rise" style="animation-delay:.12s">Modul</p>
+            <nav id="branch-grid" class="grid" aria-label="Daftar modul"></nav>
+        </main>
 
-        <!-- Footer -->
-        <footer class="mt-14 pt-6 border-t border-line flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p class="text-muted-2 text-[11px] font-semibold">© Laksamana Muda.</p>
-            <p class="text-muted-2 text-[11px] font-semibold">office.laksamanamuda.id</p>
+        <footer class="rise" style="animation-delay:.3s">
+            <p>© <span id="year"></span> Laksamana Muda. Internal use only.</p>
+            <p>office.laksamanamuda.id</p>
         </footer>
     </div>
+
+    <script>
+    /* =========================================================================
+       OFFICE IDENTITY LAYER
+       Office memegang autentikasi, daftar user, dan otorisasi kasar (modul mana
+       yang boleh dibuka). Modul memakai sesi bersama `lm_session`, tidak login
+       sendiri. Kontrak sesi dan setup Sheet ada di docs/office-auth.md.
+       ========================================================================= */
+
+    // URL Web App Apps Script (verifikasi PIN di server, kembalikan identitas +
+    // daftar modul). Kosongkan untuk mode seed lokal (jalan tanpa Sheet).
+    const OFFICE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx1A-fDLi5iLPi_49eBhSDsComoT6mK36KtEjcvU3ZmNX0u2UEZCu9QSe2sqmAzMILUQQ/exec";
+
+    const SESSION_KEY   = "lm_session";
+    const SESSION_HOURS = 24;
+
+    // ---- Fallback lokal (dipakai bila URL kosong atau server tak terjangkau).
+    // Sumber kebenaran sebenarnya adalah Sheet. Ini hanya agar Office jalan
+    // sebelum Sheet dipasang dan saat offline.
+    const SEED_USERS = [
+        { id:'u-admin', name:'Admin', pin:'9999', role:'owner' },
+        { id:'u-putra', name:'Putra', pin:'1111', role:'kitchen' },
+        { id:'u-mella', name:'Mella', pin:'7777', role:'floor' }
+    ];
+    const ROLE_MODULES = {
+        owner:['*'], admin:['*'],
+        kitchen:['ordering'], purchasing:['ordering'],
+        marketing:['konten','reservasi'], reservasi:['reservasi'], floor:['reservasi']
+    };
+
+    // ==== REGISTRI MODUL ====
+    // Tambah modul baru cukup dengan menambah satu objek di sini, lalu satu baris
+    // di tab Roles pada Sheet. `key` harus cocok dengan nilai di kolom modules.
+    const ICONS = {
+        box:'<path d="M21 8l-9-5-9 5m18 0v8l-9 5m9-13l-9 5m0 8l-9-5V8m9 5L3 8m9 5v8"/>',
+        content:'<path d="m12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+        calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M9 16l2 2 4-4"/>'
+    };
+    // `access` = kunci modul (leaf) yang membuat kartu tampil. Kartu Ordering
+    // adalah grup: tampil bila user berhak salah satu panel (kitchen atau purchasing).
+    const BRANCHES = [
+        {
+            key:'ordering', href:'./ordering/', icon:'box', access:['kitchen','purchasing'],
+            title:'Ordering', tag:'Dapur dan Pembelian',
+            desc:'Input order bahan baku dan check-in penerimaan dapur, plus panel purchasing untuk antrian order, vendor, dan dispatch.',
+            scope:['Kitchen','Purchasing']
+        },
+        {
+            key:'konten', href:'./konten/', icon:'content', access:['konten'],
+            title:'Konten', tag:'Content Operations',
+            desc:'Perencanaan, penjadwalan, dan produksi konten media sosial, dari ide sampai tayang.',
+            scope:['Rencana','Produksi','KOL']
+        },
+        {
+            key:'reservasi', href:'./reservasi/', icon:'calendar', access:['reservasi'],
+            title:'Reservasi', tag:'Booking dan Tamu',
+            desc:'Kelola reservasi meja, data tamu, dan jadwal kunjungan lintas outlet dalam satu papan.',
+            scope:['Booking','Data Tamu']
+        }
+    ];
+
+    /* ---------------------------- Sesi ---------------------------- */
+    function getSession(){
+        try{
+            const s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+            if(!s || !s.expiry || Date.now() > s.expiry) return null;
+            return s;
+        }catch(e){ return null; }
+    }
+    function setSession(user){
+        const s = {
+            v:1, userId:user.id, name:user.name, role:user.role,
+            modules:user.modules, issuedAt:Date.now(),
+            expiry: Date.now() + SESSION_HOURS*3600*1000
+        };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+        return s;
+    }
+    function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+    function canOpen(branch, session){
+        const m = session.modules || [];
+        if (m.includes('*')) return true;
+        const access = branch.access || [branch.key];
+        return access.some(k => m.includes(k));
+    }
+
+    /* ------------------------ Verifikasi login ------------------------ */
+    // Kembalikan objek user bila cocok, null bila salah, atau lempar bila server
+    // tak terjangkau (agar pemanggil bisa jatuh ke seed lokal).
+    async function verifyRemote(name, pin){
+        const res = await fetch(OFFICE_WEBAPP_URL, {
+            method:'POST',
+            headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action:'login', name, pin })
+        });
+        if(!res.ok) throw new Error('http_'+res.status);
+        const data = await res.json();
+        return data && data.ok ? data.user : null;
+    }
+    function verifySeed(name, pin){
+        const u = SEED_USERS.find(x =>
+            String(x.name).toLowerCase() === String(name).toLowerCase() &&
+            String(x.pin) === String(pin));
+        if(!u) return null;
+        return { id:u.id, name:u.name, role:u.role, modules: ROLE_MODULES[u.role] || [] };
+    }
+
+    async function doLogin(name, pin){
+        if(!name) return { error:'Isi nama pengguna terlebih dahulu.' };
+        if(!pin)  return { error:'Isi PIN akses terlebih dahulu.' };
+
+        let user;
+        if(OFFICE_WEBAPP_URL){
+            try{
+                user = await verifyRemote(name, pin);   // null = salah, throw = server mati
+            }catch(e){
+                user = verifySeed(name, pin);            // server mati, pakai seed
+            }
+        }else{
+            user = verifySeed(name, pin);                // belum ada Sheet, seed saja
+        }
+
+        if(!user) return { error:'Nama pengguna atau PIN salah.' };
+        setSession(user);
+        return { ok:true };
+    }
+
+    /* ------------------------- Tampilan ------------------------- */
+    function svgIcon(name){
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||''}</svg>`;
+    }
+
+    function renderBranches(session){
+        const grid = document.getElementById('branch-grid');
+        const visible = BRANCHES.filter(b => canOpen(b, session));
+
+        if(visible.length === 0){
+            grid.innerHTML = `<div class="empty rise"><b>Belum ada modul untuk akun ini.</b>Hubungi admin untuk mengatur akses modul Anda.</div>`;
+            return;
+        }
+
+        grid.innerHTML = visible.map((b, i) => {
+            const arrow = '<svg class="go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+            const scope = (b.scope && b.scope.length)
+                ? `<div class="scope">${b.scope.map(s => `<span class="pill"><span class="dot"></span>${s}</span>`).join('')}</div>`
+                : '';
+            const delay = (0.16 + i * 0.08).toFixed(2);
+            return `<a href="${b.href}" class="tile rise" style="animation-delay:${delay}s" aria-label="Buka modul ${b.title}">
+                <div class="head"><div class="ico">${svgIcon(b.icon)}</div>${arrow}</div>
+                <h2>${b.title}</h2>
+                <p class="kicker">${b.tag}</p>
+                <p class="desc">${b.desc}</p>
+                ${scope}
+                <div style="margin-top:14px"><span class="badge-live"><span class="dot"></span>Aktif</span></div>
+            </a>`;
+        }).join('');
+
+        grid.querySelectorAll('.tile').forEach(t => {
+            t.addEventListener('pointermove', e => {
+                const r = t.getBoundingClientRect();
+                t.style.setProperty('--mx', `${e.clientX - r.left}px`);
+            });
+        });
+    }
+
+    function updateClock(){
+        const now = new Date();
+        const t = document.getElementById('clock-time');
+        const d = document.getElementById('clock-date');
+        if(t) t.textContent = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        if(d) d.textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    }
+    function greetingText(){
+        const h = new Date().getHours();
+        return h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
+    }
+
+    /* ------------------------- Boot dan navigasi ------------------------- */
+    let clockTimer = null;
+
+    function showLogin(){
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('login').classList.remove('hidden');
+        if(clockTimer){ clearInterval(clockTimer); clockTimer = null; }
+        setTimeout(() => document.getElementById('f-name').focus(), 60);
+    }
+
+    function showApp(session){
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+
+        const first = String(session.name || '').split(' ')[0] || session.name;
+        document.getElementById('greeting').textContent = `${greetingText()}, ${first}`;
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        renderBranches(session);
+        updateClock();
+        if(!clockTimer) clockTimer = setInterval(updateClock, 1000 * 15);
+    }
+
+    function boot(){
+        const session = getSession();
+        if(session) showApp(session); else showLogin();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        boot();
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const err = document.getElementById('auth-err');
+            const name = document.getElementById('f-name').value.trim();
+            const pin  = document.getElementById('f-pin').value.trim();
+
+            err.textContent = '';
+            btn.disabled = true; btn.textContent = 'Memeriksa...';
+            const r = await doLogin(name, pin);
+            btn.disabled = false; btn.textContent = 'Masuk';
+
+            if(r.error){
+                err.textContent = r.error;
+                document.getElementById('f-pin').value = '';
+                return;
+            }
+            showApp(getSession());
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            clearSession();
+            document.getElementById('f-name').value = '';
+            document.getElementById('f-pin').value = '';
+            showLogin();
+        });
+    });
+    </script>
 
 </body>
 </html>
