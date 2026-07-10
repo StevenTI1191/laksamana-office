@@ -236,7 +236,7 @@ td .muted{color:var(--muted);font-size:13px}
 .badge-status{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
 .st-pending{background:var(--warn-bg);color:var(--warn)}
 .st-confirmed{background:var(--info-bg);color:var(--info)}
-.st-datang{background:var(--ok-bg);color:var(--ok)}
+.st-checkedin{background:var(--ok-bg);color:var(--ok)}
 .st-completed{background:#EDEFF2;color:#4a5568}
 .st-noshow{background:var(--danger-bg);color:var(--danger)}
 .st-cancelled{background:#EDEFF2;color:var(--muted)}
@@ -323,8 +323,6 @@ td .muted{color:var(--muted);font-size:13px}
 .seat-switch button.on{background:var(--surface);color:var(--gold-dim);box-shadow:var(--shadow)}
 .seat-selinfo{font-size:13px;color:var(--muted)}
 .seat-selinfo b{color:var(--ink)}
-.share-toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid #D9CBF0;border-radius:20px;padding:5px 12px;cursor:pointer;user-select:none}
-.share-toggle input{accent-color:var(--purple);width:15px;height:15px;cursor:pointer}
 .seat-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
 .seat-legend span{display:inline-flex;align-items:center;gap:5px}
 .seat-legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
@@ -356,43 +354,15 @@ td .muted{color:var(--muted);font-size:13px}
 .seat.booked{color:#fff;border-color:rgba(0,0,0,.18)}
 .seat.booked .sn,.seat.booked .sp{color:#fff;opacity:1}
 .seat.booked .sp{font-weight:800;opacity:.9}
-.seat.booked.stpending{background:#E0A82E}
-.seat.booked.stpending .sn,.seat.booked.stpending .sp{color:#3a2a00}
-.seat.booked.stconfirmed{background:#1F9D5F}
-.seat.booked.stdatang{background:#C9432B}
-/* SHARING table, warna khusus (ungu), boleh digabung tamu lain */
-.seat.booked.stsharing{background:#7C5FC0;border-color:rgba(60,40,110,.35)}
-.seat.booked.stsharing .sn,.seat.booked.stsharing .sp,.seat.booked.stsharing .seat-sub{color:#fff}
-/* meja terkunci di mode form (sudah dipesan), tetap berwarna status (sync hari-H) tapi tak bisa dipilih */
-.seat.occ-lock{cursor:not-allowed;opacity:.9}
-.seat.occ-lock:hover{transform:none;box-shadow:none}
-.seat.avail{background:#EFE6CE;border-color:rgba(120,90,30,.22)}
-.seat.avail .sn,.seat.avail .sp{color:#5a4a2a}
-.seat.avail:hover{outline:2px solid var(--gold);outline-offset:1px;background:#F5EEDB}
-.seat .seat-sub{font-size:clamp(7px,1.05vw,11px);font-weight:800;line-height:1.05;margin-top:1px}
-.seat.booked .seat-sub{color:#fff}
-.seat.booked.stpending .seat-sub{color:#3a2a00}
-.seat.fu-warn{animation:fuPulse 1.1s ease-in-out infinite}
-@keyframes fuPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,168,46,.7)}50%{box-shadow:0 0 0 7px rgba(224,168,46,0)}}
-/* Telat (lewat jam kedatangan, belum datang) → warna KUNING */
-.seat.booked.fu-late{background:#F5C400 !important;animation:fuLate 1.2s ease-in-out infinite;z-index:4}
-.seat.booked.fu-late .sn,.seat.booked.fu-late .sp,.seat.booked.fu-late .seat-sub{color:#3a2a00 !important}
-@keyframes fuLate{0%,100%{box-shadow:0 0 0 0 rgba(245,196,0,.8)}50%{box-shadow:0 0 0 8px rgba(245,196,0,0)}}
-.share-list{display:flex;flex-direction:column;gap:8px}
-.share-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:10px;padding:9px 11px;background:var(--surface)}
-.share-row .who b{display:block;font-size:14px;color:var(--ink)}
-.share-row .who span{font-size:12px;color:var(--muted)}
+.seat.booked.stpending{background:#B5831A}
+.seat.booked.stconfirmed{background:#2F7FC4}
+.seat.booked.stcheckedin{background:#1F9D5F}
+.seat.booked.stcompleted{background:#928C80}
+.seat.avail{opacity:.9}
+.seat.avail:hover{outline:2px solid var(--gold);outline-offset:1px;opacity:1}
 .seat-viewlegend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
 .seat-viewlegend span{display:inline-flex;align-items:center;gap:5px}
 .seat-viewlegend i{width:12px;height:12px;border-radius:3px;display:inline-block}
-/* pencarian kedatangan hari-H yang lebih rapi */
-.harih-search{position:relative;flex:1;min-width:220px;max-width:440px;display:flex;align-items:center}
-.harih-search .ico{position:absolute;left:15px;color:var(--muted);display:flex;pointer-events:none}
-.harih-search input{width:100%;padding:12px 40px 12px 44px;border:1.5px solid var(--line);border-radius:30px;background:var(--paper);font-size:14.5px;transition:border-color .15s,box-shadow .15s,background .15s}
-.harih-search input:focus{outline:none;border-color:var(--gold);background:var(--surface);box-shadow:0 0 0 3px rgba(169,121,31,.15)}
-.harih-search .harih-clear{position:absolute;right:9px;width:26px;height:26px;border:none;border-radius:50%;background:var(--line);color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.12s}
-.harih-search .harih-clear:hover{background:var(--danger-bg);color:var(--danger)}
-.harih-result{font-size:12.5px;color:var(--muted);font-weight:600;white-space:nowrap}
 /* tag jenis reservasi */
 .tag-cat{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--gold-soft);color:var(--gold-dim);white-space:nowrap}
 
@@ -654,18 +624,15 @@ const DEFAULT_USERS = USERS.map(u=>({ id:u.id, name:u.name, role:u.role, pin:DEF
 // Hak akses default: turunan dari ROLE_NAV (halaman -> daftar role yang boleh)
 const DEFAULT_PERMS = (()=>{ const p={}; NAV_PAGES.forEach(pg=>{ p[pg]=ROLE_KEYS.filter(r=>(ROLE_NAV[r]||[]).includes(pg)); }); return p; })();
 
-// Status disederhanakan: Pending → Confirmed → Datang; atau Cancelled / No-show
-const STATUSES = ["Pending","Confirmed","Datang","Cancelled","No-show"];
-const STATUS_CLASS = {"Pending":"st-pending","Confirmed":"st-confirmed","Datang":"st-datang","Cancelled":"st-cancelled","No-show":"st-noshow"};
-const STATUS_ICON = {"Pending":"⏳","Confirmed":"✓","Datang":"📍","Cancelled":"✕","No-show":"⚠️"};
-// Warna event kalender / denah per status
+const STATUSES = ["Pending","Confirmed","Checked-in","Completed","No-show","Cancelled"];
+const STATUS_CLASS = {"Pending":"st-pending","Confirmed":"st-confirmed","Checked-in":"st-checkedin","Completed":"st-completed","No-show":"st-noshow","Cancelled":"st-cancelled"};
+const STATUS_ICON = {"Pending":"⏳","Confirmed":"✓","Checked-in":"📍","Completed":"✅","No-show":"⚠️","Cancelled":"✕"};
+// Warna event kalender per status (garis kiri + latar lembut)
 const STATUS_COLOR = {
-  "Pending":{c:"#E0A82E",bg:"var(--warn-bg)"}, "Confirmed":{c:"#1F9D5F",bg:"var(--ok-bg)"},
-  "Datang":{c:"#C9432B",bg:"var(--danger-bg)"}, "Cancelled":{c:"#928C80",bg:"var(--paper)"},
-  "No-show":{c:"#928C80",bg:"#EDEBE7"}
+  "Pending":{c:"#B5831A",bg:"var(--warn-bg)"}, "Confirmed":{c:"#2F7FC4",bg:"var(--info-bg)"},
+  "Checked-in":{c:"#1F9D5F",bg:"var(--ok-bg)"}, "Completed":{c:"#928C80",bg:"#EDEBE7"},
+  "No-show":{c:"#C9432B",bg:"var(--danger-bg)"}, "Cancelled":{c:"#928C80",bg:"var(--paper)"}
 };
-// Normalisasi status lama (Checked-in/Completed) → "Datang"
-function normStatus(s){ return (s==="Checked-in"||s==="Completed") ? "Datang" : s; }
 
 /* ================= DENAH TEMPAT DUDUK (Lantai 1: Weekday & Weekend) ================= */
 const SEAT_W=1600, SEAT_H=1100;
@@ -688,6 +655,7 @@ const VENUE_LAYOUTS = (()=>{
     name:"Weekday",
     fixed:[
       {t:"stage",label:"STAGE",x:630,y:10,w:380,h:210},
+      {t:"viproom",label:"RUANG VIP / NON SMOKING",x:1462,y:545,w:132,h:120},
       {t:"entrance",label:"ENTRANCE IN / OUT",x:18,y:470,w:44,h:180},
     ],
     tables:[
@@ -716,6 +684,7 @@ const VENUE_LAYOUTS = (()=>{
     fixed:[
       {t:"stage",label:"STAGE",x:590,y:10,w:380,h:200},
       {t:"dj",label:"MEJA DJ",x:775,y:250,w:150,h:70},
+      {t:"viproom",label:"RUANG VIP / NON SMOKING",x:1462,y:560,w:132,h:120},
       {t:"entrance",label:"ENTRANCE IN / OUT",x:18,y:470,w:44,h:180},
     ],
     tables:[
@@ -788,26 +757,18 @@ let SEAT_SELS=[], SEAT_LAYOUT="weekday";
 const LAYOUT_LABEL={weekday:"Weekday, Lt.1", weekend:"Weekend, Lt.1", lantai2:"Lantai 2"};
 // id meja yg dipakai sebuah reservasi (dukung banyak meja: "12, 13")
 function tablesOf(r){ return String(r&&r.table||"").split(",").map(s=>s.trim()).filter(Boolean); }
-// Map id meja -> DAFTAR reservasi (satu meja bisa >1 party bila sharing).
-// Tanggal & jam tertentu, window 120 menit.
+// Map id meja -> reservasi (tanggal & jam tertentu, window 120 menit)
 function occupiedMap(date, time, exceptId){
   const m=new Map();
   STATE.reservations.forEach(r=>{
     if(r.id===exceptId) return;
     if(r.date!==date) return;
-    // tamu sudah pulang (Completed) / batal / no-show → meja bebas lagi
-    if(["Cancelled","No-show","Completed"].includes(r.status)) return;
+    if(["Cancelled","No-show"].includes(r.status)) return;
     if(time && Math.abs(toMin(r.time)-toMin(time))>=120) return;
-    tablesOf(r).forEach(id=>{ if(!m.has(id)) m.set(id,[]); m.get(id).push(r); });
+    tablesOf(r).forEach(id=>{ if(!m.has(id)) m.set(id,r); });
   });
   return m;
 }
-// Party di sebuah meja (array), plus util status sharing.
-function partiesAt(occ, id){ return occ.get(id)||[]; }
-// Meja bisa ditambah tamu lagi bila SEMUA party-nya sharing.
-function isJoinable(list){ return list.length>0 && list.every(r=>!!r.sharing); }
-// class status untuk pewarnaan denah (dipakai form & hari-H → warna sync)
-function seatStatusClass(r){ return "st"+String(r&&r.status||"").toLowerCase().replace(/[^a-z]/g,""); }
 function formOccupied(){
   const f=byId("resForm");
   const date=f?.elements.date?.value||todayStr();
@@ -819,60 +780,27 @@ function pickSeat(id){
   const occ=formOccupied();
   const i=SEAT_SELS.indexOf(id);
   if(i>=0){ SEAT_SELS.splice(i,1); }                       // klik lagi = batalkan
-  else{
-    const list=partiesAt(occ,id);
-    if(list.length && !isJoinable(list)) return;           // meja terisi non-sharing tak bisa dipilih
-    if(isJoinable(list)){ const s=byId("resSharing"); if(s) s.checked=true; } // gabung sharing → auto sharing
-    SEAT_SELS.push(id);                                     // bisa >1 meja / gabung sharing
-  }
+  else{ if(occ.has(id)) return; SEAT_SELS.push(id); }      // meja terisi tak bisa dipilih (bisa >1 meja)
   const f=byId("resForm"); if(f&&f.elements.table) f.elements.table.value=SEAT_SELS.join(", ");
   renderSeatMap(); if(typeof checkConflict==="function") checkConflict();
 }
-// Markup generik peta: mode 'select' (form), 'view' (hari-H) atau 'move' (pindah meja)
+// Markup generik peta: mode 'select' (form) atau 'view' (kedatangan hari-H)
 function seatMapMarkup(layoutKey, mode, occ){
   const L=VENUE_LAYOUTS[layoutKey]||VENUE_LAYOUTS.weekday;
   const px=v=>`${(v/SEAT_W*100).toFixed(3)}%`, py=v=>`${(v/SEAT_H*100).toFixed(3)}%`;
-  const esq=s=>String(s).replace(/'/g,"\\'");
   const fixHtml=(L.fixed||[]).map(fx=>`<div class="seat-fix seat-${fx.t}" style="left:${px(fx.x)};top:${py(fx.y)};width:${px(fx.w)};height:${py(fx.h)}">${esc(fx.label)}</div>`).join("");
   const seatHtml=L.tables.map(t=>{
     const st=`left:${px(t.x)};top:${py(t.y)};width:${px(t.w)};height:${py(t.h)}`;
-    const list=partiesAt(occ,t.id), booked=list.length>0, shared=isJoinable(list);
     if(mode==="view"){
+      const res=occ.get(t.id), booked=!!res;
       if(booked){
-        // sharing → warna khusus (ungu), bisa ditambah tamu lagi; klik = kelola sharing
-        if(shared){
-          const nm=(list[0].name||'').split(' ')[0]+(list.length>1?` +${list.length-1}`:'');
-          return `<button type="button" class="seat booked stsharing" style="${st}" onclick="sharingTableAction('${esq(t.id)}')" title="${esc(t.id+', SHARING, '+list.length+' grup, klik untuk kelola')}"><span class="sn">${esc(t.id)}</span><span class="sp">🤝 ${esc(nm)}</span><span class="seat-sub"></span></button>`;
-        }
-        const res=list[0], scls=seatStatusClass(res);
-        const isToday=(typeof HARIH_DATE!=="undefined") && HARIH_DATE===todayStr();
-        const bts=isToday ? new Date(HARIH_DATE+"T"+(res.time||"00:00")+":00").getTime() : 0;
-        const attr=bts ? ` data-bts="${bts}" data-st="${esc(res.status)}"` : "";
-        return `<button type="button" class="seat booked ${scls}"${attr} style="${st}" onclick="seatAction('${esc(res.id)}')" title="${esc(t.id+', '+res.name+', '+res.time+', '+res.status+', '+res.pax+' pax')}"><span class="sn">${esc(t.id)}</span><span class="sp">${esc((res.name||'').split(' ')[0])}</span><span class="seat-sub"></span></button>`;
+        const scls="st"+String(res.status||"").toLowerCase().replace(/[^a-z]/g,"");
+        return `<button type="button" class="seat booked ${scls}" style="${st}" onclick="openDetail('${esc(res.id)}')" title="${esc(t.id+', '+res.name+', '+res.time+', '+res.status+', '+res.pax+' pax')}"><span class="sn">${esc(t.id)}</span><span class="sp">${esc((res.name||'').split(' ')[0])}</span></button>`;
       }
-      return `<button type="button" class="seat avail" style="${st}" onclick="walkInSeat('${esq(t.id)}')" title="${esc(t.id+', '+t.cap+' pax, kosong. Klik untuk walk-in')}"><span class="sn">${esc(t.id)}</span><span class="sp">${t.cap} pax</span></button>`;
+      return `<button type="button" class="seat avail zone-${t.zone}" style="${st}" onclick="walkInSeat('${String(t.id).replace(/'/g,"\\'")}')" title="${esc(t.id+', '+t.cap+' pax, kosong. Klik untuk walk-in')}"><span class="sn">${esc(t.id)}</span><span class="sp">${t.cap} pax</span></button>`;
     }
-    if(mode==="move"){
-      const selm=(typeof MOVE_SELS!=="undefined") && MOVE_SELS.includes(t.id);
-      // meja terisi non-sharing tak bisa dituju; sharing, kosong & yg sudah terpilih bisa
-      if(booked && !shared && !selm){
-        const scls=seatStatusClass(list[0]);
-        return `<button type="button" class="seat booked ${scls}" disabled style="${st};opacity:.55" title="${esc(t.id+', terisi ('+list[0].name+')')}"><span class="sn">${esc(t.id)}</span><span class="sp">${esc((list[0].name||'').split(' ')[0])}</span></button>`;
-      }
-      const cls=(shared?'booked stsharing':'avail')+(selm?' sel':'');
-      return `<button type="button" class="seat ${cls}" style="${st}" onclick="toggleMoveSeat('${esq(t.id)}')" title="${esc(t.id+', '+t.cap+' pax'+(shared?', sharing (gabung)':'')+(selm?', terpilih':''))}"><span class="sn">${esc(t.id)}</span><span class="sp">${selm?'✓ pilih':(shared?'🤝':t.cap+' pax')}</span></button>`;
-    }
-    // mode 'select' (form), warna sync dgn hari-H: available=cream, booked=status/sharing
-    const sel=SEAT_SELS.includes(t.id);
-    if(sel) return `<button type="button" class="seat avail sel" style="${st}" onclick="pickSeat('${esq(t.id)}')" title="${esc(t.id+', '+t.cap+' pax, terpilih')}"><span class="sn">${esc(t.id)}</span><span class="sp">${t.cap} pax</span></button>`;
-    if(booked && !shared){
-      const scls=seatStatusClass(list[0]);
-      return `<button type="button" class="seat booked ${scls} occ-lock" disabled style="${st}" title="${esc(t.id+', sudah dipesan ('+list[0].name+', '+list[0].status+')')}"><span class="sn">${esc(t.id)}</span><span class="sp">${esc((list[0].name||'').split(' ')[0])}</span></button>`;
-    }
-    if(shared){
-      return `<button type="button" class="seat booked stsharing" style="${st}" onclick="pickSeat('${esq(t.id)}')" title="${esc(t.id+', sharing. Klik untuk gabung')}"><span class="sn">${esc(t.id)}</span><span class="sp">🤝 gabung</span></button>`;
-    }
-    return `<button type="button" class="seat avail" style="${st}" onclick="pickSeat('${esq(t.id)}')" title="${esc(t.id+', '+t.cap+' pax')}"><span class="sn">${esc(t.id)}</span><span class="sp">${t.cap} pax</span></button>`;
+    const sel=SEAT_SELS.includes(t.id), isOcc=occ.has(t.id)&&!sel;
+    return `<button type="button" class="seat zone-${t.zone}${sel?' sel':''}${isOcc?' occ':''}"${isOcc?' disabled':''} style="${st}" onclick="pickSeat('${String(t.id).replace(/'/g,"\\'")}')" title="${esc(t.id+', '+t.cap+' pax'+(isOcc?', sudah dipesan':''))}"><span class="sn">${esc(t.id)}</span><span class="sp">${t.cap} pax</span></button>`;
   }).join("");
   return fixHtml+seatHtml;
 }
@@ -945,7 +873,6 @@ async function loadState(){
   setSync("sync","Memuat data…");
   const d = await apiGet("getAll");
   STATE.reservations = Array.isArray(d.reservations)? d.reservations : [];
-  STATE.reservations.forEach(r=>{ r.status = normStatus(r.status); });   // migrasi status lama
   STATE.master = Object.assign(JSON.parse(JSON.stringify(DEFAULT_MASTER)), d.master||{});
   ensureUsersPerms();                 // seed users & hak akses bila Sheet lama belum punya
   STATE.audit = Array.isArray(d.audit)? d.audit : [];
@@ -1002,7 +929,6 @@ function logAudit(action, detail){
 function uid(){ return "r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function rp(n){ n=Number(n)||0; return "Rp "+n.toLocaleString("id-ID"); }
-function rpDot(n){ n=Number(n)||0; return "Rp. "+n.toLocaleString("id-ID"); }   // format DP: Rp. 1.000.000
 function normPhone(p){ let x=(p||"").replace(/[^0-9]/g,""); if(x.startsWith("0")) x="62"+x.slice(1); else if(x.startsWith("62")){} else if(x.length>0 && !x.startsWith("62")) x="62"+x; return x; }
 function displayPhone(p){ return (p||"").replace(/[^0-9]/g,""); }
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
@@ -1027,7 +953,7 @@ function closeModal(){ byId("modalRoot").innerHTML=""; }
 function customerProfile(phone){
   const key=normPhone(phone);
   const hist = STATE.reservations.filter(r=>normPhone(r.phone)===key);
-  const done = hist.filter(r=>r.status==="Datang");
+  const done = hist.filter(r=>["Completed","Checked-in"].includes(r.status));
   const noshow = hist.filter(r=>r.status==="No-show").length;
   const visits = done.length;
   let type="Baru";
@@ -1057,6 +983,7 @@ function ensureUsersPerms(){
 }
 function getUsers(){ return (STATE.master && Array.isArray(STATE.master.users) && STATE.master.users.length) ? STATE.master.users : DEFAULT_USERS; }
 function getPerms(){ return (STATE.master && STATE.master.perms) ? STATE.master.perms : DEFAULT_PERMS; }
+function userById(id){ return getUsers().find(u=>u.id===id) || null; }
 
 // ===== Integrasi identitas Office (SSO) =====
 // Baca lm_session dan pastikan user berhak membuka Reservasi. null bila tidak.
@@ -1089,7 +1016,6 @@ function resolveReservasiUser(s){
   }
   return u;
 }
-function userById(id){ return getUsers().find(u=>u.id===id) || null; }
 // Admin selalu akses penuh; role lain mengikuti matriks hak akses
 function pageAllowed(page, role){ if(role==="admin") return true; const p=getPerms()[page]; return p ? p.includes(role) : true; }
 function allowedPages(role){ const a=NAV_PAGES.filter(p=>pageAllowed(p,role)); return a.length?a:["dashboard"]; }
@@ -1188,11 +1114,11 @@ async function doLogin(){
 }
 function doLogout(){
   if(DATA_LOADED){ logAudit("Logout","Keluar dari sistem"); saveState(); }
-  sessionStorage.removeItem(SESSION_KEY);
-  SESSION=null; SELECTED_CREW=null;
   // Kembali ke pemilih modul Office. Sesi Office (lm_session) TIDAK dihapus
   // di sini secara sengaja, supaya user bisa pindah modul tanpa login ulang.
   // Sign-out penuh hanya lewat tombol Keluar di Office sendiri.
+  sessionStorage.removeItem(SESSION_KEY);
+  SESSION=null; SELECTED_CREW=null;
   location.replace('../');
 }
 async function enterApp(){
@@ -1283,14 +1209,11 @@ function needFollowUpCount(){
 }
 
 /* helper: reservasi untuk sebuah meja/tanggal (deteksi bentrok) */
-function conflictCheck(date, table, time, exceptId, sharing){
+function conflictCheck(date, table, time, exceptId){
   if(!table) return null;
-  const want=String(table).split(",").map(s=>s.trim()).filter(Boolean);
-  return STATE.reservations.find(r=>r.id!==exceptId && r.date===date &&
+  return STATE.reservations.find(r=>r.id!==exceptId && r.date===date && r.table===table &&
     !["Cancelled","No-show"].includes(r.status) &&
-    Math.abs(toMin(r.time)-toMin(time))<120 &&
-    tablesOf(r).some(t=>want.includes(t)) &&
-    !(sharing && r.sharing));   // dua-duanya sharing → boleh gabung, bukan bentrok
+    Math.abs(toMin(r.time)-toMin(time))<120);
 }
 function toMin(t){ if(!t) return 0; const[h,m]=t.split(":").map(Number); return h*60+m; }
 
@@ -1359,17 +1282,16 @@ function renderInput(editId){
              <button type="button" data-l="lantai2" onclick="setSeatLayout('lantai2')">Lantai 2</button>
            </div>
            <span class="seat-selinfo" id="seatSelLabel">Belum ada meja dipilih</span>
-           <label class="share-toggle"><input type="checkbox" name="sharing" id="resSharing" ${r?.sharing?"checked":""} onchange="checkConflict()"> 🤝 Sharing table <span class="hint" style="font-weight:400">(boleh digabung tamu lain)</span></label>
          </div>
          <div class="seat-map" id="seatMap"></div>
          <div class="seat-legend">
-           <span><i style="background:#EFE6CE;border:1px solid rgba(120,90,30,.3)"></i>Kosong (available) → klik utk pilih</span>
-           <span><i style="outline:2px solid var(--gold);outline-offset:-2px;background:#F5EEDB"></i>Terpilih</span>
-           <span><i style="background:#7C5FC0"></i>🤝 Sharing (bisa gabung)</span>
-           <span><i style="background:#E0A82E"></i>Pending</span>
-           <span><i style="background:#1F9D5F"></i>Confirmed</span>
-           <span><i style="background:#C9432B"></i>Datang</span>
-           <span style="opacity:.7">Meja berwarna status = sudah dipesan (terkunci)</span>
+           <span><i style="background:#4db2e8"></i>Reguler</span>
+           <span><i style="background:#43c06a;border-radius:50%"></i>Meja 4 pax</span>
+           <span><i style="background:#cdb18a"></i>Sharing / R</span>
+           <span><i style="background:#c9b28c"></i>VIP</span>
+           <span><i style="background:#f7b24a"></i>Extension</span>
+           <span><i style="background:#2f3a4a"></i>U-Block</span>
+           <span><i style="filter:grayscale(1);opacity:.45;background:#4db2e8"></i>✕ sudah dipesan (disable)</span>
          </div>
          <div id="conflictHint" style="margin-top:8px"></div>
        </div>
@@ -1402,11 +1324,15 @@ function renderInput(editId){
          <select name="source">${opt(m.infoSources, r?.source)}</select>
        </div>
        <div class="field">
-         <label>PIC Penanganan</label>
-         <input value="${esc(r?.picName || SESSION.name)}" disabled style="background:var(--paper);color:var(--muted);cursor:not-allowed">
-         <input type="hidden" name="picName" value="${esc(r?.picName || SESSION.name)}">
-         <input type="hidden" name="picType" value="${esc(r?.picType || (SESSION.role==='marketing'?'Marketing':'Host/Captain'))}">
-         <div class="hint">⚓ Otomatis diisi kru yang login: <b>${esc(SESSION.name)}</b></div>
+         <label>PIC Penanganan <span class="req">*</span></label>
+         <select name="picType" required onchange="togglePIC()">
+           <option value="Host/Captain" ${r?.picType==="Host/Captain"?"selected":""}>Langsung Host / Captain</option>
+           <option value="Marketing" ${r?.picType==="Marketing"?"selected":""}>Marketing (pilih PIC)</option>
+         </select>
+       </div>
+       <div class="field" id="picNameWrap">
+         <label>Nama PIC Marketing</label>
+         <select name="picName">${opt(marketingPICs, r?.picName)}</select>
        </div>
        <div class="field">
          <label>Status Member</label>
@@ -1476,9 +1402,8 @@ function toggleDP(){
   ["dpMethodWrap","dpNominalWrap","dpProofWrap"].forEach(id=>byId(id).classList.toggle("hidden",!sudah));
 }
 function togglePIC(){
-  const wrap=byId("picNameWrap"); const el=byId("resForm")?.elements["picType"];
-  if(!wrap || !el) return;              // PIC kini otomatis (kru login), tidak ada toggle
-  wrap.classList.toggle("hidden", el.value!=="Marketing");
+  const isMkt = byId("resForm").elements["picType"].value==="Marketing";
+  byId("picNameWrap").classList.toggle("hidden",!isMkt);
 }
 function toggleMember(){
   const ya = document.querySelector('input[name=member]:checked')?.value==="ya";
@@ -1498,7 +1423,7 @@ function checkPhoneHistory(v){
 function checkConflict(){
   renderSeatMap();                        // segarkan meja yang ter-disable
   const f=byId("resForm"); const el=byId("conflictHint"); if(!el) return;
-  const c = conflictCheck(f.elements["date"].value, f.elements["table"].value, f.elements["time"].value, EDIT_ID, !!byId("resSharing")?.checked);
+  const c = conflictCheck(f.elements["date"].value, f.elements["table"].value, f.elements["time"].value, EDIT_ID);
   el.innerHTML = c? `<div class="inline-danger">⛔ Bentrok! <b>${esc(c.table)}</b> sudah dipesan <b>${esc(c.name)}</b> jam ${c.time} (${c.status}).</div>` : "";
 }
 function onDateChange(){
@@ -1522,16 +1447,14 @@ function saveReservation(){
     id: existing?existing.id:uid(),
     name:g("name"), phone:normPhone(g("phone")),
     date:g("date"), time:g("time"), pax:Number(g("pax")),
-    table:g("table"), sharing: !!document.querySelector('input[name=sharing]')?.checked,
-    category:g("category"), foodReq:g("foodReq"), drinkReq:g("drinkReq"),
+    table:g("table"), category:g("category"), foodReq:g("foodReq"), drinkReq:g("drinkReq"),
     dpStatus, dpMethod: dpStatus==="Sudah"?g("dpMethod"):"", dpAmount: dpStatus==="Sudah"?Number(g("dpAmount")||0):0,
     dpProofData: PENDING_FILES.dpProofData?.data || existing?.dpProofData || "",
     dpProofName: PENDING_FILES.dpProofData?.name || existing?.dpProofName || "",
     docReqData: PENDING_FILES.docReqData?.data || existing?.docReqData || "",
     docReqName: PENDING_FILES.docReqData?.name || existing?.docReqName || "",
     source:g("source"),
-    picType: g("picType") || (SESSION.role==="marketing"?"Marketing":"Host/Captain"),
-    picName: g("picName") || SESSION.name,
+    picType:g("picType"), picName: g("picType")==="Marketing"?g("picName"):SESSION.name,
     member: document.querySelector('input[name=member]:checked').value==="ya",
     memberNo:g("memberNo"), notes:g("notes"),
     vip: existing?.vip||false,
@@ -1804,7 +1727,7 @@ function dashCalendar(){
   const total=lead+days, tail=(7-(total%7))%7;
   for(let d=1;d<=tail;d++) cells+=cell(new Date(y,mo+1,d),false);
   const chip=(label,val)=>`<span class="cal-legend${CAL_STATUS===val?' active':''}" onclick="CAL_STATUS='${val}';renderDashboard()">${val?`<span class="dot" style="background:${STATUS_COLOR[val].c}"></span>`:""}${label}</span>`;
-  const legend=chip("Semua","")+["Pending","Confirmed","Datang","Cancelled","No-show"].map(s=>chip(s,s)).join("");
+  const legend=chip("Semua","")+["Pending","Confirmed","Checked-in","No-show"].map(s=>chip(s,s)).join("");
   return `<div class="panel"><div class="panel-body">
     <div class="cal-head">
       <div class="cal-nav">
@@ -1841,7 +1764,7 @@ function exportCSV(ids){
 let HARIH_DATE = todayStr();
 let HARIH_Q = "", HARIH_VIEW = "list", HARIH_LAYOUT = "l1";
 function harihL1(){ const dg=new Date(HARIH_DATE+"T00:00:00").getDay(); return (dg===0||dg===6)?"weekend":"weekday"; }
-function renderHariHListOnly(){ renderHariH(); const inp=byId('harihSearchInput'); if(inp){ inp.focus(); try{inp.setSelectionRange(inp.value.length,inp.value.length);}catch(e){} } }
+function renderHariHListOnly(){ renderHariH(); const inp=document.querySelector('#page-hariH .search-box input'); if(inp){ inp.focus(); try{inp.setSelectionRange(inp.value.length,inp.value.length);}catch(e){} } }
 function harihMapView(){
   const layoutKey=(HARIH_LAYOUT==="lantai2")?"lantai2":harihL1();
   const occ=occupiedMap(HARIH_DATE,"",null);
@@ -1852,88 +1775,29 @@ function harihMapView(){
         <button class="${HARIH_LAYOUT!=='lantai2'?'on':''}" onclick="HARIH_LAYOUT='l1';renderHariH()">Lantai 1 (${l1label})</button>
         <button class="${HARIH_LAYOUT==='lantai2'?'on':''}" onclick="HARIH_LAYOUT='lantai2';renderHariH()">Lantai 2</button>
       </div>
-      <span class="seat-selinfo">Klik meja <b>terisi</b> → detail/aksi, <b>🤝 sharing</b> → kelola & tambah tamu, <b>kosong</b> → walk-in</span>
+      <span class="seat-selinfo">Klik meja <b>terisi</b> → detail tamu, meja <b>kosong</b> → walk-in</span>
     </div>
     <div class="seat-map" id="harihMap">${seatMapMarkup(layoutKey,"view",occ)}</div>
     <div class="seat-viewlegend">
-      <span><i style="background:#E0A82E"></i>Pending (bisa diedit)</span>
-      <span><i style="background:#1F9D5F"></i>Confirmed</span>
-      <span><i style="background:#C9432B"></i>Sudah Datang</span>
-      <span><i style="background:#7C5FC0"></i>🤝 Sharing (bisa gabung)</span>
-      <span><i style="background:#EFE6CE;border:1px solid rgba(120,90,30,.3)"></i>Kosong (available) → klik utk walk-in</span>
+      <span><i style="background:#B5831A"></i>Pending</span>
+      <span><i style="background:#2F7FC4"></i>Confirmed</span>
+      <span><i style="background:#1F9D5F"></i>Checked-in</span>
+      <span><i style="background:#928C80"></i>Completed</span>
+      <span><i style="background:#4db2e8;opacity:.6"></i>Kosong → klik utk walk-in</span>
     </div>
   </div></div>`;
 }
-// Tik per-detik: warning H-10 menit (follow up) & hitung mundur lewat jam booking
-function updateHarihTimers(){
-  const map=byId("harihMap"); if(!map) return;
-  const now=Date.now();
-  map.querySelectorAll(".seat.booked[data-bts]").forEach(el=>{
-    const bts=Number(el.dataset.bts), stt=el.dataset.st, sub=el.querySelector(".seat-sub");
-    el.classList.remove("fu-warn","fu-late");
-    if(stt==="Datang"){ if(sub) sub.textContent=""; return; }        // sudah datang, tak perlu
-    const diff=bts-now;                                              // ms menuju jam booking
-    if(diff>0 && diff<=600000){                                     // ≤ 10 menit lagi → follow up
-      el.classList.add("fu-warn"); if(sub) sub.textContent="⏰ FU";
-    } else if(diff<=0){                                             // sudah lewat jam booking
-      el.classList.add("fu-late");
-      const s=Math.floor(-diff/1000), mm=String(Math.floor(s/60)).padStart(2,"0"), ss=String(s%60).padStart(2,"0");
-      if(sub) sub.textContent="⏱ "+mm+":"+ss;
-    } else if(sub){ sub.textContent=""; }
-  });
-}
-setInterval(updateHarihTimers, 1000);
-// Klik meja terisi di denah → aksi cepat (detail / edit / tandai datang / batal)
-function seatAction(id){
-  const r=STATE.reservations.find(x=>x.id===id); if(!r) return;
-  const canEdit=CAN.input(SESSION.role);
-  let acts="";
-  if(["Pending","Confirmed"].includes(r.status)) acts+=`<button class="btn btn-ok" onclick="closeModal();checkIn('${r.id}')">✅ Tandai Datang</button>`;
-  if(canEdit){
-    acts+=`<button class="btn btn-ghost" onclick="toggleSharing('${r.id}')">🤝 ${r.sharing?"Batalkan Sharing":"Jadikan Sharing"}</button>`;
-    if(r.table) acts+=`<button class="btn btn-ghost" onclick="changeTable('${r.id}')">🔁 Pindah Meja</button>`;
-    if(r.table) acts+=`<button class="btn btn-ghost" onclick="emptyTable('${r.id}')">🗑️ Kosongkan Meja</button>`;
-  }
-  if(["Pending","Confirmed","Datang"].includes(r.status)) acts+=`<button class="btn btn-danger" onclick="closeModal();cancelReservation('${r.id}')">❌ Batalkan (bebaskan meja)</button>`;
-  openModal(`<div class="modal-head"><h3>Meja ${esc(r.table)}, ${esc(r.name)}</h3><button class="close-x" onclick="closeModal()">×</button></div>
-   <div class="modal-body">
-     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-       <span class="badge-status ${STATUS_CLASS[r.status]}">${STATUS_ICON[r.status]} ${r.status}</span>
-       ${r.category?`<span class="tag-cat">${esc(r.category)}</span>`:""}
-     </div>
-     <div class="detail-grid">
-       <div class="detail-item"><div class="k">Jam</div><div class="v">${r.time}</div></div>
-       <div class="detail-item"><div class="k">Pax</div><div class="v">${r.pax}${r.actualPax!=null?` (datang ${r.actualPax})`:""}</div></div>
-       <div class="detail-item"><div class="k">No. HP</div><div class="v">${displayPhone(r.phone)||"-"}</div></div>
-       <div class="detail-item"><div class="k">DP</div><div class="v">${r.dpStatus==="Sudah"?rpDot(r.dpAmount):"Belum"}</div></div>
-     </div>
-     ${canEdit?`<div class="section-title" style="margin-top:14px">🔄 Ubah Status Langsung</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <div class="field" style="margin:0;min-width:160px"><select id="stSel">${STATUSES.map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}</select></div>
-        <button class="btn btn-sm btn-ink" onclick="changeStatus('${r.id}')">Terapkan</button>
-      </div>`:""}
-   </div>
-   <div class="modal-foot" style="flex-wrap:wrap;justify-content:flex-start">
-     ${acts}
-     ${canEdit?`<button class="btn btn-ghost" onclick="closeModal();editReservation('${r.id}')">✏️ Edit</button>`:""}
-     <button class="btn btn-ghost" onclick="closeModal();openDetail('${r.id}')">🔍 Detail</button>
-     <button class="btn btn-ghost" onclick="printCheck('${r.id}')">🖨️ Struk</button>
-     <button class="btn btn-ink" style="margin-left:auto" onclick="closeModal()">Tutup</button>
-   </div>`);
-}
-function walkInSeat(tableId, sharingDefault){
-  const esq=String(tableId).replace(/'/g,"\\'");
+function walkInSeat(tableId){
   openModal(`<div class="modal-head"><h3>🚶 Walk-in, Meja ${esc(tableId)}</h3><button class="close-x" onclick="closeModal()">×</button></div>
    <div class="modal-body"><div class="form-grid">
      <div class="field full"><label>Nama Tamu <span class="req">*</span></label><input id="wi_name" placeholder="Nama tamu" autocomplete="off"></div>
      <div class="field"><label>No. HP</label><input id="wi_phone" inputmode="numeric" placeholder="08xxx (opsional)"></div>
      <div class="field"><label>Jumlah Pax <span class="req">*</span></label><input id="wi_pax" type="number" min="1" value="2"></div>
-     <div class="field full"><label class="share-toggle" style="width:100%"><input type="checkbox" id="wi_sharing" ${sharingDefault?"checked":""}> 🤝 Sharing table <span class="hint" style="font-weight:400">meja boleh ditambah tamu lain</span></label></div>
-   </div><p class="hint">Meja <b>${esc(tableId)}</b>, ${fmtDate(HARIH_DATE)}, status otomatis <b>Datang</b>.</p></div>
+   </div><p class="hint">Meja <b>${esc(tableId)}</b>, ${fmtDate(HARIH_DATE)}, status otomatis <b>Checked-in</b>.</p></div>
    <div class="modal-foot">
      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-     <button class="btn btn-primary" onclick="saveWalkIn('${esq}',false)">Simpan</button>
-     <button class="btn btn-ok" onclick="saveWalkIn('${esq}',true)">Simpan &amp; Print</button>
+     <button class="btn btn-primary" onclick="saveWalkIn('${String(tableId).replace(/'/g,"\\'")}',false)">Simpan</button>
+     <button class="btn btn-ok" onclick="saveWalkIn('${String(tableId).replace(/'/g,"\\'")}',true)">Simpan &amp; Print</button>
    </div>`);
   setTimeout(()=>byId("wi_name")?.focus(),60);
 }
@@ -1941,97 +1805,16 @@ function saveWalkIn(tableId, doPrint){
   const name=(byId("wi_name").value||"").trim(), pax=Number(byId("wi_pax").value||0);
   if(!name){ toast("Nama wajib diisi","err"); return; }
   if(!pax||pax<1){ toast("Jumlah pax wajib","err"); return; }
-  const sharing=!!byId("wi_sharing")?.checked;
   const now=Date.now(), nowTime=new Date().toTimeString().slice(0,5);
   const rec={ id:uid(), name, phone:normPhone(byId("wi_phone").value||""), date:HARIH_DATE, time:nowTime, pax,
-    table:tableId, sharing, category:"Tamu Umum", foodReq:"", drinkReq:"", dpStatus:"Belum", dpMethod:"", dpAmount:0,
+    table:tableId, category:"Tamu Umum", foodReq:"", drinkReq:"", dpStatus:"Belum", dpMethod:"", dpAmount:0,
     dpProofData:"", dpProofName:"", docReqData:"", docReqName:"", source:"Walk-in", picType:"Host/Captain", picName:SESSION.name,
-    member:false, memberNo:"", notes:"Walk-in", vip:false, status:"Datang", actualPax:pax, checkinAt:now,
+    member:false, memberNo:"", notes:"Walk-in", vip:false, status:"Checked-in", actualPax:pax, checkinAt:now,
     createdBy:SESSION.name, createdAt:now, updatedAt:now, followups:[] };
   STATE.reservations.push(rec);
-  logAudit("Walk-in",`${name}, meja ${tableId} (${pax} pax)${sharing?", sharing":""}`); saveState(); closeModal(); renderHariH();
+  logAudit("Walk-in",`${name}, meja ${tableId} (${pax} pax)`); saveState(); closeModal(); renderHariH();
   toast("Walk-in tersimpan ✓","ok");
   if(doPrint) printCheck(rec.id);
-}
-/* ===== Sharing / kelola meja (hari-H) ===== */
-// Jadikan / batalkan sharing untuk sebuah reservasi
-function toggleSharing(id){
-  const r=STATE.reservations.find(x=>x.id===id); if(!r) return;
-  r.sharing=!r.sharing; r.updatedAt=Date.now();
-  logAudit(r.sharing?"Set Sharing":"Batal Sharing", `${r.name}, meja ${r.table||'-'}`);
-  saveState(); closeModal(); renderHariH();
-  toast(r.sharing?"Meja dijadikan sharing 🤝":"Sharing dibatalkan","ok");
-}
-// Kosongkan meja: reservasi tetap ada tetapi tanpa meja → seat kembali tersedia
-function emptyTable(id){
-  const r=STATE.reservations.find(x=>x.id===id); if(!r) return;
-  if(!confirm(`Kosongkan meja "${r.table}" dari reservasi ${r.name}?\nMeja jadi tersedia kembali, reservasi tetap ada (tanpa meja).`)) return;
-  logAudit("Kosongkan Meja",`${r.name}, dari meja ${r.table}`);
-  r.table=""; r.updatedAt=Date.now();
-  saveState(); closeModal(); renderHariH();
-  toast("Meja dikosongkan, reservasi tanpa meja","ok");
-}
-// ---- Pindah meja (change table), bisa >1 meja ----
-let MOVE_ID=null, MOVE_LAYOUT="weekday", MOVE_SELS=[];
-function changeTable(id){
-  const r=STATE.reservations.find(x=>x.id===id); if(!r) return;
-  MOVE_ID=id; MOVE_SELS=tablesOf(r);
-  const d=new Date((r.date||todayStr())+"T00:00:00");
-  MOVE_LAYOUT=(d.getDay()===0||d.getDay()===6)?"weekend":"weekday";
-  renderMoveModal();
-}
-function setMoveLayout(l){ MOVE_LAYOUT=l; renderMoveModal(); }
-function toggleMoveSeat(tableId){
-  const i=MOVE_SELS.indexOf(tableId);
-  if(i>=0) MOVE_SELS.splice(i,1); else MOVE_SELS.push(tableId);
-  renderMoveModal();
-}
-function renderMoveModal(){
-  const r=STATE.reservations.find(x=>x.id===MOVE_ID); if(!r) return;
-  const occ=occupiedMap(r.date, r.time, MOVE_ID);   // kecualikan diri sendiri
-  const sw=(l,t)=>`<button type="button" class="${MOVE_LAYOUT===l?'on':''}" onclick="setMoveLayout('${l}')">${t}</button>`;
-  openModal(`<div class="modal-head"><h3>🔁 Pindah Meja, ${esc(r.name)}</h3><button class="close-x" onclick="closeModal()">×</button></div>
-   <div class="modal-body">
-     <p class="hint" style="margin-bottom:10px">Meja sekarang: <b>${esc(r.table||'-')}</b>, ${fmtDate(r.date)} ${r.time}. Klik meja untuk pilih/lepas (boleh &gt;1). Meja terisi non-sharing terkunci.</p>
-     <div class="seat-toolbar"><div class="seat-switch">${sw('weekday','Weekday')}${sw('weekend','Weekend')}${sw('lantai2','Lantai 2')}</div>
-       <span class="seat-selinfo">Terpilih: <b>${MOVE_SELS.length?esc(MOVE_SELS.join(", ")):"-"}</b></span></div>
-     <div class="seat-map" id="moveMap">${seatMapMarkup(MOVE_LAYOUT,"move",occ)}</div>
-   </div>
-   <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-     <button class="btn btn-primary" onclick="applyMoveTables()">💾 Simpan Meja (${MOVE_SELS.length})</button></div>`, true);
-}
-function applyMoveTables(){
-  const r=STATE.reservations.find(x=>x.id===MOVE_ID); if(!r) return;
-  if(!MOVE_SELS.length){ toast("Pilih minimal 1 meja","err"); return; }
-  const prev=r.table||'-';
-  r.table=MOVE_SELS.join(", "); r.updatedAt=Date.now();
-  logAudit("Pindah Meja",`${r.name}, ${prev} → ${r.table}`);
-  saveState(); closeModal(); renderHariH();
-  toast(`Meja diperbarui: ${r.table} ✓`,"ok");
-}
-// ---- Kelola meja sharing (banyak grup di satu meja) ----
-function sharingTableAction(tableId){
-  const occ=occupiedMap(HARIH_DATE,"",null);
-  const list=partiesAt(occ,tableId);
-  if(!list.length){ walkInSeat(tableId,true); return; }
-  const canEdit=CAN.input(SESSION.role);
-  const rows=list.map(r=>`
-    <div class="share-row">
-      <div class="who"><b>${esc(r.name)}</b><span>${r.time}, ${r.pax} pax, <span class="badge-status ${STATUS_CLASS[r.status]}" style="font-size:10px">${STATUS_ICON[r.status]} ${r.status}</span></span></div>
-      <div class="mini-actions">
-        ${["Pending","Confirmed"].includes(r.status)?`<button class="btn btn-xs btn-ok" onclick="closeModal();checkIn('${r.id}')">✅ Datang</button>`:""}
-        ${canEdit?`<button class="btn btn-xs btn-ghost" onclick="toggleSharing('${r.id}')" title="Batalkan sharing party ini">🤝✕</button>`:""}
-        <button class="btn btn-xs btn-ghost" onclick="closeModal();openDetail('${r.id}')">🔍</button>
-      </div>
-    </div>`).join("");
-  openModal(`<div class="modal-head"><h3>🤝 Meja ${esc(tableId)}, Sharing (${list.length} grup)</h3><button class="close-x" onclick="closeModal()">×</button></div>
-   <div class="modal-body">
-     <div class="share-list">${rows}</div>
-   </div>
-   <div class="modal-foot" style="flex-wrap:wrap">
-     <button class="btn btn-primary" onclick="closeModal();walkInSeat('${String(tableId).replace(/'/g,"\\'")}',true)">➕ Tambah Tamu (Walk-in)</button>
-     <button class="btn btn-ink" style="margin-left:auto" onclick="closeModal()">Tutup</button>
-   </div>`);
 }
 let BT_PRINTER=null;
 async function connectPrinter(){
@@ -2080,7 +1863,7 @@ function renderHariH(){
     .sort((a,b)=>a.time.localeCompare(b.time));
   const nowMin = new Date().getHours()*60+new Date().getMinutes();
   const isToday = HARIH_DATE===todayStr();
-  const arrived = dayList.filter(r=>r.status==="Datang").length;
+  const arrived = dayList.filter(r=>["Checked-in","Completed"].includes(r.status)).length;
   const pending = dayList.filter(r=>["Pending","Confirmed"].includes(r.status)).length;
   const noshow = dayList.filter(r=>r.status==="No-show").length;
 
@@ -2090,7 +1873,6 @@ function renderHariH(){
      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
        <button class="btn btn-sm btn-ghost" onclick="connectPrinter()" title="Sambungkan printer thermal Bluetooth">🖨️ Printer</button>
        <button class="btn btn-sm btn-wa" onclick="openCoordWA()">📋 WA Koordinasi</button>
-       <button class="btn btn-sm ${HARIH_DATE===todayStr()?'btn-primary':'btn-ghost'}" onclick="HARIH_DATE=todayStr();renderHariH()" title="Lompat ke tanggal hari ini">📅 Hari Ini</button>
        <div class="field" style="margin:0"><input type="date" value="${HARIH_DATE}" onchange="HARIH_DATE=this.value;renderHariH()"></div>
      </div>
    </div>
@@ -2105,12 +1887,7 @@ function renderHariH(){
        <button class="${HARIH_VIEW==='list'?'on':''}" onclick="HARIH_VIEW='list';renderHariH()">📋 Daftar</button>
        <button class="${HARIH_VIEW==='map'?'on':''}" onclick="HARIH_VIEW='map';renderHariH()">🗺️ Denah Meja</button>
      </div>
-     <div class="harih-search">
-       <span class="ico">${icon('search',18)}</span>
-       <input id="harihSearchInput" placeholder="Cari nama tamu, nomor HP, atau meja…" value="${esc(HARIH_Q)}" oninput="HARIH_Q=this.value;renderHariHListOnly()">
-       ${HARIH_Q?`<button class="harih-clear" title="Bersihkan pencarian" onclick="HARIH_Q='';renderHariH()">×</button>`:""}
-     </div>
-     ${HARIH_Q?`<span class="harih-result">${list.length} hasil untuk “${esc(HARIH_Q)}”</span>`:""}
+     <div class="search-box" style="flex:1;min-width:200px;max-width:360px"><span class="ico">${icon('search',16)}</span><input placeholder="Cari nama / no HP / meja…" value="${esc(HARIH_Q)}" oninput="HARIH_Q=this.value;renderHariHListOnly()"></div>
    </div></div>
    ${HARIH_VIEW==='map'?harihMapView():!list.length?`<div class="panel"><div class="empty"><div class="big">📭</div>Tidak ada reservasi pada ${fmtDate(HARIH_DATE)}.</div></div>`:`
    <div class="panel"><div class="panel-head"><h3>Jadwal Kedatangan, ${fmtDate(HARIH_DATE)}</h3></div>
@@ -2120,9 +1897,9 @@ function renderHariH(){
         const p=customerProfile(r.phone);
         const late = isToday && ["Pending","Confirmed"].includes(r.status) && toMin(r.time)<nowMin;
         const near = isToday && ["Pending","Confirmed"].includes(r.status) && toMin(r.time)-nowMin<=30 && toMin(r.time)>=nowMin;
-        const rowStyle = late?'background:#FCEFB8':near?'background:#FBF6E6':'';
+        const rowStyle = late?'background:#FBECEA':near?'background:#FBF6E6':'';
         return `<tr style="${rowStyle};cursor:pointer" onclick="openDetail('${r.id}')">
-          <td><b>${r.time}</b>${late?'<br><span class="badge-status" style="font-size:10px;background:#F5C400;color:#3a2a00">⏰ telat</span>':near?'<br><span class="badge-status st-pending" style="font-size:10px">segera</span>':''}</td>
+          <td><b>${r.time}</b>${late?'<br><span class="badge-status st-noshow" style="font-size:10px">⏰ lewat</span>':near?'<br><span class="badge-status st-pending" style="font-size:10px">segera</span>':''}</td>
           <td><div class="name">${esc(r.name)} ${tagFor(p)}</div><div class="muted">${displayPhone(r.phone)}</div>${r.category?`<span class="tag-cat">${esc(r.category)}</span>`:""}</td>
           <td>${r.pax}${r.actualPax!=null?` <span class="muted">/${r.actualPax}✓</span>`:""}</td>
           <td>${r.table?esc(r.table):'<span class="muted">-</span>'}</td>
@@ -2132,28 +1909,25 @@ function renderHariH(){
             ${["Pending","Confirmed"].includes(r.status)?`<button class="btn btn-xs btn-ok" onclick="checkIn('${r.id}')">✅ Datang</button>
               <button class="btn btn-xs btn-wa" onclick="followUp('${r.id}')">📞 Follow Up</button>
               <button class="btn btn-xs btn-danger" onclick="markNoShow('${r.id}')">⚠️</button>`:""}
-            ${r.status==="Datang"?`<button class="btn btn-xs btn-ghost" onclick="cancelReservation('${r.id}')">❌ Batal</button>`:""}
+            ${r.status==="Checked-in"?`<button class="btn btn-xs btn-ink" onclick="completeVisit('${r.id}')">Selesai</button>`:""}
             ${r.followups?.length?`<span class="pill">${r.followups.length} FU</span>`:""}
           </div></td>
         </tr>`; }).join("")}
      </tbody></table></div></div>`}
   `;
-  if(HARIH_VIEW==='map') updateHarihTimers();   // tampilkan warning/timer segera
 }
 function checkIn(id){
   const r=STATE.reservations.find(x=>x.id===id);
   const actual = prompt(`Check-in "${r.name}".\nJumlah tamu yang benar-benar datang (dipesan ${r.pax} pax):`, r.pax);
   if(actual===null) return;
-  r.status="Datang"; r.actualPax=Number(actual)||r.pax; r.checkinAt=Date.now(); r.updatedAt=Date.now();
-  logAudit("Datang",`${r.name}, ${r.actualPax} pax datang`); saveState(); buildNav(); renderHariH();
-  toast(`${r.name} sudah datang ✓`,"ok");
+  r.status="Checked-in"; r.actualPax=Number(actual)||r.pax; r.checkinAt=Date.now(); r.updatedAt=Date.now();
+  logAudit("Check-in",`${r.name}, ${r.actualPax} pax datang`); saveState(); buildNav(); renderHariH();
+  toast(`${r.name} check-in ✓`,"ok");
 }
-// Batalkan reservasi → meja kembali tersedia (cream)
-function cancelReservation(id){
-  const r=STATE.reservations.find(x=>x.id===id); if(!r) return;
-  if(!confirm(`Batalkan reservasi "${r.name}"? Meja akan tersedia kembali.`)) return;
-  r.status="Cancelled"; r.updatedAt=Date.now();
-  logAudit("Batal",`${r.name}`); saveState(); buildNav(); renderHariH(); toast("Reservasi dibatalkan, meja tersedia kembali","err");
+function completeVisit(id){
+  const r=STATE.reservations.find(x=>x.id===id);
+  r.status="Completed"; r.updatedAt=Date.now();
+  logAudit("Selesai",`${r.name}`); saveState(); renderHariH(); toast("Kunjungan selesai","ok");
 }
 function markNoShow(id){
   const r=STATE.reservations.find(x=>x.id===id);
@@ -2202,8 +1976,6 @@ function dpShort(r){
   if(n>=1000) return Math.round(n/1000)+"K";
   return String(n);
 }
-// Nominal DP format penuh: "Rp. 1.000.000" (dipakai di rekap WA koordinasi)
-function dpFull(r){ return (r.dpStatus==="Sudah" && Number(r.dpAmount)>0) ? rpDot(r.dpAmount) : "Belum DP"; }
 // Metode bayar ringkas: "Transfer BCA" → "BCA", "QRIS" → "QRIS"
 function dpMethodShort(r){
   if(r.dpStatus!=="Sudah" || !r.dpMethod) return "-";
@@ -2223,7 +1995,7 @@ function buildCoordText(dateStr, variant){
   const pad = n=>String(n).padStart(2," ");
 
   if(variant==="kasir"){
-    const rows = list.map((r,i)=>`${pad(i+1)}. ${(r.name||"-").toUpperCase()} / ${(Number(r.pax)||0)}PAX / ${dpFull(r)} / ${dpMethodShort(r)}`);
+    const rows = list.map((r,i)=>`${pad(i+1)}. ${(r.name||"-").toUpperCase()} / ${(Number(r.pax)||0)}PAX / ${dpShort(r)} / ${dpMethodShort(r)}`);
     const paidList = list.filter(r=>r.dpStatus==="Sudah");
     const totalDP = paidList.reduce((a,r)=>a+(Number(r.dpAmount)||0),0);
     return [
@@ -2234,7 +2006,7 @@ function buildCoordText(dateStr, variant){
       "",
       rows.join("\n"),
       LINE,
-      `💰 TOTAL DP MASUK : ${rpDot(totalDP)}`,
+      `💰 TOTAL DP MASUK : ${rp(totalDP)}`,
       `✅ SUDAH DP : ${paidList.length} tamu`,
       `⭕ BELUM DP : ${list.length-paidList.length} tamu`,
       `👥 TOTAL TAMU : ${totalPax} PAX, ${list.length} reservasi`,
@@ -2242,8 +2014,8 @@ function buildCoordText(dateStr, variant){
   }
 
   // variant koordinasi (default)
-  const rows = list.map((r,i)=>`${pad(i+1)}. ${(r.name||"-").toUpperCase()} / ${(Number(r.pax)||0)}PAX / ${dpFull(r)} / ${r.table||"-"}`);
-  const mejaCount = list.reduce((a,r)=> a + tablesOf(r).length, 0);
+  const rows = list.map((r,i)=>`${pad(i+1)}. ${(r.name||"-").toUpperCase()} / ${(Number(r.pax)||0)}PAX / ${dpShort(r)} / ${r.table||"-"}`);
+  const mejaCount = list.reduce((a,r)=> a + (r.table? r.table.trim().split(/\s+/).length : 0), 0);
   return [
     "⚓ *KOORDINASI KEDATANGAN*",
     `LAKSAMANA MUDA, ${fmtDate(dateStr)}`,
@@ -2300,7 +2072,6 @@ function openDetail(id){
      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
        <span class="badge-status ${STATUS_CLASS[r.status]}">${STATUS_ICON[r.status]} ${r.status}</span>
        <span class="badge-status ${r.dpStatus==="Sudah"?"dp-yes":"dp-no"}">${r.dpStatus==="Sudah"?"💰 DP "+rp(r.dpAmount):"Belum DP"}</span>
-       ${r.sharing?`<span class="badge-status" style="background:var(--purple-bg);color:var(--purple)">🤝 Sharing</span>`:""}
        ${p.isMember?`<span class="badge-status tag-vip">🎫 Member ${esc(p.memberNo)}</span>`:""}
      </div>
      <div class="detail-grid">
@@ -2359,7 +2130,7 @@ function delReservation(id){
 let HIST_F={ q:"", status:"", mode:"all", month:todayStr().slice(0,7), year:new Date().getFullYear() };
 function renderRiwayat(){
   const today=todayStr();
-  let list=STATE.reservations.filter(r=>r.date<today || ["No-show","Cancelled"].includes(r.status));
+  let list=STATE.reservations.filter(r=>r.date<today || ["Completed","No-show","Cancelled"].includes(r.status));
   if(HIST_F.mode==="month") list=list.filter(r=>r.date.slice(0,7)===HIST_F.month);
   else if(HIST_F.mode==="year") list=list.filter(r=>r.date.slice(0,4)===String(HIST_F.year));
   if(HIST_F.status) list=list.filter(r=>r.status===HIST_F.status);
@@ -2373,7 +2144,7 @@ function renderRiwayat(){
      <div class="field"><label>Periode</label><select onchange="HIST_F.mode=this.value;renderRiwayat()"><option value="all" ${HIST_F.mode==="all"?"selected":""}>Semua</option><option value="month" ${HIST_F.mode==="month"?"selected":""}>Bulanan</option><option value="year" ${HIST_F.mode==="year"?"selected":""}>Tahunan</option></select></div>
      ${HIST_F.mode==="month"?`<div class="field"><label>Bulan</label><input type="month" value="${HIST_F.month}" onchange="HIST_F.month=this.value;renderRiwayat()"></div>`:""}
      ${HIST_F.mode==="year"?`<div class="field"><label>Tahun</label><input type="number" value="${HIST_F.year}" onchange="HIST_F.year=this.value;renderRiwayat()"></div>`:""}
-     <div class="field"><label>Status Akhir</label><select onchange="HIST_F.status=this.value;renderRiwayat()"><option value="">Semua</option><option ${HIST_F.status==="Datang"?"selected":""}>Datang</option><option ${HIST_F.status==="No-show"?"selected":""}>No-show</option><option ${HIST_F.status==="Cancelled"?"selected":""}>Cancelled</option></select></div>
+     <div class="field"><label>Status Akhir</label><select onchange="HIST_F.status=this.value;renderRiwayat()"><option value="">Semua</option><option ${HIST_F.status==="Completed"?"selected":""}>Completed</option><option ${HIST_F.status==="No-show"?"selected":""}>No-show</option><option ${HIST_F.status==="Cancelled"?"selected":""}>Cancelled</option></select></div>
    </div></div></div>
    ${HIST_F.q && list.length? crmCard(list):""}
    ${!list.length?`<div class="panel"><div class="empty"><div class="big">🗂️</div>Belum ada riwayat.</div></div>`:`
@@ -2413,7 +2184,7 @@ function renderAnalitik(){
   const bySource={}; all.forEach(r=>{if(r.source)bySource[r.source]=(bySource[r.source]||0)+1;});
   const srcArr=Object.entries(bySource).sort((a,b)=>b[1]-a[1]); const srcMax=Math.max(1,...srcArr.map(x=>x[1]));
   // PIC
-  const byPic={}; all.forEach(r=>{const k=r.picType==="Marketing"?r.picName:"Host/Captain";byPic[k]=byPic[k]||{total:0,hadir:0};byPic[k].total++;if(r.status==="Datang")byPic[k].hadir++;});
+  const byPic={}; all.forEach(r=>{const k=r.picType==="Marketing"?r.picName:"Host/Captain";byPic[k]=byPic[k]||{total:0,hadir:0};byPic[k].total++;if(["Checked-in","Completed"].includes(r.status))byPic[k].hadir++;});
   const picArr=Object.entries(byPic).sort((a,b)=>b[1].total-a[1].total); const picMax=Math.max(1,...picArr.map(x=>x[1].total));
   // peak hour
   const byHour={}; all.forEach(r=>{const h=(r.time||"0").split(":")[0];byHour[h]=(byHour[h]||0)+1;});
@@ -2426,7 +2197,7 @@ function renderAnalitik(){
   const byMonth={}; all.forEach(r=>{const m=r.date.slice(0,7);byMonth[m]=(byMonth[m]||0)+1;});
   const monArr=Object.entries(byMonth).sort(); const monMax=Math.max(1,...monArr.map(x=>x[1]));
   // no-show ratio
-  const done=all.filter(r=>["Datang","No-show"].includes(r.status));
+  const done=all.filter(r=>["Completed","Checked-in","No-show"].includes(r.status));
   const noshow=all.filter(r=>r.status==="No-show").length;
   const nsRatio=done.length?Math.round(noshow/done.length*100):0;
   const avgPax=all.length?(all.reduce((a,r)=>a+(Number(r.pax)||0),0)/all.length).toFixed(1):0;
@@ -2481,7 +2252,7 @@ function userAccessBlock(){
   const usersHtml = users.map(u=>`
     <div class="user-row">
       <span class="av" style="background:${avatarColor(u.id)}">${crewInitials(u.name)}</span>
-      <span class="who"><b>${esc(u.name)}${u.id===SESSION.id?', <span style="color:var(--gold-dim)">kamu</span>':''}</b>
+      <span class="who"><b>${esc(u.name)}${u.id===SESSION.id?' <span style="color:var(--gold-dim)">(kamu)</span>':''}</b>
         <span><span class="role-badge">${ROLE_LABEL[u.role]||u.role}</span></span></span>
       <span class="pinpill">PIN ${esc((u.pin||DEFAULT_PIN).replace(/./g,"•"))}</span>
       <button class="btn btn-xs btn-ghost" onclick="openUserForm('${u.id}')">✎ Kelola</button>
@@ -2608,7 +2379,7 @@ function seedDemo(){
   names.forEach((n,i)=>{
     const d=new Date(now); d.setDate(d.getDate()-7+i*2);
     const dp = i%3===0;
-    STATE.reservations.push({ id:uid(), name:n, phone:normPhone("08"+(1234500000+i*11111)), date:d.toISOString().slice(0,10), time:["18:00","19:00","19:30","20:00","20:30"][i%5], pax:[2,4,6,10,25,4,8,3][i], table:STATE.master.tables[i%STATE.master.tables.length], foodReq:i%2?"Nasi Goreng Kapal":"", drinkReq:"", dpStatus:dp?"Sudah":"Belum", dpMethod:dp?"QRIS":"", dpAmount:dp?100000:0, dpProofData:"",dpProofName:"", docReqData:"",docReqName:"", source:STATE.master.infoSources[i%STATE.master.infoSources.length], picType:i%2?"Marketing":"Host/Captain", picName:["Devani","Aurel","Christy"][i%3], member:i%4===0, memberNo:i%4===0?"LM-000"+i:"", notes:i===4?"Reservasi korporat, butuh proyektor":"", vip:false, status:["Datang","Datang","No-show","Datang","Confirmed","Pending","Datang","Datang"][i], createdBy:"Devani", createdAt:Date.now()-i*86400000, updatedAt:Date.now(), actualPax:i%3?[2,4,null,10,null,null,8,3][i]:null, checkinAt:null, followups:[] });
+    STATE.reservations.push({ id:uid(), name:n, phone:normPhone("08"+(1234500000+i*11111)), date:d.toISOString().slice(0,10), time:["18:00","19:00","19:30","20:00","20:30"][i%5], pax:[2,4,6,10,25,4,8,3][i], table:STATE.master.tables[i%STATE.master.tables.length], foodReq:i%2?"Nasi Goreng Kapal":"", drinkReq:"", dpStatus:dp?"Sudah":"Belum", dpMethod:dp?"QRIS":"", dpAmount:dp?100000:0, dpProofData:"",dpProofName:"", docReqData:"",docReqName:"", source:STATE.master.infoSources[i%STATE.master.infoSources.length], picType:i%2?"Marketing":"Host/Captain", picName:["Devani","Aurel","Christy"][i%3], member:i%4===0, memberNo:i%4===0?"LM-000"+i:"", notes:i===4?"Reservasi korporat, butuh proyektor":"", vip:false, status:["Completed","Completed","No-show","Completed","Confirmed","Pending","Completed","Checked-in"][i], createdBy:"Devani", createdAt:Date.now()-i*86400000, updatedAt:Date.now(), actualPax:i%3?[2,4,null,10,null,null,8,3][i]:null, checkinAt:null, followups:[] });
   });
   logAudit("Seed Demo","8 reservasi contoh ditambahkan"); saveState(); toast("Data demo ditambahkan","ok"); navigate("dashboard");
 }
