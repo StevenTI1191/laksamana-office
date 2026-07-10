@@ -837,9 +837,10 @@
             const isAdmin   = user.role === 'admin';
             const canOrder  = user.role === 'admin' || user.role === 'full';
 
-            // Tombol Admin. Kelola User kini terpusat di Office (Sheet Users/Roles),
-            // jadi tombol lokal ini tetap disembunyikan meski admin.
-            document.getElementById('btn-manage-users').classList.add('hidden');
+            // Tombol Admin. Office menentukan SIAPA yang boleh masuk; panel ini
+            // mengelola hak internal tiap kru (Order penuh vs Check-in saja) lewat
+            // Kelola User lokal, seperti Konten dan Reservasi.
+            document.getElementById('btn-manage-users').classList.toggle('hidden', !isAdmin);
             document.getElementById('btn-config').classList.toggle('hidden', !isAdmin);
 
             // Tab & halaman Order Belanja, switchTab dulu, baru sembunyikan
