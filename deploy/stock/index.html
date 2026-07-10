@@ -113,9 +113,9 @@
 
       <div class="lbl">Panel Tersedia</div>
       <div class="side-grid">
-        <button type="button" class="side-card" data-key="kitchen" onclick="openPanel('kitchen')">
+        <button type="button" class="side-card" data-key="ordering" onclick="openPanel('ordering')">
           <div class="av">🍳</div>
-          <div class="who-text"><b>Kitchen</b><span>Order &amp; Check-in penerimaan</span></div>
+          <div class="who-text"><b>Ordering</b><span>Order &amp; Check-in penerimaan</span></div>
           <div class="arrow">→</div>
         </button>
         <button type="button" class="side-card" data-key="purchasing" onclick="openPanel('purchasing')">
@@ -144,7 +144,7 @@ function officeSession() {
         const s = JSON.parse(localStorage.getItem('lm_session'));
         if (!s || !s.expiry || Date.now() > s.expiry) return null;
         const m = s.modules || [];
-        if (!(m.includes('*') || m.includes('kitchen') || m.includes('purchasing'))) return null;
+        if (!(m.includes('*') || m.includes('ordering') || m.includes('purchasing'))) return null;
         return s;
     } catch (e) { return null; }
 }
@@ -154,13 +154,13 @@ function allowedPanels(s) {
     const m = s.modules || [];
     const all = m.includes('*');
     const list = [];
-    if (all || m.includes('kitchen')) list.push('kitchen');
+    if (all || m.includes('ordering')) list.push('ordering');
     if (all || m.includes('purchasing')) list.push('purchasing');
     return list;
 }
 
 function openPanel(key) {
-    window.location.href = key === 'purchasing' ? './purchasing/' : './kitchen/';
+    window.location.href = key === 'purchasing' ? './purchasing/' : './ordering/';
 }
 
 document.addEventListener('DOMContentLoaded', function () {

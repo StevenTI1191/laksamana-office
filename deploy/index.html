@@ -130,6 +130,49 @@
     }
     footer p{color:var(--muted-2); font-size:11.5px; font-weight:600}
 
+    /* ---------- ADMIN MODAL ---------- */
+    .modal-wrap{
+        position:fixed; inset:0; z-index:60; display:flex; align-items:flex-start; justify-content:center;
+        padding:24px; overflow-y:auto; background:rgba(42,38,32,.44); backdrop-filter:blur(3px);
+    }
+    .modal-card{
+        width:100%; max-width:640px; margin:auto; background:var(--surface); border:1px solid var(--line);
+        border-radius:20px; box-shadow:var(--shadow-lg); animation:lm-rise .4s var(--ease) both;
+    }
+    .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding:22px 24px 16px; border-bottom:1px solid var(--line)}
+    .modal-head h2{font-size:19px; font-weight:800}
+    .modal-head p{color:var(--muted); font-size:12.5px; margin-top:3px}
+    .modal-x{width:34px; height:34px; flex:none; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--muted); display:flex; align-items:center; justify-content:center; transition:.16s var(--ease)}
+    .modal-x:hover{border-color:var(--danger); color:var(--danger); background:var(--danger-bg)}
+    .modal-x svg{width:16px; height:16px}
+    .modal-body{padding:20px 24px 24px}
+
+    .admin-form{background:#FCFBF8; border:1px solid var(--line); border-radius:14px; padding:16px}
+    .af-title{font-size:12px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:12px}
+    .af-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .admin-form .field{margin-bottom:0}
+    .admin-form .field input, .admin-form .field select{padding:10px 11px; font-size:14px}
+    .af-active{display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink); margin-top:12px; cursor:pointer}
+    .af-active input{width:15px; height:15px; accent-color:var(--gold)}
+    .af-actions{display:flex; gap:8px; margin-top:12px}
+    .af-actions .btn{padding:10px 16px; font-size:14px}
+
+    .admin-list-head{font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted-2); margin:22px 0 10px}
+    .admin-list{display:flex; flex-direction:column; gap:8px}
+    .u-row{display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:12px; padding:11px 13px; background:var(--surface)}
+    .u-row.inactive{opacity:.55}
+    .u-av{width:36px; height:36px; flex:none; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:13px; background:linear-gradient(135deg,var(--gold-2),var(--gold-dim))}
+    .u-info{min-width:0; flex:1}
+    .u-info b{font-size:14px; color:var(--ink); display:flex; align-items:center; gap:7px}
+    .u-info .u-role{font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--gold-dim); background:var(--gold-soft); border:1px solid var(--line); border-radius:20px; padding:1px 7px}
+    .u-info span{font-size:11.5px; color:var(--muted)}
+    .u-acts{display:flex; gap:4px; flex:none}
+    .u-acts button{width:32px; height:32px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--muted); display:flex; align-items:center; justify-content:center; transition:.16s var(--ease)}
+    .u-acts button svg{width:15px; height:15px}
+    .u-acts .u-edit:hover{border-color:var(--gold-2); color:var(--gold-dim); background:var(--gold-soft)}
+    .u-acts .u-del:hover{border-color:var(--danger); color:var(--danger); background:var(--danger-bg)}
+    @media(max-width:520px){ .af-grid{grid-template-columns:1fr} }
+
     /* Hormati preferensi kurangi gerak. Animasi global dimatikan di laksamana.css. */
     @media (prefers-reduced-motion: reduce){
         .tile, .tile .go, .tile .ico, .brand .mark{transition:none}
@@ -187,6 +230,11 @@
                     <div class="time mono" id="clock-time">--:--</div>
                     <div class="date" id="clock-date">&nbsp;</div>
                 </div>
+                <!-- Kelola User. Hanya tampil untuk owner/admin (akses '*'). -->
+                <button class="logout" id="admin-btn" type="button" hidden style="border-color:var(--line);color:var(--gold-dim)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Kelola User</span>
+                </button>
                 <button class="logout" id="logout-btn" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
                     <span>Keluar</span>
@@ -211,6 +259,48 @@
         </footer>
     </div>
 
+    <!-- ==================== PANEL KELOLA USER (admin) ==================== -->
+    <div id="admin-modal" class="modal-wrap hidden">
+        <div class="modal-card">
+            <div class="modal-head">
+                <div>
+                    <h2>Kelola User</h2>
+                    <p>Tambah, ubah, atau hapus akun dan PIN. Tersimpan langsung ke Sheet.</p>
+                </div>
+                <button class="modal-x" id="admin-close" type="button" aria-label="Tutup">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Form tambah/edit -->
+                <form id="admin-form" class="admin-form" autocomplete="off">
+                    <div class="af-title" id="af-title">Tambah User Baru</div>
+                    <input type="hidden" id="af-id">
+                    <div class="af-grid">
+                        <div class="field"><label for="af-name">Nama</label>
+                            <input id="af-name" type="text" placeholder="cth: Christy"></div>
+                        <div class="field"><label for="af-pin">PIN</label>
+                            <input id="af-pin" type="text" inputmode="numeric" placeholder="3 sampai 8 digit"></div>
+                        <div class="field"><label for="af-role">Role</label>
+                            <select id="af-role"></select></div>
+                        <div class="field"><label for="af-ket">Keterangan</label>
+                            <input id="af-ket" type="text" placeholder="opsional"></div>
+                    </div>
+                    <label class="af-active"><input type="checkbox" id="af-active" checked> Akun aktif</label>
+                    <p class="auth-err" id="af-err" role="alert"></p>
+                    <div class="af-actions">
+                        <button type="submit" class="btn btn-primary" id="af-save">Simpan</button>
+                        <button type="button" class="btn btn-ghost hidden" id="af-cancel">Batal edit</button>
+                    </div>
+                </form>
+
+                <div class="admin-list-head">Daftar User (<span id="admin-count">0</span>)</div>
+                <div id="admin-list" class="admin-list"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
     /* =========================================================================
        OFFICE IDENTITY LAYER
@@ -221,7 +311,7 @@
 
     // URL Web App Apps Script (verifikasi PIN di server, kembalikan identitas +
     // daftar modul). Kosongkan untuk mode seed lokal (jalan tanpa Sheet).
-    const OFFICE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxzQv59JbCfvS-B2_6HgHQCD1DqaxKrDqCm071KD3vUJXcv7nkhwmed6QAZl3dALaBzng/exec";
+    const OFFICE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwTm9jZ0vs9yHUuft6N62cn2GxQ9pq2NfqyhrtBfzjVsW0zlJt7a3a5iyXZcvU36Rpa-A/exec";
 
     const SESSION_KEY   = "lm_session";
     const SESSION_HOURS = 24;
@@ -236,7 +326,7 @@
     ];
     const ROLE_MODULES = {
         owner:['*'], admin:['*'],
-        kitchen:['ordering'], purchasing:['ordering'],
+        kitchen:['ordering'], purchasing:['purchasing'],
         marketing:['konten','reservasi'], reservasi:['reservasi'], floor:['reservasi']
     };
 
@@ -248,14 +338,14 @@
         content:'<path d="m12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
         calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M9 16l2 2 4-4"/>'
     };
-    // `access` = kunci modul (leaf) yang membuat kartu tampil. Kartu Ordering
-    // adalah grup: tampil bila user berhak salah satu panel (kitchen atau purchasing).
+    // `access` = kunci modul (leaf) yang membuat kartu tampil. Kartu Stock
+    // adalah grup: tampil bila user berhak salah satu panel (ordering atau purchasing).
     const BRANCHES = [
         {
-            key:'ordering', href:'./ordering/', icon:'box', access:['kitchen','purchasing'],
-            title:'Ordering', tag:'Dapur dan Pembelian',
-            desc:'Input order bahan baku dan check-in penerimaan dapur, plus panel purchasing untuk antrian order, vendor, dan dispatch.',
-            scope:['Kitchen','Purchasing']
+            key:'stock', href:'./stock/', icon:'box', access:['ordering','purchasing'],
+            title:'Stock', tag:'Ordering dan Purchasing',
+            desc:'Input order bahan baku dan check-in penerimaan, plus panel purchasing untuk antrian order, vendor, dan dispatch.',
+            scope:['Ordering','Purchasing']
         },
         {
             key:'konten', href:'./konten/', icon:'content', access:['konten'],
@@ -318,6 +408,10 @@
         return { id:u.id, name:u.name, role:u.role, modules: ROLE_MODULES[u.role] || [] };
     }
 
+    // Kredensial admin ditahan HANYA di memori (tidak pernah ke localStorage) agar
+    // aksi Kelola User bisa diotorisasi ulang di server tanpa menyimpan PIN.
+    let adminCreds = null;   // { name, pin }
+
     async function doLogin(name, pin){
         if(!name) return { error:'Isi nama pengguna terlebih dahulu.' };
         if(!pin)  return { error:'Isi PIN akses terlebih dahulu.' };
@@ -335,7 +429,160 @@
 
         if(!user) return { error:'Nama pengguna atau PIN salah.' };
         setSession(user);
+        // Simpan kredensial di memori bila user admin/owner, untuk panel Kelola User.
+        if((user.modules || []).includes('*')) adminCreds = { name, pin };
         return { ok:true };
+    }
+
+    function isAdminSession(session){ return (session.modules || []).includes('*'); }
+
+    /* ------------------------- Panel Kelola User ------------------------- */
+    // Kirim aksi admin ke Apps Script, selalu sertakan kredensial admin (callerName,
+    // callerPin) agar server memverifikasi ulang bahwa pemanggil memang admin/owner.
+    async function adminCall(action, extra){
+        if(!adminCreds) throw new Error('need_pin');
+        const res = await fetch(OFFICE_WEBAPP_URL, {
+            method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+            body: JSON.stringify(Object.assign({
+                action, callerName: adminCreds.name, callerPin: adminCreds.pin
+            }, extra || {}))
+        });
+        if(!res.ok) throw new Error('http_'+res.status);
+        return res.json();
+    }
+
+    let adminRoles = [];   // pilihan role dari Sheet, untuk dropdown
+
+    function initials(name){
+        return String(name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // Bila kredensial admin tak ada di memori (mis. setelah reload), minta PIN sekali.
+    function ensureAdminPin(){
+        if(adminCreds) return true;
+        const session = getSession();
+        if(!session) return false;
+        const pin = prompt('Masukkan PIN Anda untuk membuka Kelola User:');
+        if(!pin) return false;
+        adminCreds = { name: session.name, pin: pin.trim() };
+        return true;
+    }
+
+    async function openAdminPanel(){
+        if(!ensureAdminPin()) return;
+        document.getElementById('admin-modal').classList.remove('hidden');
+        resetAdminForm();
+        await loadAdminUsers();
+    }
+    function closeAdminPanel(){
+        document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    async function loadAdminUsers(){
+        const list = document.getElementById('admin-list');
+        list.innerHTML = '<div class="empty">Memuat...</div>';
+        let data;
+        try{ data = await adminCall('listUsers'); }
+        catch(e){ list.innerHTML = '<div class="empty">Gagal memuat. Cek koneksi.</div>'; return; }
+        if(!data.ok){
+            if(data.error === 'forbidden'){ adminCreds = null; list.innerHTML = '<div class="empty">PIN salah atau bukan admin.</div>'; }
+            else list.innerHTML = `<div class="empty">Gagal: ${esc(data.error)}</div>`;
+            return;
+        }
+        adminRoles = data.roles || [];
+        const sel = document.getElementById('af-role');
+        sel.innerHTML = adminRoles.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+
+        document.getElementById('admin-count').textContent = data.users.length;
+        list.innerHTML = data.users.map(u => `
+            <div class="u-row${u.active ? '' : ' inactive'}">
+                <div class="u-av">${esc(initials(u.name))}</div>
+                <div class="u-info">
+                    <b>${esc(u.name)} <span class="u-role">${esc(u.role)}</span>${u.active ? '' : ' <span style="color:var(--muted-2);font-size:11px">nonaktif</span>'}</b>
+                    <span>PIN ${esc(u.pin)}${u.keterangan ? ', ' + esc(u.keterangan) : ''}</span>
+                </div>
+                <div class="u-acts">
+                    <button class="u-edit" title="Ubah" data-id="${esc(u.id)}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                    <button class="u-del" title="Hapus" data-id="${esc(u.id)}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                    </button>
+                </div>
+            </div>`).join('') || '<div class="empty">Belum ada user.</div>';
+
+        // Simpan data untuk pengisian form saat edit.
+        list._users = data.users;
+    }
+
+    function resetAdminForm(){
+        document.getElementById('af-title').textContent = 'Tambah User Baru';
+        document.getElementById('af-id').value = '';
+        document.getElementById('af-name').value = '';
+        document.getElementById('af-pin').value = '';
+        document.getElementById('af-ket').value = '';
+        document.getElementById('af-active').checked = true;
+        document.getElementById('af-err').textContent = '';
+        document.getElementById('af-cancel').classList.add('hidden');
+        document.getElementById('af-save').textContent = 'Simpan';
+    }
+
+    function fillAdminForm(u){
+        document.getElementById('af-title').textContent = 'Ubah User: ' + u.name;
+        document.getElementById('af-id').value = u.id;
+        document.getElementById('af-name').value = u.name;
+        document.getElementById('af-pin').value = u.pin;
+        document.getElementById('af-role').value = u.role;
+        document.getElementById('af-ket').value = u.keterangan || '';
+        document.getElementById('af-active').checked = !!u.active;
+        document.getElementById('af-cancel').classList.remove('hidden');
+        document.getElementById('af-save').textContent = 'Simpan Perubahan';
+        document.getElementById('af-name').focus();
+    }
+
+    const ADMIN_ERR = {
+        name_taken:'Nama sudah dipakai user lain.', pin_taken:'PIN sudah dipakai user lain.',
+        missing_fields:'Nama, PIN, dan role wajib diisi.', forbidden:'PIN salah atau bukan admin.',
+        cannot_delete_self:'Tidak bisa menghapus akun sendiri.', not_found:'User tidak ditemukan.'
+    };
+
+    async function submitAdminForm(e){
+        e.preventDefault();
+        const err = document.getElementById('af-err');
+        const save = document.getElementById('af-save');
+        const name = document.getElementById('af-name').value.trim();
+        const pin  = document.getElementById('af-pin').value.trim();
+        err.textContent = '';
+        if(!name || !pin){ err.textContent = 'Nama dan PIN wajib diisi.'; return; }
+        if(!/^\d{3,8}$/.test(pin)){ err.textContent = 'PIN harus 3 sampai 8 digit angka.'; return; }
+
+        const payload = {
+            id: document.getElementById('af-id').value,
+            name, pin,
+            role: document.getElementById('af-role').value,
+            keterangan: document.getElementById('af-ket').value.trim(),
+            active: document.getElementById('af-active').checked
+        };
+        save.disabled = true; save.textContent = 'Menyimpan...';
+        let data;
+        try{ data = await adminCall('saveUser', payload); }
+        catch(e2){ err.textContent = 'Gagal terhubung. Cek koneksi.'; save.disabled = false; save.textContent = 'Simpan'; return; }
+        save.disabled = false;
+
+        if(!data.ok){ err.textContent = ADMIN_ERR[data.error] || ('Gagal: ' + data.error); save.textContent = 'Simpan'; return; }
+        resetAdminForm();
+        await loadAdminUsers();
+    }
+
+    async function deleteAdminUser(id, name){
+        if(!confirm(`Hapus user "${name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+        let data;
+        try{ data = await adminCall('deleteUser', { id }); }
+        catch(e){ alert('Gagal terhubung. Cek koneksi.'); return; }
+        if(!data.ok){ alert(ADMIN_ERR[data.error] || ('Gagal: ' + data.error)); return; }
+        await loadAdminUsers();
     }
 
     /* ------------------------- Tampilan ------------------------- */
@@ -409,6 +656,9 @@
         renderBranches(session);
         updateClock();
         if(!clockTimer) clockTimer = setInterval(updateClock, 1000 * 15);
+
+        // Tombol Kelola User hanya untuk owner/admin, dan hanya bila Sheet terpasang.
+        document.getElementById('admin-btn').hidden = !(isAdminSession(session) && OFFICE_WEBAPP_URL);
     }
 
     function boot(){
@@ -441,9 +691,33 @@
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             clearSession();
+            adminCreds = null;
             document.getElementById('f-name').value = '';
             document.getElementById('f-pin').value = '';
             showLogin();
+        });
+
+        // ----- Panel Kelola User -----
+        document.getElementById('admin-btn').addEventListener('click', openAdminPanel);
+        document.getElementById('admin-close').addEventListener('click', closeAdminPanel);
+        document.getElementById('admin-modal').addEventListener('click', (e) => {
+            if(e.target.id === 'admin-modal') closeAdminPanel();   // klik latar untuk tutup
+        });
+        document.getElementById('admin-form').addEventListener('submit', submitAdminForm);
+        document.getElementById('af-cancel').addEventListener('click', resetAdminForm);
+
+        // Aksi edit/hapus per baris (event delegation).
+        document.getElementById('admin-list').addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.u-edit');
+            const delBtn  = e.target.closest('.u-del');
+            const users = document.getElementById('admin-list')._users || [];
+            if(editBtn){
+                const u = users.find(x => x.id === editBtn.dataset.id);
+                if(u) fillAdminForm(u);
+            } else if(delBtn){
+                const u = users.find(x => x.id === delBtn.dataset.id);
+                if(u) deleteAdminUser(u.id, u.name);
+            }
         });
     });
     </script>

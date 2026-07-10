@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Laksamana Ordering - Input Order & Check-in</title>
 
-    <!-- Guard SSO: tanpa sesi Office yang berhak buka kitchen, langsung ke login Office.
+    <!-- Guard SSO: tanpa sesi Office yang berhak buka Ordering, langsung ke login Office.
          Jalan sebelum body render agar tidak ada kedipan layar login lama. -->
     <script>
     (function(){try{var s=JSON.parse(localStorage.getItem('lm_session')||'null');
-      var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='kitchen';});
+      var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='ordering';});
       if(!ok)location.replace('../../');}catch(e){location.replace('../../');}})();
     </script>
 
@@ -772,7 +772,7 @@
                 const s = JSON.parse(localStorage.getItem('lm_session'));
                 if (!s || !s.expiry || Date.now() > s.expiry) return null;
                 const mods = s.modules || [];
-                if (!(mods.includes('*') || mods.includes('kitchen'))) return null;
+                if (!(mods.includes('*') || mods.includes('ordering'))) return null;
                 return s;
             } catch (e) { return null; }
         }
