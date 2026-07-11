@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#A9791F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Akademi Laksamana, Training dan Standardisasi Kru</title>
+<!-- Guard SSO: tanpa sesi Office yang berhak buka akademi, langsung ke login Office. -->
+<script>
+(function(){try{var s=JSON.parse(localStorage.getItem('lm_session')||'null');
+  var ok=s&&s.expiry&&Date.now()<s.expiry&&(s.modules||[]).some(function(m){return m==='*'||m==='akademi';});
+  if(!ok)location.replace('../');}catch(e){location.replace('../');}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/laksamana.css">
+<style>
+/* Token Akademi dipetakan ke design system Office (laksamana.css). Nilai variabel
+   diarahkan ke palet Office (paper hangat, gold dalam, Plus Jakarta Sans) sehingga
+   seluruh aturan di bawah ikut re-theme tanpa ditulis ulang. Nama variabel lama
+   dipertahankan supaya perubahan minim. Aturan copy: tanpa em dash, tanpa middle dot. */
+:root{
+  --ink:#2A2620; --ink2:#3A3428; --ink3:#4A4234;
+  --gold:#C8961F; --gold2:#A9791F; --cream:#F7F6F4; --cream2:#F2E9D3;
+  --white:#FFFFFF; --line:#E7E1D3; --line-dark:rgba(169,121,31,.22);
+  --ok:#1F9D5F; --warn:#B5831A; --bad:#C9432B; --info:#2F7FC4;
+  --muted:#5C574D; --muted-dark:#928C80;
+  --radius:16px; --shadow:0 4px 18px rgba(50,42,28,.06);
+  --font-d:'Plus Jakarta Sans',system-ui,sans-serif; --font-b:'Inter',system-ui,-apple-system,sans-serif;
+}
+html,body{height:100%}
+body{font-family:var(--font-b);background:var(--cream);color:var(--ink);font-size:15px;-webkit-font-smoothing:antialiased}
+button{border:none;background:none}
+input,select,textarea{font-family:var(--font-b);font-size:14px}
+h1,h2,h3{font-family:var(--font-d);letter-spacing:-.02em}
+
+/* ========== LOGIN (dead code sejak SSO; disimpan low-risk) ========== */
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;background:
+  radial-gradient(900px 480px at 50% -12%, rgba(200,150,31,.10), transparent 60%),
+  var(--cream);padding:20px}
+.login-card{width:100%;max-width:420px;background:var(--white);border:1px solid var(--line);border-radius:22px;padding:36px 32px;box-shadow:var(--shadow-lg)}
+.login-emblem{display:flex;justify-content:center;margin-bottom:14px}
+.login-card h1{font-size:28px;font-weight:900;text-align:center;letter-spacing:-.02em}
+.login-sub{text-align:center;color:var(--muted);font-size:13px;margin:6px 0 24px}
+.login-sub b{color:var(--gold2)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--white);outline:none;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:700;font-size:14px;transition:transform .1s,box-shadow .15s}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 4px 14px rgba(200,150,31,.30)}
+.btn-gold:hover{box-shadow:0 6px 20px rgba(200,150,31,.45)}
+.btn-ink{background:var(--ink);color:var(--gold)}
+.btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn-danger{background:var(--danger-bg);color:var(--bad)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px}
+.btn-block{width:100%}
+.login-err{background:var(--danger-bg);color:var(--bad);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:none}
+.login-foot{text-align:center;font-size:11.5px;color:var(--muted);margin-top:18px}
+
+/* ========== APP SHELL ========== */
+#appView{display:none;min-height:100vh}
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:var(--ink);color:var(--cream);padding:22px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;border-bottom:1px solid var(--line-dark);margin-bottom:14px}
+.side-brand .t{font-family:var(--font-d);font-weight:900;font-size:17px;color:var(--gold);line-height:1.1}
+.side-brand .s{font-size:10px;color:var(--muted-dark);text-transform:uppercase;letter-spacing:.12em}
+.nav-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted-dark);padding:12px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 10px;border-radius:9px;color:#E7E1D3;font-size:13.5px;font-weight:600;text-align:left;transition:background .12s}
+.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item.active{background:var(--gold);color:#fff}
+.nav-item .ic{width:18px;text-align:center}
+.side-user{margin-top:auto;padding:12px 10px;border-top:1px solid var(--line-dark);font-size:12px}
+.side-user .n{font-weight:700;color:var(--gold)}
+.side-user .r{color:var(--muted-dark);font-size:11px}
+.main{padding:26px 30px 60px;max-width:1180px;width:100%}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.topbar h2{font-size:26px;font-weight:900;letter-spacing:-.02em}
+.topbar .sub{color:var(--muted);font-size:13px;margin-top:3px}
+
+/* mobile */
+.mobile-top{display:none}
+.mobile-nav{display:none}
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:16px 14px 90px}
+  .mobile-top{display:flex;align-items:center;justify-content:space-between;background:var(--ink);color:var(--gold);padding:13px 16px;position:sticky;top:0;z-index:40}
+  .mobile-top .t{font-family:var(--font-d);font-weight:900;font-size:15px}
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid var(--line-dark);z-index:40}
+  .mobile-nav button{flex:1;padding:9px 2px 11px;color:var(--muted-dark);font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .mobile-nav button .ic{font-size:17px}
+  .mobile-nav button.active{color:var(--gold)}
+  .topbar h2{font-size:21px}
+}
+
+/* ========== COMPONENTS ========== */
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr}}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 2px 8px rgba(11,27,43,.04)}
+.card h3{font-size:16px;font-weight:700;margin-bottom:10px}
+.stat{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.stat .v{font-family:var(--font-d);font-size:30px;font-weight:900;line-height:1}
+.stat .l{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.b-gold{background:var(--gold-soft);color:var(--gold2)}
+.b-ok{background:var(--ok-bg);color:var(--ok)}
+.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-bad{background:var(--danger-bg);color:var(--bad)}
+.b-info{background:var(--info-bg);color:var(--info)}
+.b-ink{background:var(--ink);color:var(--gold)}
+.b-mut{background:var(--cream2);color:var(--muted)}
+.progress{height:8px;background:var(--cream2);border-radius:99px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:99px;transition:width .4s}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 10px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--cream2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto;background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:7px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--white);font-size:12.5px;font-weight:700;color:var(--muted);transition:all .12s}
+.chip.active{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .big{font-size:38px;margin-bottom:8px}
+
+/* materi card */
+.mat-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:9px;cursor:pointer;transition:transform .12s,box-shadow .15s;position:relative}
+.mat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.mat-card .ty{font-size:22px}
+.mat-card .ti{font-weight:700;font-size:14.5px;line-height:1.35}
+.mat-card .me{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mat-done{position:absolute;top:12px;right:12px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(11,27,43,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.modal{background:var(--cream);border-radius:18px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:24px}
+.modal.wide{max-width:860px}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.modal-head h3{font-size:20px;font-weight:900}
+.modal-x{font-size:22px;color:var(--muted);padding:2px 8px;border-radius:8px}
+.modal-x:hover{background:var(--cream2)}
+.video-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000;margin-bottom:14px}
+.video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.modul-body{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:20px;font-size:14.5px;line-height:1.75;white-space:pre-wrap}
+.sop-step{display:flex;gap:11px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.sop-step input{width:19px;height:19px;margin-top:1px;accent-color:var(--gold2);flex-shrink:0}
+.sop-step .tx{font-size:14px;line-height:1.55}
+.quiz-q{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.quiz-q .qt{font-weight:700;margin-bottom:11px;font-size:14.5px;line-height:1.4}
+.quiz-opt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:14px;transition:all .1s}
+.quiz-opt:hover{border-color:var(--gold2)}
+.quiz-opt.sel{border-color:var(--gold2);background:var(--gold-soft)}
+.quiz-opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+.quiz-opt.wrong{border-color:var(--bad);background:var(--danger-bg)}
+.quiz-opt input{accent-color:var(--gold2)}
+.menu-hero{background:linear-gradient(135deg,var(--ink),var(--ink3));color:var(--cream);border-radius:14px;padding:22px;margin-bottom:14px}
+.menu-hero .nm{font-family:var(--font-d);font-size:24px;font-weight:900;color:var(--gold)}
+.menu-hero .pr{font-size:15px;margin-top:4px;font-weight:700}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;font-size:13.5px;margin-bottom:10px}
+.kv .k{font-weight:800;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.script-box{background:var(--gold-soft);border:1.5px dashed var(--gold2);border-radius:11px;padding:14px;font-size:14px;line-height:1.6;font-style:italic}
+
+/* cert */
+.cert{border:3px double var(--gold2);border-radius:14px;background:var(--white);padding:34px 24px;text-align:center}
+.cert .h{font-family:var(--font-d);font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold2);font-weight:700}
+.cert .n{font-family:var(--font-d);font-size:30px;font-weight:900;margin:10px 0 4px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--gold);padding:12px 22px;border-radius:99px;font-weight:700;font-size:13.5px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:tin .25s}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.list-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--cream2)}
+.list-row:last-child{border-bottom:none}
+.org-col{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.org-col .oh{background:var(--ink);color:var(--gold);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.org-col .oh .nm{font-weight:800;font-size:14px}
+.org-person{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--cream2);font-size:13px}
+.org-person:last-child{border-bottom:none}
+.org-pic{background:var(--gold-soft)}
+.org-line{width:2px;height:20px;background:var(--gold2);margin:0 auto}
+.prog-item{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+.prog-item .t{font-size:13.5px;font-weight:600;line-height:1.35}
+.sync-dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:var(--muted)}
+.sync-dot.ok{background:var(--ok)}.sync-dot.pending{background:var(--warn)}.sync-dot.error{background:var(--bad)}
+.guide-step{display:flex;gap:10px;margin-bottom:10px;font-size:13.5px;line-height:1.55}
+.guide-step .n{flex-shrink:0;width:22px;height:22px;border-radius:99px;background:var(--ink);color:var(--gold);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+@media print{.sidebar,.mobile-top,.mobile-nav,.topbar,.no-print{display:none!important}.main{padding:0}}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView">
+  <div class="login-card">
+    <div class="login-emblem">
+      <svg width="72" height="72" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="#2A2620"/>
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#C8961F" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="34" fill="none" stroke="#A9791F" stroke-width="1" opacity=".7"/>
+        <polygon points="50,12 55,45 50,50 45,45" fill="#C8961F"/>
+        <polygon points="50,88 55,55 50,50 45,55" fill="#A9791F"/>
+        <polygon points="12,50 45,45 50,50 45,55" fill="#A9791F"/>
+        <polygon points="88,50 55,55 50,50 55,45" fill="#A9791F"/>
+        <circle cx="50" cy="50" r="5" fill="#F7F6F4"/>
+      </svg>
+    </div>
+    <h1>Akademi Laksamana</h1>
+    <div class="login-sub">Training & Standardisasi Kru, <b>Laksamana Muda Coffee & Live Space</b></div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="field">
+      <label>Nama Kru</label>
+      <select id="loginUser"></select>
+    </div>
+    <div class="field">
+      <label>PIN</label>
+      <input type="password" id="loginPin" inputmode="numeric" maxlength="6" placeholder="••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-gold btn-block" onclick="doLogin()">⚓ Naik Kapal</button>
+    <div class="login-foot">Satu standar, satu pelayaran., PIN default kru baru: 1234</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="appView">
+  <div class="mobile-top">
+    <div class="t">⚓ Akademi Laksamana</div>
+    <button onclick="doLogout()" style="color:var(--muted-dark);font-size:12px;font-weight:700">Keluar</button>
+  </div>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main" id="main"></main>
+  </div>
+  <nav class="mobile-nav" id="mobileNav"></nav>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+'use strict';
+/* =====================================================
+   AKADEMI LAKSAMANA, Training Management System
+   Laksamana Muda Coffee & Live Space, Pekanbaru
+   Single-file PWA, vanilla JS, localStorage
+   ===================================================== */
+
+var DB_KEY = 'lm_akademi_v1';
+var SESSION_KEY = 'lm_akademi_session';
+var DB = null;
+var VIEW = 'dashboard';
+var VIEW_ARG = null;
+
+/* ---------- divisions ---------- */
+var DEFAULT_DIVISIONS = [
+  {id:'service',  name:'Service / FOH',        icon:'🛎️'},
+  {id:'kitchen',  name:'Galangan Dapur',       icon:'🍳'},
+  {id:'bar',      name:'Galangan Bar',         icon:'🥤'},
+  {id:'marketing',name:'Marketing & Digital',  icon:'📣'},
+  {id:'sales',    name:'Sales & Event',        icon:'🤝'},
+  {id:'finance',  name:'Finance & Admin',      icon:'📊'}
+];
+var DIVISIONS = DEFAULT_DIVISIONS;
+var TYPES = {
+  video:{label:'Video',icon:'🎬',badge:'b-info'},
+  modul:{label:'Modul',icon:'📘',badge:'b-gold'},
+  sop:  {label:'SOP',icon:'📋',badge:'b-ink'},
+  menu: {label:'Menu Baru',icon:'🍽️',badge:'b-warn'},
+  quiz: {label:'Kuis',icon:'📝',badge:'b-ok'}
+};
+var CATS = [
+  {id:'onboarding',name:'Onboarding'},
+  {id:'sop',name:'SOP & Standar'},
+  {id:'menu',name:'Product Knowledge'},
+  {id:'skill',name:'Skill & Service'},
+  {id:'brand',name:'Brand & Culture'}
+];
+
+function divName(id){ if(id==='all') return 'Semua Divisi'; var d=DIVISIONS.find(function(x){return x.id===id}); return d?d.name:id; }
+function divIcon(id){ if(id==='all') return '🌐'; var d=DIVISIONS.find(function(x){return x.id===id}); return d?d.icon:'•'; }
+function uid(p){ return (p||'id')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(ts){ if(!ts) return '-'; var d=new Date(ts); return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtDT(ts){ if(!ts) return '-'; var d=new Date(ts); return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})+' '+d.toTimeString().slice(0,5); }
+function toast(msg){ var t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(function(){t.remove()},2400); }
+
+/* ---------- seed ---------- */
+function seedDB(){
+  var now = Date.now();
+  var users = [
+    {id:'u_howandi', name:'Howandi Chandra', role:'admin',   division:'all',      pin:'2045', title:'CEO / Nahkoda', active:true},
+    {id:'u_ismail',  name:'Ismail Magribi',  role:'admin',   division:'all',      pin:'1234', title:'Store Manager', active:true},
+    {id:'u_aditya',  name:'Aditya Setiadi',  role:'manager', division:'kitchen',  pin:'1234', title:'Head Chef', active:true},
+    {id:'u_arif',    name:'Arif Rahman Harefa', role:'manager', division:'bar',   pin:'1234', title:'Head Bar', active:true},
+    {id:'u_devani',  name:'Devani',          role:'manager', division:'sales',    pin:'1234', title:'Sales Manager', active:true},
+    {id:'u_aurel',   name:'Aurel',           role:'manager', division:'marketing',pin:'1234', title:'Marketing & Digital', active:true},
+    {id:'u_hengky',  name:'Hengky Fernando', role:'manager', division:'sales',    pin:'1234', title:'Event Manager', active:true},
+    {id:'u_dina',    name:'Dina Mariana',    role:'manager', division:'finance',  pin:'1234', title:'CFO', active:true},
+    {id:'u_christy', name:'Christy',         role:'staff',   division:'marketing',pin:'1234', title:'Social Media', active:true},
+    {id:'u_indah',   name:'Indah',           role:'staff',   division:'marketing',pin:'1234', title:'Graphic Designer', active:true},
+    {id:'u_cindy',   name:'Cindy Juliawati', role:'staff',   division:'finance',  pin:'1234', title:'Finance', active:true},
+    {id:'u_novianti',name:'Novianti Kemala', role:'staff',   division:'finance',  pin:'1234', title:'Admin Purchasing', active:true},
+    {id:'u_kru1',    name:'Kru Service 01',  role:'staff',   division:'service',  pin:'1234', title:'Waiter/ss', active:true},
+    {id:'u_kru2',    name:'Kru Service 02',  role:'staff',   division:'service',  pin:'1234', title:'Waiter/ss', active:true},
+    {id:'u_kru3',    name:'Kru Dapur 01',    role:'staff',   division:'kitchen',  pin:'1234', title:'Cook', active:true},
+    {id:'u_kru4',    name:'Kru Bar 01',      role:'staff',   division:'bar',      pin:'1234', title:'Barista', active:true}
+  ];
+  var materials = [
+    {id:'m_welcome', type:'modul', title:'Selamat Datang di Kapal, Orientasi Kru Baru', division:['all'], cat:'onboarding', mandatory:true, published:true, createdAt:now,
+     body:'SELAMAT BERGABUNG DI LAKSAMANA MUDA COFFEE & LIVE SPACE!\n\nKita bukan sekadar cafe. Kita adalah venue premium F&B + live entertainment pertama di Pekanbaru yang restaurant-first, 100% non-alkohol, dan bangga akan itu.\n\nTAGLINE KITA:\n"Sail to Good Taste, Stay for the Vibes"\n"Pagi Meeting, Malam Healing"\n\nISTILAH DI KAPAL INI:\n• Nahkoda = CEO\n• Dermaga = area venue / floor\n• Galangan = dapur & bar (back of house)\n• Kru / Pelaut Muda = kamu, tim kita\n• Anjungan = dashboard / pusat kendali\n\n3 JANJI KRU LAKSAMANA:\n1. Tamu pulang dengan cerita baik, bukan cuma kenyang.\n2. Standar sama di semua shift, semua hari.\n3. Masalah diangkat ke atas, bukan disimpan.\n\nStruktur venue: kapasitas standar 400–500 pax, konser hingga 1.500 pax. Stage 4.2m × 7.6m. Jam prime live: 20.00–21.30 WIB.\n\nSetelah baca modul ini, lanjut ke SOP Grooming lalu kerjakan Kuis Onboarding. Selamat berlayar! ⚓'},
+    {id:'m_grooming', type:'sop', title:'SOP Grooming & Seragam Kru', division:['all'], cat:'onboarding', mandatory:true, published:true, createdAt:now,
+     steps:[
+       'Seragam bersih, rapi, tidak kusut. Dipakai lengkap sesuai divisi sebelum masuk area Dermaga.',
+       'Name tag terpasang di dada kiri, terbaca jelas.',
+       'Rambut rapi. Kru Galangan Dapur & Bar wajib pakai penutup kepala saat food handling.',
+       'Kuku pendek dan bersih. Tanpa cat kuku untuk kru yang menyentuh makanan/minuman.',
+       'Sepatu tertutup, tidak licin, kondisi bersih.',
+       'Aroma badan netral, mandi sebelum shift, hindari parfum menyengat berlebihan.',
+       'Cuci tangan sebelum shift, setelah dari toilet, dan setiap ganti aktivitas kotor→bersih.',
+       'HP disimpan selama jam layanan kecuali untuk keperluan kerja yang diizinkan.'
+     ]},
+    {id:'m_quiz_onb', type:'quiz', title:'Kuis Onboarding, Brand & Nilai Dasar', division:['all'], cat:'onboarding', mandatory:true, published:true, createdAt:now, passing:80,
+     questions:[
+       {q:'Apa positioning utama Laksamana Muda?', opts:['Nightclub dengan live DJ','Restaurant-first dengan live entertainment, 100% non-alkohol','Coffee shop grab-and-go','Bar & lounge premium'], a:1},
+       {q:'Apa arti "Galangan" dalam istilah internal kita?', opts:['Panggung utama','Area parkir','Dapur & bar (back of house)','Ruang meeting'], a:2},
+       {q:'Jam prime live entertainment Laksamana Muda adalah…', opts:['17.00–18.30 WIB','20.00–21.30 WIB','22.00–24.00 WIB','19.00–20.00 WIB'], a:1},
+       {q:'Kalau ada masalah di lapangan, prinsip kru Laksamana adalah…', opts:['Selesaikan diam-diam, jangan sampai atasan tahu','Tunggu tamu komplain dulu','Angkat ke atasan/PIC, jangan disimpan','Tulis di media sosial'], a:2},
+       {q:'Tagline Laksamana Muda adalah…', opts:['"Good Vibes Only"','"Sail to Good Taste, Stay for the Vibes"','"Eat, Drink, Repeat"','"Taste the Night"'], a:1}
+     ]},
+    {id:'m_seq_service', type:'sop', title:'SOP Sequence of Service (Table Service)', division:['service'], cat:'sop', mandatory:true, published:true, createdAt:now,
+     steps:[
+       'GREETING (0–30 detik): sambut tamu maksimal 30 detik setelah masuk. Senyum, kontak mata, "Selamat datang di Laksamana Muda!"',
+       'SEATING: antar ke meja sesuai reservasi/preferensi. Tarik kursi untuk tamu bila memungkinkan.',
+       'MENU & AIR ES: serahkan menu terbuka, tawarkan air mineral, informasikan menu baru / signature / promo hari ini.',
+       'TAKING ORDER: catat jelas, ULANGI pesanan ke tamu (repeat order), konfirmasi level pedas/es/gula & alergi.',
+       'INPUT POS: masukkan order maksimal 2 menit setelah diambil. Pastikan modifier lengkap.',
+       'SERVING: minuman maksimal 7 menit, makanan maksimal 15 menit (non-peak). Sebutkan nama menu saat menyajikan.',
+       'CHECK BACK: 2–3 menit setelah makanan tersaji, tanyakan "Bagaimana makanannya, Kak?"',
+       'CLEARING: angkat piring kosong dengan izin. Jangan menumpuk piring di depan tamu.',
+       'BILLING: antar bill dalam bill holder, konfirmasi metode pembayaran, hitung di depan tamu bila tunai.',
+       'FAREWELL: ucapkan terima kasih + ajak kembali. "Terima kasih sudah berlayar bersama kami!"'
+     ]},
+    {id:'m_video_service', type:'video', title:'Video: Standar Greeting & Table Manner FOH', division:['service'], cat:'skill', mandatory:false, published:true, createdAt:now,
+     videoUrl:'https://www.youtube.com/watch?v=dQw4w9WgXcQ', desc:'Ganti URL ini dengan video training internal kalian (YouTube unlisted). Video contoh greeting, body language, dan handling tamu.'},
+    {id:'m_foodsafety', type:'sop', title:'SOP Food Safety & Hygiene Dapur', division:['kitchen'], cat:'sop', mandatory:true, published:true, createdAt:now,
+     steps:[
+       'Cuci tangan 20 detik dengan sabun sebelum food handling, setelah menyentuh bahan mentah, dan setelah dari toilet.',
+       'FIFO (First In First Out): bahan datang lebih dulu dipakai lebih dulu. Label tanggal di semua container.',
+       'Pisahkan talenan & pisau: merah (daging mentah), hijau (sayur), putih (ready-to-eat).',
+       'Suhu chiller 0–4°C, freezer maksimal -18°C. Cek & catat suhu 2× per shift.',
+       'Danger zone 5–60°C: makanan tidak boleh berada di suhu ini lebih dari 2 jam.',
+       'Thawing hanya di chiller atau air mengalir, TIDAK PERNAH di suhu ruang.',
+       'Sisa prep diberi label: nama item, tanggal prep, tanggal expired.',
+       'Area kerja dibersihkan & disanitasi setiap pergantian aktivitas dan closing.'
+     ]},
+    {id:'m_menu_nasigoreng', type:'menu', title:'Menu Baru: Nasi Goreng Laksamana', division:['service','kitchen'], cat:'menu', mandatory:true, published:true, createdAt:now,
+     menu:{name:'Nasi Goreng Laksamana', price:'Rp 48.000', category:'Signature Main Course',
+       desc:'Nasi goreng seafood premium dengan udang, cumi, dan telur mata sapi, disajikan dengan kerupuk udang dan acar. Plating ala kapal dengan bendera Laksamana.',
+       ingredients:'Nasi, udang, cumi, telur, bawang merah, bawang putih, cabai, kecap manis premium, kerupuk udang, acar timun-wortel',
+       allergens:'Udang & cumi (seafood/shellfish), telur, kecap (kedelai & gluten)',
+       selling:'"Kak, ini signature kita yang paling banyak dipesan, Nasi Goreng Laksamana. Seafood-nya fresh, porsinya pas buat yang lapar habis nonton live music. Mau sekalian saya pasangkan dengan Es Kopi Laksamana? Kombinasi favorit tamu kita."',
+       notes:'Wajib tanya level pedas (1–3). Bisa request tanpa seafood → jadi Nasi Goreng Kampung (harga beda, konfirmasi kasir). Waktu masak ± 12 menit.'}},
+    {id:'m_menu_kopilaks', type:'menu', title:'Menu Baru: Es Kopi Laksamana', division:['service','bar'], cat:'menu', mandatory:true, published:true, createdAt:now,
+     menu:{name:'Es Kopi Laksamana', price:'Rp 29.000', category:'Signature Beverage',
+       desc:'Es kopi susu signature dengan double shot espresso house blend, gula aren asli Riau, dan susu fresh. Topping foam tipis + drizzle aren.',
+       ingredients:'Double shot espresso (house blend), susu fresh full cream, gula aren cair Riau, es batu kristal',
+       allergens:'Susu (dairy). Tersedia opsi oat milk +Rp 8.000.',
+       selling:'"Ini es kopi andalan kita, Kak, gula arennya asli dari petani Riau, jadi manisnya beda, lebih smooth. Best seller nomor satu. Kalau kurang suka manis bisa saya buatkan less sugar."',
+       notes:'Standar resep: 40ml espresso, 30ml gula aren, 120ml susu, es 150gr. Shake dulu gula aren sebelum shift. JANGAN ganti rasio tanpa approval Head Bar.'}},
+    {id:'m_quiz_menu', type:'quiz', title:'Kuis Product Knowledge, Menu Signature', division:['service','kitchen','bar'], cat:'menu', mandatory:true, published:true, createdAt:now, passing:80,
+     questions:[
+       {q:'Alergen utama pada Nasi Goreng Laksamana adalah…', opts:['Kacang & susu','Seafood (udang, cumi), telur, kedelai/gluten','Hanya gluten','Tidak ada alergen'], a:1},
+       {q:'Harga Es Kopi Laksamana dengan oat milk adalah…', opts:['Rp 29.000','Rp 34.000','Rp 37.000','Rp 40.000'], a:2},
+       {q:'Yang WAJIB ditanyakan saat tamu pesan Nasi Goreng Laksamana…', opts:['Mau makan di sini atau bungkus','Level pedas (1–3)','Mau pakai sendok atau garpu','Nomor meja'], a:1},
+       {q:'Standar resep Es Kopi Laksamana adalah…', opts:['Single shot + 50ml aren','40ml espresso, 30ml gula aren, 120ml susu','60ml espresso, 60ml aren','Bebas sesuai selera barista'], a:1},
+       {q:'Gula aren pada Es Kopi Laksamana berasal dari…', opts:['Impor Vietnam','Pabrik sirup komersial','Petani Riau','Jawa Barat'], a:2}
+     ]},
+    {id:'m_bar_basic', type:'sop', title:'SOP Bar: Standar Penyajian Minuman', division:['bar'], cat:'sop', mandatory:true, published:true, createdAt:now,
+     steps:[
+       'Kalibrasi grinder setiap awal shift pagi. Catat hasil dial-in di log bar.',
+       'Semua minuman mengikuti resep standar, tidak ada improvisasi rasio tanpa approval Head Bar.',
+       'Gelas dicek bersih & bebas noda sebelum dipakai. Gelas signature hanya untuk menu signature.',
+       'Garnish disiapkan fresh setiap shift, disimpan tertutup di chiller bar.',
+       'Waktu buat minuman: maksimal 5 menit non-peak, 8 menit saat peak/event.',
+       'Es batu diambil dengan scoop, tidak pernah dengan tangan atau gelas.',
+       'Milk pitcher dibilas setiap selesai steam. Sisa susu steam tidak dipakai ulang.',
+       'Closing: mesin espresso backflush, grinder dibersihkan, stok bahan dicatat untuk purchasing.'
+     ]},
+    {id:'m_mkt_pillar', type:'modul', title:'Modul: Content Pillar & Tone of Voice Laksamana', division:['marketing'], cat:'brand', mandatory:true, published:true, createdAt:now,
+     body:'CONTENT PILLAR @laksamanamuda.id & @laksamanalive\n\n1. TASTE (40%), food & beverage visual, menu baru, behind the scenes Galangan.\n2. VIBES (30%), live performance, crowd moment, atmosfer malam. Prime window 20.00–21.30 WIB.\n3. PEOPLE (15%), kru, talent, komunitas, tamu (dengan izin).\n4. INFO (15%), event mendatang, promo, reservasi, corporate package.\n\nTONE OF VOICE:\n• Hangat, percaya diri, sedikit playful, bukan kaku korporat.\n• Bahasa Indonesia santai + sentuhan istilah maritim (berlayar, berlabuh, kru).\n• JANGAN pernah pakai framing "nightclub", alkohol, atau party yang liar. Kita restaurant-first & 100% non-alkohol, itu diferensiasi kita.\n\nSTANDAR VISUAL:\n• Palet: paper hangat + gold dalam + ink cokelat gelap.\n• Font display: Plus Jakarta Sans. Body: Inter.\n• Logo & kompas selalu clear space minimal 1× tinggi logo.\n\nCTA STANDAR: arahkan ke WhatsApp reservasi 6285365234898 atau link bio.'},
+    {id:'m_sales_reservasi', type:'sop', title:'SOP Handling Reservasi & Corporate Inquiry', division:['sales'], cat:'sop', mandatory:true, published:true, createdAt:now,
+     steps:[
+       'Respon inquiry WhatsApp maksimal 15 menit pada jam kerja, 1 jam di luar jam kerja.',
+       'Tanyakan & catat: nama, tanggal, jam, jumlah pax, occasion, kebutuhan khusus (stage/videotron/sound).',
+       'Cek ketersediaan di sistem reservasi SEBELUM menjanjikan slot, hindari double booking.',
+       'Corporate/event besar: tawarkan paket + site visit. Eskalasi ke Devani (venue) atau Hengky (event) sesuai jalur.',
+       'DP sesuai ketentuan aktif (cek Settings sistem) sebelum slot dikunci. Kirim invoice resmi dari Finance.',
+       'Konfirmasi H-3 dan H-1 ke tamu via WhatsApp dengan template resmi.',
+       'Semua kesepakatan harga di luar rate card WAJIB approval sesuai threshold di sistem.',
+       'Setelah event: follow-up ucapan terima kasih + minta review/testimoni maksimal H+2.'
+     ]},
+    {id:'m_fin_petty', type:'modul', title:'Modul: Alur Petty Cash & Pembelian Harian', division:['finance'], cat:'sop', mandatory:true, published:true, createdAt:now,
+     body:'ALUR PETTY CASH LAKSAMANA MUDA\n\n1. PENGAJUAN: kru mengisi form pengajuan (item, jumlah, alasan) → approval PIC divisi.\n2. LIMIT: pembelian di atas limit petty cash harian wajib PO melalui Novianti (Admin Purchasing) & approval sesuai threshold.\n3. BUKTI: SEMUA pengeluaran wajib nota/struk asli. Tanpa nota = tidak di-reimburse.\n4. PENCATATAN: input hari yang sama ke sistem keuangan. Tidak ada penundaan lintas hari.\n5. REKONSILIASI: kas kecil dihitung & dicocokkan setiap closing oleh Finance (Cindy), diketahui CFO (Dina).\n6. AUDIT: selisih dicatat, dicari akarnya, dilaporkan, bukan ditutup dari kantong pribadi tanpa lapor.\n\nPRINSIP: rapi hari ini = laporan bulanan tidak drama. Data keuangan adalah kompas kapal.'}
+  ];
+  var mk0=new Date();
+  var bulan0=mk0.getFullYear()+'-'+String(mk0.getMonth()+1).padStart(2,'0');
+  var ld0=new Date(mk0.getFullYear(), mk0.getMonth()+1, 0);
+  var dl0=ld0.getFullYear()+'-'+String(ld0.getMonth()+1).padStart(2,'0')+'-'+String(ld0.getDate()).padStart(2,'0');
+  return {
+    version:2, createdAt:now, updatedAt:now,
+    settings:{ passingDefault:80, orgName:'Laksamana Muda Coffee & Live Space', requirePinChange:false, syncUrl:'', syncKey:'', syncAuto:true },
+    divisions: DEFAULT_DIVISIONS.map(function(d){return {id:d.id,name:d.name,icon:d.icon}}),
+    programs:[{id:'p_awal', bulan:bulan0, title:'Program '+bulanLabel(bulan0), deadline:dl0, createdAt:now,
+      note:'Program perdana: refresher standar dasar + product knowledge menu signature. Selesaikan sebelum akhir bulan.',
+      materialIds:['m_grooming','m_quiz_onb','m_quiz_menu']}],
+    progProg:{},
+    users:users, materials:materials, progress:{}, activity:[
+      {ts:now, userId:'u_howandi', action:'system', detail:'Akademi Laksamana diinisialisasi dengan data awal'}
+    ]
+  };
+}
+
+/* ---------- store ---------- */
+function loadDB(){
+  try{ var raw=localStorage.getItem(DB_KEY); if(raw){ DB=JSON.parse(raw); } }catch(e){}
+  if(!DB) DB=seedDB();
+  migrateDB();
+  DIVISIONS=DB.divisions;
+  saveDB(true);
+}
+function migrateDB(){
+  if(!DB.divisions || !DB.divisions.length) DB.divisions=DEFAULT_DIVISIONS.map(function(d){return {id:d.id,name:d.name,icon:d.icon}});
+  if(!DB.programs) DB.programs=[];
+  if(!DB.progProg) DB.progProg={};
+  if(!DB.settings) DB.settings={passingDefault:80};
+  if(DB.settings.syncUrl==null) DB.settings.syncUrl='';
+  if(DB.settings.syncKey==null) DB.settings.syncKey='';
+  if(DB.settings.syncAuto==null) DB.settings.syncAuto=true;
+  if(!DB.updatedAt) DB.updatedAt=Date.now();
+  DB.version=2;
+}
+function saveDB(skipSync){
+  try{
+    if(!skipSync){ DB.updatedAt=Date.now(); }
+    localStorage.setItem(DB_KEY, JSON.stringify(DB));
+  }catch(e){ console.error('save fail',e); }
+  if(!skipSync) scheduleSync();
+}
+function logAct(action, detail){
+  DB.activity.unshift({ts:Date.now(), userId:(currentUser()?currentUser().id:'-'), action:action, detail:detail});
+  if(DB.activity.length>500) DB.activity.length=500;
+  saveDB();
+}
+function currentUser(){
+  var sid=null; try{ sid=localStorage.getItem(SESSION_KEY); }catch(e){}
+  if(!sid) return null;
+  return DB.users.find(function(u){return u.id===sid && u.active;})||null;
+}
+function isAdmin(u){ return u && u.role==='admin'; }
+function isManager(u){ return u && (u.role==='manager'||u.role==='admin'); }
+
+/* ===== Integrasi identitas Office (SSO) =====
+   Akademi tidak lagi punya login sendiri. Identitas datang dari Office lewat
+   lm_session; kru dicocokkan ke daftar DB.users milik modul (id lalu nama).
+   Kru baru disediakan sementara in-memory dengan role default dari role Office;
+   admin merapikan role permanen di Kelola Kru. Sejalan dgn pola Pattern B
+   (konten, reservasi) di office-playbook. */
+function readLmSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem('lm_session')||'null');
+    if(!s||!s.expiry||Date.now()>s.expiry) return null;
+    var m=s.modules||[];
+    if(!(m.indexOf('*')>-1||m.indexOf('akademi')>-1)) return null;
+    return s;
+  }catch(e){ return null; }
+}
+// Peta role Office -> role internal Akademi (admin / manager / staff).
+var OFFICE_TO_AKADEMI_ROLE = {
+  owner:'admin', admin:'admin', manager:'manager',
+  kitchen:'staff', purchasing:'staff', konten:'staff', host:'staff',
+  cashier:'staff', marketing:'staff', reservasi:'staff'
+};
+function resolveAkademiUser(s){
+  var u = DB.users.find(function(x){return x.id===s.userId;})
+       || DB.users.find(function(x){return String(x.name).toLowerCase()===String(s.name).toLowerCase();});
+  if(!u){
+    u = { id:s.userId, name:s.name, role:(OFFICE_TO_AKADEMI_ROLE[s.role]||'staff'),
+          division:'all', pin:'', title:'', active:true };
+    DB.users.push(u);   // in-memory; ikut tersimpan saat saveDB() berikutnya
+  }
+  return u;
+}
+
+/* ---------- progress helpers ---------- */
+function getProg(userId, matId){
+  var p=DB.progress[userId]; return p?p[matId]:null;
+}
+function setProg(userId, matId, data){
+  if(!DB.progress[userId]) DB.progress[userId]={};
+  var cur=DB.progress[userId][matId]||{};
+  for(var k in data) cur[k]=data[k];
+  DB.progress[userId][matId]=cur; saveDB();
+}
+function matsForUser(u){
+  return DB.materials.filter(function(m){
+    if(!m.published) return false;
+    if(u.division==='all') return true;
+    return m.division.indexOf('all')>-1 || m.division.indexOf(u.division)>-1;
+  });
+}
+function isDone(u, m){
+  var p=getProg(u.id, m.id);
+  if(!p) return false;
+  if(m.type==='quiz') return p.passed===true;
+  return p.status==='done';
+}
+function userStats(u){
+  var mats=matsForUser(u);
+  var mand=mats.filter(function(m){return m.mandatory});
+  var doneAll=mats.filter(function(m){return isDone(u,m)}).length;
+  var doneMand=mand.filter(function(m){return isDone(u,m)}).length;
+  return {total:mats.length, done:doneAll, mandTotal:mand.length, mandDone:doneMand,
+    pct: mats.length? Math.round(doneAll/mats.length*100):0,
+    mandPct: mand.length? Math.round(doneMand/mand.length*100):100,
+    certified: mand.length>0 && doneMand===mand.length};
+}
+
+/* ---------- auth ---------- */
+function renderLoginUsers(){
+  var sel=document.getElementById('loginUser');
+  var list=DB.users.filter(function(u){return u.active}).slice().sort(function(a,b){return a.name.localeCompare(b.name)});
+  sel.innerHTML=list.map(function(u){
+    return '<option value="'+u.id+'">'+esc(u.name)+', '+esc(u.title||divName(u.division))+'</option>';
+  }).join('');
+}
+function doLogin(){
+  var id=document.getElementById('loginUser').value;
+  var pin=document.getElementById('loginPin').value.trim();
+  var u=DB.users.find(function(x){return x.id===id});
+  var err=document.getElementById('loginErr');
+  if(!u || u.pin!==pin){ err.textContent='PIN salah. Coba lagi atau hubungi Store Manager.'; err.style.display='block'; return; }
+  err.style.display='none';
+  try{ localStorage.setItem(SESSION_KEY, u.id); }catch(e){}
+  document.getElementById('loginPin').value='';
+  logAct('login', u.name+' naik kapal');
+  VIEW = 'dashboard'; VIEW_ARG=null;
+  showApp();
+}
+function doLogout(){
+  logAct('logout', 'Turun kapal');
+  try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
+  // Kembali ke pemilih modul Office. Sesi Office (lm_session) sengaja TIDAK
+  // dihapus supaya user bisa pindah modul tanpa login ulang. Sign-out penuh
+  // hanya lewat tombol Keluar di Office.
+  location.replace('../');
+  return;
+}
+function doLogoutLocalUI(){
+  document.getElementById('appView').style.display='none';
+  document.getElementById('loginView').style.display='flex';
+  renderLoginUsers();
+}
+
+/* ---------- shell / nav ---------- */
+function navItems(u){
+  var items=[
+    {id:'dashboard', label:'Beranda', icon:'⚓'},
+    {id:'materi',    label:'Materi Saya', icon:'📚'},
+    {id:'program',   label:'Program Bulanan', icon:'📅'},
+    {id:'perpus',    label:'Perpustakaan', icon:'📖'},
+    {id:'struktur',  label:'Struktur Organisasi', icon:'🪢'},
+    {id:'sertifikat',label:'Progress & Sertifikat', icon:'🏅'}
+  ];
+  if(isManager(u)) items.push({id:'tim', label:'Progress Tim', icon:'👥'});
+  if(isAdmin(u)){
+    items.push({id:'anjungan', label:'Anjungan (Dashboard)', icon:'🧭'});
+    items.push({id:'kelolaMateri', label:'Kelola Materi', icon:'🗂️'});
+    items.push({id:'kelolaProgram', label:'Kelola Program', icon:'🗓️'});
+    items.push({id:'kelolaKru', label:'Kelola Kru', icon:'🧑‍✈️'});
+    items.push({id:'log', label:'Log Aktivitas', icon:'🕐'});
+    items.push({id:'sync', label:'Sinkronisasi & Backup', icon:'☁️'});
+  }
+  return items;
+}
+function go(view, arg){ VIEW=view; VIEW_ARG=arg||null; render(); window.scrollTo(0,0); }
+function showApp(){
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('appView').style.display='block';
+  render();
+}
+function render(){
+  var u=currentUser();
+  if(!u){ doLogout(); return; }
+  var items=navItems(u);
+  document.getElementById('sidebar').innerHTML =
+    '<div class="side-brand"><svg width="38" height="38" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2A2620" stroke="#C8961F" stroke-width="3"/><polygon points="50,12 55,45 50,50 45,45" fill="#C8961F"/><polygon points="50,88 55,55 50,50 45,55" fill="#A9791F"/><polygon points="12,50 45,45 50,50 45,55" fill="#A9791F"/><polygon points="88,50 55,55 50,50 55,45" fill="#A9791F"/><circle cx="50" cy="50" r="5" fill="#F7F6F4"/></svg>'+
+    '<div><div class="t">Akademi<br>Laksamana</div><div class="s">Training Kru</div></div></div>'+
+    '<div class="nav-sec">Navigasi</div>'+
+    items.map(function(it){
+      return '<button class="nav-item'+(VIEW===it.id?' active':'')+'" onclick="go(\''+it.id+'\')"><span class="ic">'+it.icon+'</span>'+it.label+'</button>';
+    }).join('')+
+    '<div class="side-user"><div class="n">'+esc(u.name)+'</div><div class="r">'+esc(u.title||'')+', '+divName(u.division)+'</div>'+
+    (isAdmin(u)&&DB.settings.syncUrl?'<div style="margin-top:7px;font-size:10.5px;color:var(--muted-dark)"><span class="sync-dot '+SYNC_STATE+'" id="syncDot"></span> Sync: <span id="syncTxt">'+SYNC_STATE+'</span></div>':'')+
+    '<button class="btn btn-sm btn-ghost" style="margin-top:9px;color:#E7E1D3;border-color:rgba(255,255,255,.2)" onclick="doLogout()">Keluar ⏻</button></div>';
+  var mobItems=items.slice(0,5);
+  document.getElementById('mobileNav').innerHTML = mobItems.map(function(it){
+    return '<button class="'+(VIEW===it.id?'active':'')+'" onclick="go(\''+it.id+'\')"><span class="ic">'+it.icon+'</span>'+it.label.split(' ')[0]+'</button>';
+  }).join('');
+  var main=document.getElementById('main');
+  var views={dashboard:vDashboard, materi:vMateri, sertifikat:vSertifikat, tim:vTim, program:vProgram,
+    anjungan:vAnjungan, kelolaMateri:vKelolaMateri, kelolaProgram:vKelolaProgram, struktur:vStruktur,
+    kelolaKru:vKelolaKru, log:vLog, sync:vSync, perpus:vPerpus};
+  main.innerHTML=(views[VIEW]||vDashboard)(u);
+}
+
+/* ---------- VIEW: dashboard ---------- */
+function vDashboard(u){
+  var st=userStats(u);
+  var mats=matsForUser(u);
+  var pending=mats.filter(function(m){return m.mandatory && !isDone(u,m)}).slice(0,6);
+  var newest=mats.slice().sort(function(a,b){return b.createdAt-a.createdAt}).slice(0,3);
+  var h='<div class="topbar"><div><h2>Halo, '+esc(u.name.split(' ')[0])+'! ⚓</h2>'+
+    '<div class="sub">'+divName(u.division)+', '+(st.certified?'Kru Tersertifikasi ✅':'Selesaikan materi wajib untuk sertifikasi')+'</div></div></div>';
+  h+='<div class="grid g4" style="margin-bottom:18px">'+
+    '<div class="stat"><div class="v">'+st.mandPct+'%</div><div class="l">Materi Wajib Selesai</div><div class="progress" style="margin-top:10px"><div style="width:'+st.mandPct+'%"></div></div></div>'+
+    '<div class="stat"><div class="v">'+st.done+'/'+st.total+'</div><div class="l">Total Materi Selesai</div></div>'+
+    '<div class="stat"><div class="v">'+st.mandDone+'/'+st.mandTotal+'</div><div class="l">Wajib Selesai</div></div>'+
+    '<div class="stat"><div class="v">'+(st.certified?'🏅':'⏳')+'</div><div class="l">'+(st.certified?'Tersertifikasi':'Belum Sertifikasi')+'</div></div></div>';
+  DB.programs.filter(function(p){return p.bulan===currentMonthKey() && progMatsForUser(u,p).length}).forEach(function(p){
+    var ps=programUserStats(u,p);
+    h+='<div class="card" style="margin-bottom:16px;border:1.5px solid var(--gold2)"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3 style="margin-bottom:4px">📅 '+esc(p.title)+'</h3><div style="font-size:12.5px;color:var(--muted)">Deadline '+esc(p.deadline)+', '+ps.done+'/'+ps.total+' item selesai</div></div><button class="btn btn-sm btn-gold" onclick="go(\'program\')">Buka Program →</button></div><div class="progress" style="margin-top:10px"><div style="width:'+ps.pct+'%"></div></div></div>';
+  });
+  if(pending.length){
+    h+='<div class="card" style="margin-bottom:16px"><h3>📌 Materi Wajib yang Belum Selesai</h3><div class="grid g3">'+
+      pending.map(matCard.bind(null,u)).join('')+'</div></div>';
+  } else {
+    h+='<div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,var(--ink),var(--ink3));color:var(--cream);border:none">'+
+      '<h3 style="color:var(--gold)">🏅 Semua materi wajib selesai!</h3><div style="font-size:13.5px">Kamu sudah memenuhi standar divisi. Cek tab Progress & Sertifikat untuk melihat sertifikatmu.</div></div>';
+  }
+  h+='<div class="card"><h3>🆕 Materi Terbaru</h3><div class="grid g3">'+newest.map(matCard.bind(null,u)).join('')+'</div></div>';
+  return h;
+}
+function matCard(u, m){
+  var t=TYPES[m.type]; var done=isDone(u,m);
+  var p=getProg(u.id,m.id);
+  var scoreTxt='';
+  if(m.type==='quiz' && p && p.score!=null) scoreTxt='<span class="badge '+(p.passed?'b-ok':'b-bad')+'">Skor '+p.score+'%</span>';
+  return '<div class="mat-card" onclick="openMaterial(\''+m.id+'\')">'+
+    (done?'<span class="mat-done badge b-ok">✓ Selesai</span>':'')+
+    '<div class="ty">'+t.icon+'</div><div class="ti">'+esc(m.title)+'</div>'+
+    '<div class="me"><span class="badge '+t.badge+'">'+t.label+'</span>'+
+    (m.mandatory?'<span class="badge b-bad">Wajib</span>':'')+scoreTxt+
+    '<span class="badge b-mut">'+m.division.map(divIcon).join(' ')+'</span></div></div>';
+}
+
+/* ---------- VIEW: materi list ---------- */
+var matFilter={type:'all', cat:'all'};
+function setMatFilter(k,v){ matFilter[k]=v; render(); }
+function vMateri(u){
+  var mats=matsForUser(u);
+  var shown=mats.filter(function(m){
+    if(matFilter.type!=='all' && m.type!==matFilter.type) return false;
+    if(matFilter.cat!=='all' && m.cat!==matFilter.cat) return false;
+    return true;
+  });
+  var h='<div class="topbar"><div><h2>Materi Saya</h2><div class="sub">Materi training untuk '+divName(u.division)+' + materi semua divisi</div></div></div>';
+  h+='<div class="chip-row">'+
+    '<button class="chip'+(matFilter.type==='all'?' active':'')+'" onclick="setMatFilter(\'type\',\'all\')">Semua Tipe</button>'+
+    Object.keys(TYPES).map(function(k){
+      return '<button class="chip'+(matFilter.type===k?' active':'')+'" onclick="setMatFilter(\'type\',\''+k+'\')">'+TYPES[k].icon+' '+TYPES[k].label+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="chip-row">'+
+    '<button class="chip'+(matFilter.cat==='all'?' active':'')+'" onclick="setMatFilter(\'cat\',\'all\')">Semua Kategori</button>'+
+    CATS.map(function(c){
+      return '<button class="chip'+(matFilter.cat===c.id?' active':'')+'" onclick="setMatFilter(\'cat\',\''+c.id+'\')">'+c.name+'</button>';
+    }).join('')+'</div>';
+  if(!shown.length) return h+'<div class="empty"><div class="big">🌊</div>Belum ada materi di filter ini.</div>';
+  h+='<div class="grid g3">'+shown.map(matCard.bind(null,u)).join('')+'</div>';
+  return h;
+}
+
+/* ---------- material viewer ---------- */
+function closeModal(){ PROG_CTX=null; document.getElementById('modalRoot').innerHTML=''; }
+function modal(html, wide){
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal'+(wide?' wide':'')+'">'+html+'</div></div>';
+}
+function ytId(url){
+  if(!url) return null;
+  var m=url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  return m?m[1]:null;
+}
+function openMaterial(id, progId){
+  var u=currentUser(); var m=DB.materials.find(function(x){return x.id===id});
+  if(!m) return;
+  PROG_CTX = progId||null;
+  var t=TYPES[m.type];
+  var inScope = matsForUser(u).some(function(x){return x.id===m.id});
+  OPEN_SCOPE = inScope;
+  var done = PROG_CTX ? progItemDone(u, PROG_CTX, m.id) : isDone(u,m);
+  var head='<div class="modal-head"><div><span class="badge '+t.badge+'">'+t.icon+' '+t.label+'</span>'+
+    (m.mandatory?' <span class="badge b-bad">Wajib</span>':'')+
+    (PROG_CTX?' <span class="badge b-info">📅 Program Bulanan</span>':'')+
+    '<h3 style="margin-top:8px">'+esc(m.title)+'</h3>'+
+    '<div style="font-size:12px;color:var(--muted);margin-top:4px">Untuk: '+m.division.map(divName).join(', ')+'</div></div>'+
+    '<button class="modal-x" onclick="closeModal()">✕</button></div>';
+  var body='';
+  var scopeNote = inScope ? '' : '<div style="background:var(--info-bg);color:var(--info);border-radius:9px;padding:10px 13px;font-size:12.5px;font-weight:600;margin-bottom:12px">📖 Mode Baca, materi ini milik divisi lain. Kamu bebas mempelajarinya, tapi tidak masuk hitungan progress/sertifikasimu.</div>';
+  if(m.type==='modul'){
+    body='<div class="modul-body">'+esc(m.body)+'</div>'+doneBtn(m,done);
+  }
+  else if(m.type==='video'){
+    var vid=ytId(m.videoUrl);
+    body = vid
+      ? '<div class="video-frame"><iframe src="https://www.youtube.com/embed/'+vid+'" allowfullscreen allow="accelerometer; autoplay; encrypted-media; picture-in-picture"></iframe></div>'
+      : '<div class="card">Link video: <a href="'+esc(m.videoUrl)+'" target="_blank" rel="noopener">'+esc(m.videoUrl)+'</a></div>';
+    if(m.desc) body+='<div style="font-size:13.5px;color:var(--muted);margin-bottom:12px">'+esc(m.desc)+'</div>';
+    body+=doneBtn(m,done,'Saya sudah menonton video ini sampai selesai');
+  }
+  else if(m.type==='sop'){
+    var p=getProg(u.id,m.id)||{};
+    body='<div style="font-size:13px;color:var(--muted);margin-bottom:12px">Baca & centang setiap langkah. Setelah semua dicentang, konfirmasi komitmenmu di bawah.</div>';
+    body+=m.steps.map(function(s,i){
+      return '<label class="sop-step"><input type="checkbox" class="sopChk" '+(done?'checked disabled':'')+' onchange="sopCheck(\''+m.id+'\')"><div class="tx"><b>'+(i+1)+'.</b> '+esc(s)+'</div></label>';
+    }).join('');
+    if(done){
+      body+='<div class="badge b-ok" style="margin-top:10px">✓ Dikonfirmasi '+fmtDT(p.completedAt)+'</div>';
+    } else if(!inScope){
+      body+='';
+    } else {
+      body+='<button id="sopAckBtn" class="btn btn-gold btn-block" style="margin-top:12px" disabled onclick="completeMaterial(\''+m.id+'\')">🖊️ Saya sudah membaca, paham, dan berkomitmen menjalankan SOP ini</button>';
+    }
+  }
+  else if(m.type==='menu'){
+    var mn=m.menu||{};
+    body='<div class="menu-hero"><div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted-dark)">'+esc(mn.category||'')+'</div>'+
+      '<div class="nm">'+esc(mn.name||m.title)+'</div><div class="pr" style="color:var(--gold)">'+esc(mn.price||'')+'</div>'+
+      '<div style="font-size:13.5px;margin-top:9px;line-height:1.6">'+esc(mn.desc||'')+'</div></div>'+
+      '<div class="card" style="margin-bottom:12px"><div class="kv">'+
+      '<div class="k">Komposisi</div><div>'+esc(mn.ingredients||'-')+'</div>'+
+      '<div class="k">⚠️ Alergen</div><div><b>'+esc(mn.allergens||'-')+'</b></div>'+
+      '<div class="k">Catatan Ops</div><div>'+esc(mn.notes||'-')+'</div></div></div>'+
+      '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--gold2);margin-bottom:6px">💬 Selling Script (hafalkan gayanya, bukan kata per kata)</div>'+
+      '<div class="script-box">'+esc(mn.selling||'-')+'</div>'+
+      doneBtn(m,done,'Saya sudah mempelajari produk ini (komposisi, alergen, script)');
+  }
+  else if(m.type==='quiz'){
+    body=renderQuizIntro(u,m);
+  }
+  modal(head+scopeNote+body, m.type==='quiz'||m.type==='menu');
+}
+function doneBtn(m,done,label){
+  if(typeof OPEN_SCOPE!=='undefined' && OPEN_SCOPE===false) return '';
+  if(done) return '<div style="margin-top:14px"><span class="badge b-ok">✓ Sudah diselesaikan</span></div>';
+  return '<button class="btn btn-gold btn-block" style="margin-top:14px" onclick="completeMaterial(\''+m.id+'\')">✓ '+(label||'Tandai selesai')+'</button>';
+}
+function sopCheck(){
+  var chks=document.querySelectorAll('.sopChk');
+  var all=true; chks.forEach(function(c){ if(!c.checked) all=false; });
+  var b=document.getElementById('sopAckBtn'); if(b) b.disabled=!all;
+}
+function completeMaterial(id){
+  var u=currentUser(); var m=DB.materials.find(function(x){return x.id===id});
+  setProg(u.id, id, {status:'done', completedAt:Date.now()});
+  if(PROG_CTX) markProgDone(u.id, PROG_CTX, id, null);
+  logAct('selesai', 'Menyelesaikan '+TYPES[m.type].label+': '+m.title);
+  closeModal(); toast('✓ Materi selesai. Kerja bagus, Pelaut!');
+  var st=userStats(u);
+  if(st.certified && !u._certToasted){ toast('🏅 Semua materi wajib selesai, kamu tersertifikasi!'); }
+  render();
+}
+
+/* ---------- quiz ---------- */
+var quizState=null;
+function renderQuizIntro(u,m){
+  var p=getProg(u.id,m.id)||{};
+  var h='';
+  if(PROG_CTX && !progItemDone(u,PROG_CTX,m.id) && p.passed) h+='<div class="badge b-info" style="margin-bottom:10px">🔁 Refresher program bulan ini, kerjakan ulang meski dulu sudah lulus</div>';
+  h+='<div class="card" style="margin-bottom:14px"><div class="kv">'+
+    '<div class="k">Jumlah Soal</div><div>'+m.questions.length+' pertanyaan pilihan ganda</div>'+
+    '<div class="k">Nilai Lulus</div><div>'+(m.passing||DB.settings.passingDefault)+'%</div>'+
+    '<div class="k">Percobaan</div><div>'+(p.attempts||0)+'× '+(p.score!=null?('skor terakhir <b>'+p.score+'%</b> '+(p.passed?'✅ LULUS':'❌ belum lulus')):'')+'</div></div></div>';
+  if(OPEN_SCOPE===false){
+    h+='<button class="btn btn-ghost btn-block" onclick="startQuiz(\''+m.id+'\',true)">🎯 Coba Kuis (Mode Latihan, skor tidak disimpan)</button>';
+  } else {
+    h+='<button class="btn btn-gold btn-block" onclick="startQuiz(\''+m.id+'\')">'+(p.attempts?'🔁 Ulangi Kuis':'▶️ Mulai Kuis')+'</button>';
+  }
+  return h;
+}
+function startQuiz(id, practice){
+  var m=DB.materials.find(function(x){return x.id===id});
+  quizState={matId:id, answers:new Array(m.questions.length).fill(null), practice:!!practice};
+  var h='<div class="modal-head"><h3>📝 '+esc(m.title)+'</h3><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+=m.questions.map(function(q,qi){
+    return '<div class="quiz-q"><div class="qt">'+(qi+1)+'. '+esc(q.q)+'</div>'+
+      q.opts.map(function(o,oi){
+        return '<label class="quiz-opt" id="q'+qi+'o'+oi+'"><input type="radio" name="q'+qi+'" onchange="pickAns('+qi+','+oi+')"> '+esc(o)+'</label>';
+      }).join('')+'</div>';
+  }).join('');
+  h+='<button class="btn btn-gold btn-block" onclick="submitQuiz()">Kumpulkan Jawaban ✓</button>';
+  modal(h, true);
+}
+function pickAns(qi,oi){
+  quizState.answers[qi]=oi;
+  var m=DB.materials.find(function(x){return x.id===quizState.matId});
+  m.questions[qi].opts.forEach(function(_,i){
+    var el=document.getElementById('q'+qi+'o'+i);
+    if(el) el.classList.toggle('sel', i===oi);
+  });
+}
+function submitQuiz(){
+  var u=currentUser();
+  var m=DB.materials.find(function(x){return x.id===quizState.matId});
+  if(quizState.answers.some(function(a){return a===null})){ toast('⚠️ Masih ada soal yang belum dijawab'); return; }
+  var correct=0;
+  m.questions.forEach(function(q,i){ if(quizState.answers[i]===q.a) correct++; });
+  var score=Math.round(correct/m.questions.length*100);
+  var passing=m.passing||DB.settings.passingDefault;
+  var passed=score>=passing;
+  if(!quizState.practice){
+    var p=getProg(u.id,m.id)||{};
+    setProg(u.id, m.id, {attempts:(p.attempts||0)+1, score:score, passed:passed||p.passed===true, lastAt:Date.now(), completedAt: passed?Date.now():(p.completedAt||null)});
+    if(PROG_CTX && passed) markProgDone(u.id, PROG_CTX, m.id, score);
+    logAct('kuis', m.title+', skor '+score+'% ('+(passed?'LULUS':'belum lulus')+')');
+  }
+  var h='<div class="modal-head"><h3>'+(quizState.practice?'🎯 Hasil Latihan':(passed?'🏅 Lulus!':'🌊 Belum Lulus'))+'</h3><button class="modal-x" onclick="closeModal();render()">✕</button></div>';
+  h+='<div class="cert" style="margin-bottom:14px"><div class="h">Hasil Kuis</div><div class="n">'+score+'%</div>'+
+    '<div style="font-size:13px;color:var(--muted)">'+correct+' dari '+m.questions.length+' benar, nilai lulus '+passing+'%</div>'+
+    '<div style="margin-top:10px">'+(quizState.practice?'<span class="badge b-info">Mode Latihan, skor tidak disimpan</span>':(passed?'<span class="badge b-ok">✓ LULUS, standar tercapai</span>':'<span class="badge b-warn">Pelajari lagi materinya, lalu ulangi. Kamu pasti bisa!</span>'))+'</div></div>';
+  h+='<div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Review Jawaban</div>';
+  h+=m.questions.map(function(q,qi){
+    var ua=quizState.answers[qi]; var ok=ua===q.a;
+    return '<div class="quiz-q"><div class="qt">'+(qi+1)+'. '+esc(q.q)+' '+(ok?'✅':'❌')+'</div>'+
+      q.opts.map(function(o,oi){
+        var cls= oi===q.a?'correct':(oi===ua && !ok?'wrong':'');
+        return '<div class="quiz-opt '+cls+'">'+esc(o)+(oi===q.a?' <b style="margin-left:auto;font-size:11px">JAWABAN BENAR</b>':'')+'</div>';
+      }).join('')+'</div>';
+  }).join('');
+  h+='<button class="btn btn-ink btn-block" onclick="closeModal();render()">Selesai</button>';
+  modal(h, true);
+}
+
+/* ---------- VIEW: sertifikat ---------- */
+function vSertifikat(u){
+  var st=userStats(u);
+  var mats=matsForUser(u).filter(function(m){return m.mandatory});
+  var h='<div class="topbar"><div><h2>Progress & Sertifikat</h2><div class="sub">Jejak trainingmu di Akademi Laksamana</div></div>'+
+    (st.certified?'<button class="btn btn-ghost no-print" onclick="window.print()">🖨️ Cetak Sertifikat</button>':'')+'</div>';
+  if(st.certified){
+    h+='<div class="cert" style="margin-bottom:20px"><div class="h">Akademi Laksamana, Sertifikat Standar Kru</div>'+
+      '<div style="margin:14px 0 4px;font-size:12px;color:var(--muted)">Diberikan kepada</div>'+
+      '<div class="n">'+esc(u.name)+'</div>'+
+      '<div style="font-size:13px;color:var(--gold2);font-weight:700">'+esc(u.title||'')+', '+divName(u.division)+'</div>'+
+      '<div style="font-size:12.5px;color:var(--muted);margin-top:12px;max-width:420px;margin-left:auto;margin-right:auto">Telah menyelesaikan seluruh materi wajib ('+st.mandTotal+' materi) dan memenuhi standar layanan Laksamana Muda Coffee & Live Space.</div>'+
+      '<div style="margin-top:16px;font-size:12px;font-weight:700">'+fmtDate(Date.now())+', Pekanbaru</div>'+
+      '<div style="margin-top:4px;font-size:22px">⚓</div></div>';
+  } else {
+    h+='<div class="card" style="margin-bottom:18px"><h3>⏳ Menuju Sertifikasi</h3>'+
+      '<div class="progress" style="margin:8px 0"><div style="width:'+st.mandPct+'%"></div></div>'+
+      '<div style="font-size:13px;color:var(--muted)">'+st.mandDone+' dari '+st.mandTotal+' materi wajib selesai. Selesaikan semua untuk mendapatkan sertifikat kru.</div></div>';
+  }
+  h+='<div class="table-wrap"><table><thead><tr><th>Materi Wajib</th><th>Tipe</th><th>Status</th><th>Skor</th><th>Selesai</th></tr></thead><tbody>'+
+    mats.map(function(m){
+      var p=getProg(u.id,m.id)||{}; var done=isDone(u,m);
+      return '<tr><td style="font-weight:600">'+esc(m.title)+'</td><td><span class="badge '+TYPES[m.type].badge+'">'+TYPES[m.type].label+'</span></td>'+
+        '<td>'+(done?'<span class="badge b-ok">✓ Selesai</span>':'<span class="badge b-warn">Belum</span>')+'</td>'+
+        '<td>'+(p.score!=null?p.score+'%':'-')+'</td><td>'+fmtDate(p.completedAt)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+  return h;
+}
+
+/* ---------- VIEW: tim (manager) ---------- */
+function vTim(u){
+  var scope = isAdmin(u) ? DB.users.filter(function(x){return x.active}) :
+    DB.users.filter(function(x){return x.active && x.division===u.division});
+  scope=scope.slice().sort(function(a,b){return a.name.localeCompare(b.name)});
+  var h='<div class="topbar"><div><h2>Progress Tim</h2><div class="sub">'+(isAdmin(u)?'Seluruh kru kapal':divName(u.division))+'</div></div></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Kru</th><th>Divisi</th><th>Wajib</th><th>Progress</th><th>Status</th><th></th></tr></thead><tbody>'+
+    scope.map(function(k){
+      var st=userStats(k);
+      return '<tr><td><b>'+esc(k.name)+'</b><div style="font-size:11px;color:var(--muted)">'+esc(k.title||'')+'</div></td>'+
+        '<td>'+divIcon(k.division)+' '+divName(k.division)+'</td>'+
+        '<td>'+st.mandDone+'/'+st.mandTotal+'</td>'+
+        '<td style="min-width:130px"><div class="progress"><div style="width:'+st.mandPct+'%"></div></div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+st.mandPct+'%</div></td>'+
+        '<td>'+(st.certified?'<span class="badge b-ok">🏅 Tersertifikasi</span>':(st.mandPct>=50?'<span class="badge b-warn">Proses</span>':'<span class="badge b-bad">Perlu didorong</span>'))+'</td>'+
+        '<td><button class="btn btn-sm btn-ghost" onclick="openKruDetail(\''+k.id+'\')">Detail</button></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  return h;
+}
+function openKruDetail(kid){
+  var k=DB.users.find(function(x){return x.id===kid});
+  var mats=matsForUser(k);
+  var h='<div class="modal-head"><div><h3>'+esc(k.name)+'</h3><div style="font-size:12px;color:var(--muted)">'+esc(k.title||'')+', '+divName(k.division)+'</div></div><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Materi</th><th>Wajib</th><th>Status</th><th>Skor</th><th>Waktu</th></tr></thead><tbody>'+
+    mats.map(function(m){
+      var p=getProg(k.id,m.id)||{}; var done=isDone(k,m);
+      return '<tr><td style="font-weight:600">'+TYPES[m.type].icon+' '+esc(m.title)+'</td>'+
+        '<td>'+(m.mandatory?'✔️':'-')+'</td>'+
+        '<td>'+(done?'<span class="badge b-ok">Selesai</span>':(p.attempts?'<span class="badge b-warn">'+p.attempts+'× coba</span>':'<span class="badge b-mut">Belum</span>'))+'</td>'+
+        '<td>'+(p.score!=null?p.score+'%':'-')+'</td><td>'+fmtDT(p.completedAt||p.lastAt)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+  modal(h, true);
+}
+
+/* ---------- VIEW: anjungan (admin dashboard) ---------- */
+function vAnjungan(u){
+  var kru=DB.users.filter(function(x){return x.active});
+  var certified=kru.filter(function(k){return userStats(k).certified}).length;
+  var totalMat=DB.materials.filter(function(m){return m.published}).length;
+  var avgPct=Math.round(kru.reduce(function(s,k){return s+userStats(k).mandPct},0)/(kru.length||1));
+  var h='<div class="topbar"><div><h2>🧭 Anjungan</h2><div class="sub">Pusat kendali training, kondisi standar kru secara keseluruhan</div></div></div>';
+  h+='<div class="grid g4" style="margin-bottom:18px">'+
+    '<div class="stat"><div class="v">'+kru.length+'</div><div class="l">Kru Aktif</div></div>'+
+    '<div class="stat"><div class="v">'+certified+'</div><div class="l">Tersertifikasi</div></div>'+
+    '<div class="stat"><div class="v">'+avgPct+'%</div><div class="l">Rata-rata Progress Wajib</div><div class="progress" style="margin-top:10px"><div style="width:'+avgPct+'%"></div></div></div>'+
+    '<div class="stat"><div class="v">'+totalMat+'</div><div class="l">Materi Terbit</div></div></div>';
+  h+='<div class="grid g2" style="margin-bottom:16px"><div class="card"><h3>Progress per Divisi</h3>';
+  DIVISIONS.forEach(function(d){
+    var dk=kru.filter(function(k){return k.division===d.id});
+    if(!dk.length){ return; }
+    var pct=Math.round(dk.reduce(function(s,k){return s+userStats(k).mandPct},0)/dk.length);
+    h+='<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px"><span>'+d.icon+' '+d.name+' <span style="color:var(--muted);font-weight:500">('+dk.length+' kru)</span></span><b>'+pct+'%</b></div><div class="progress"><div style="width:'+pct+'%"></div></div></div>';
+  });
+  h+='</div><div class="card"><h3>⚠️ Kru yang Perlu Didorong (&lt;50% wajib)</h3>';
+  var lagging=kru.filter(function(k){var s=userStats(k);return s.mandTotal>0 && s.mandPct<50}).sort(function(a,b){return userStats(a).mandPct-userStats(b).mandPct});
+  if(!lagging.length) h+='<div class="empty" style="padding:20px">Semua kru di atas 50%. Kapal berlayar mulus. 🌊</div>';
+  else lagging.slice(0,8).forEach(function(k){
+    var s=userStats(k);
+    h+='<div class="list-row"><div><b>'+esc(k.name)+'</b><div style="font-size:11px;color:var(--muted)">'+divName(k.division)+'</div></div><span class="badge b-bad">'+s.mandPct+'%</span></div>';
+  });
+  h+='</div></div>';
+  var quizzes=DB.materials.filter(function(m){return m.type==='quiz'&&m.published});
+  h+='<div class="card"><h3>Hasil Kuis per Materi</h3><div class="table-wrap" style="border:none"><table><thead><tr><th>Kuis</th><th>Peserta</th><th>Lulus</th><th>Rata-rata Skor</th></tr></thead><tbody>';
+  quizzes.forEach(function(q){
+    var taken=0, pass=0, sum=0;
+    kru.forEach(function(k){ var p=getProg(k.id,q.id); if(p&&p.attempts){taken++; sum+=p.score; if(p.passed)pass++;} });
+    h+='<tr><td style="font-weight:600">'+esc(q.title)+'</td><td>'+taken+'/'+kru.length+'</td><td>'+pass+'</td><td>'+(taken?Math.round(sum/taken)+'%':'-')+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+/* ---------- VIEW: log ---------- */
+function vLog(u){
+  var h='<div class="topbar"><div><h2>Log Aktivitas</h2><div class="sub">Jejak audit training (500 terakhir)</div></div></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Waktu</th><th>Kru</th><th>Aksi</th><th>Detail</th></tr></thead><tbody>'+
+    DB.activity.slice(0,120).map(function(a){
+      var k=DB.users.find(function(x){return x.id===a.userId});
+      return '<tr><td style="white-space:nowrap">'+fmtDT(a.ts)+'</td><td>'+esc(k?k.name:'-')+'</td><td><span class="badge b-mut">'+esc(a.action)+'</span></td><td>'+esc(a.detail)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+  return h;
+}
+
+/* ---------- VIEW: kelola materi (admin) ---------- */
+function vKelolaMateri(u){
+  var h='<div class="topbar"><div><h2>Kelola Materi</h2><div class="sub">Tambah / edit video, modul, SOP, menu baru, dan kuis</div></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+Object.keys(TYPES).map(function(k){
+      return '<button class="btn btn-sm btn-ink" onclick="editMaterial(null,\''+k+'\')">+ '+TYPES[k].icon+' '+TYPES[k].label+'</button>';
+    }).join('')+'</div></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Materi</th><th>Tipe</th><th>Divisi</th><th>Kategori</th><th>Wajib</th><th>Status</th><th></th></tr></thead><tbody>'+
+    DB.materials.slice().sort(function(a,b){return b.createdAt-a.createdAt}).map(function(m){
+      return '<tr><td style="font-weight:600;max-width:280px">'+esc(m.title)+'</td>'+
+        '<td><span class="badge '+TYPES[m.type].badge+'">'+TYPES[m.type].icon+' '+TYPES[m.type].label+'</span></td>'+
+        '<td style="font-size:12px">'+m.division.map(divName).join(', ')+'</td>'+
+        '<td style="font-size:12px">'+esc((CATS.find(function(c){return c.id===m.cat})||{}).name||m.cat)+'</td>'+
+        '<td>'+(m.mandatory?'✔️':'-')+'</td>'+
+        '<td>'+(m.published?'<span class="badge b-ok">Terbit</span>':'<span class="badge b-mut">Draft</span>')+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn btn-sm btn-ghost" onclick="editMaterial(\''+m.id+'\')">✏️</button> '+
+        '<button class="btn btn-sm btn-danger" onclick="delMaterial(\''+m.id+'\')">🗑️</button></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  return h;
+}
+function delMaterial(id){
+  var m=DB.materials.find(function(x){return x.id===id});
+  if(!confirm('Hapus materi "'+m.title+'"? Progress kru untuk materi ini juga akan hilang.')) return;
+  DB.materials=DB.materials.filter(function(x){return x.id!==id});
+  Object.keys(DB.progress).forEach(function(uid){ delete DB.progress[uid][id]; });
+  logAct('hapus_materi', m.title); saveDB(); render(); toast('Materi dihapus');
+}
+var editQ=[]; // quiz question buffer during edit
+function editMaterial(id, newType){
+  var m = id ? DB.materials.find(function(x){return x.id===id}) : {id:null, type:newType, title:'', division:['all'], cat:'sop', mandatory:false, published:true};
+  var t=TYPES[m.type];
+  editQ = (m.questions||[]).map(function(q){return {q:q.q, opts:q.opts.slice(), a:q.a}});
+  var h='<div class="modal-head"><h3>'+(id?'Edit':'Tambah')+' '+t.icon+' '+t.label+'</h3><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="field"><label>Judul Materi</label><input id="fTitle" value="'+esc(m.title)+'" placeholder="cth: SOP Handling Komplain Tamu"></div>';
+  h+='<div class="form-grid"><div class="field"><label>Kategori</label><select id="fCat">'+
+    CATS.map(function(c){return '<option value="'+c.id+'"'+(m.cat===c.id?' selected':'')+'>'+c.name+'</option>'}).join('')+'</select></div>';
+  h+='<div class="field"><label>Sifat</label><select id="fMand"><option value="0"'+(!m.mandatory?' selected':'')+'>Opsional</option><option value="1"'+(m.mandatory?' selected':'')+'>Wajib (masuk sertifikasi)</option></select></div></div>';
+  h+='<div class="field"><label>Untuk Divisi (bisa lebih dari satu)</label><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<label class="chip" style="cursor:pointer"><input type="checkbox" class="fDiv" value="all" '+(m.division.indexOf('all')>-1?'checked':'')+'> 🌐 Semua</label>'+
+    DIVISIONS.map(function(d){
+      return '<label class="chip" style="cursor:pointer"><input type="checkbox" class="fDiv" value="'+d.id+'" '+(m.division.indexOf(d.id)>-1?'checked':'')+'> '+d.icon+' '+d.name+'</label>';
+    }).join('')+'</div></div>';
+  if(m.type==='modul'){
+    h+='<div class="field"><label>Isi Modul (teks bebas, enter untuk paragraf baru)</label><textarea id="fBody" rows="12">'+esc(m.body||'')+'</textarea></div>';
+  }
+  if(m.type==='video'){
+    h+='<div class="field"><label>URL Video (YouTube, pakai unlisted untuk video internal)</label><input id="fVideo" value="'+esc(m.videoUrl||'')+'" placeholder="https://www.youtube.com/watch?v=..."></div>';
+    h+='<div class="field"><label>Deskripsi Singkat</label><textarea id="fDesc" rows="3">'+esc(m.desc||'')+'</textarea></div>';
+  }
+  if(m.type==='sop'){
+    h+='<div class="field"><label>Langkah-langkah SOP (satu langkah per baris)</label><textarea id="fSteps" rows="12" placeholder="Langkah 1&#10;Langkah 2&#10;...">'+esc((m.steps||[]).join('\n'))+'</textarea></div>';
+  }
+  if(m.type==='menu'){
+    var mn=m.menu||{};
+    h+='<div class="form-grid">'+
+      '<div class="field"><label>Nama Menu</label><input id="fMName" value="'+esc(mn.name||'')+'"></div>'+
+      '<div class="field"><label>Harga</label><input id="fMPrice" value="'+esc(mn.price||'')+'" placeholder="Rp 48.000"></div></div>';
+    h+='<div class="field"><label>Kategori Menu</label><input id="fMCat" value="'+esc(mn.category||'')+'" placeholder="Signature Main Course"></div>';
+    h+='<div class="field"><label>Deskripsi</label><textarea id="fMDesc" rows="3">'+esc(mn.desc||'')+'</textarea></div>';
+    h+='<div class="field"><label>Komposisi / Bahan</label><textarea id="fMIng" rows="2">'+esc(mn.ingredients||'')+'</textarea></div>';
+    h+='<div class="field"><label>⚠️ Alergen</label><input id="fMAll" value="'+esc(mn.allergens||'')+'"></div>';
+    h+='<div class="field"><label>Selling Script</label><textarea id="fMSell" rows="3">'+esc(mn.selling||'')+'</textarea></div>';
+    h+='<div class="field"><label>Catatan Operasional</label><textarea id="fMNotes" rows="2">'+esc(mn.notes||'')+'</textarea></div>';
+  }
+  if(m.type==='quiz'){
+    h+='<div class="field"><label>Nilai Lulus (%)</label><input id="fPassing" type="number" min="1" max="100" value="'+(m.passing||DB.settings.passingDefault)+'"></div>';
+    h+='<div id="quizBuilder"></div><button class="btn btn-sm btn-ink" onclick="addQ()">+ Tambah Soal</button>';
+  }
+  h+='<div class="form-grid" style="margin-top:14px"><button class="btn btn-ghost" onclick="closeModal()">Batal</button>'+
+    '<button class="btn btn-gold" onclick="saveMaterial(\''+(id||'')+'\',\''+m.type+'\')">💾 Simpan Materi</button></div>';
+  modal(h, true);
+  if(m.type==='quiz') renderQB();
+}
+function renderQB(){
+  var el=document.getElementById('quizBuilder'); if(!el) return;
+  el.innerHTML=editQ.map(function(q,qi){
+    return '<div class="quiz-q"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px">'+
+      '<b style="font-size:12px;color:var(--muted)">SOAL '+(qi+1)+'</b><button class="btn btn-sm btn-danger" onclick="delQ('+qi+')">Hapus</button></div>'+
+      '<div class="field"><input value="'+esc(q.q)+'" placeholder="Tulis pertanyaan..." oninput="editQ['+qi+'].q=this.value"></div>'+
+      q.opts.map(function(o,oi){
+        return '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'+
+          '<input type="radio" name="qa'+qi+'" '+(q.a===oi?'checked':'')+' onchange="editQ['+qi+'].a='+oi+'" title="Jawaban benar" style="accent-color:var(--gold2)">'+
+          '<input style="flex:1;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px" value="'+esc(o)+'" placeholder="Opsi '+String.fromCharCode(65+oi)+'" oninput="editQ['+qi+'].opts['+oi+']=this.value"></div>';
+      }).join('')+
+      '<div style="font-size:11px;color:var(--muted)">● tandai radio di kiri untuk jawaban benar</div></div>';
+  }).join('') || '<div class="empty" style="padding:16px">Belum ada soal. Klik "+ Tambah Soal".</div>';
+}
+function addQ(){ editQ.push({q:'', opts:['','','',''], a:0}); renderQB(); }
+function delQ(i){ editQ.splice(i,1); renderQB(); }
+function saveMaterial(id, type){
+  var title=document.getElementById('fTitle').value.trim();
+  if(!title){ toast('⚠️ Judul wajib diisi'); return; }
+  var divs=[]; document.querySelectorAll('.fDiv:checked').forEach(function(c){divs.push(c.value)});
+  if(!divs.length){ toast('⚠️ Pilih minimal satu divisi'); return; }
+  if(divs.indexOf('all')>-1) divs=['all'];
+  var m = id ? DB.materials.find(function(x){return x.id===id}) : {id:uid('m'), type:type, createdAt:Date.now(), published:true};
+  m.title=title; m.division=divs;
+  m.cat=document.getElementById('fCat').value;
+  m.mandatory=document.getElementById('fMand').value==='1';
+  if(type==='modul') m.body=document.getElementById('fBody').value;
+  if(type==='video'){ m.videoUrl=document.getElementById('fVideo').value.trim(); m.desc=document.getElementById('fDesc').value; }
+  if(type==='sop'){
+    m.steps=document.getElementById('fSteps').value.split('\n').map(function(s){return s.trim()}).filter(Boolean);
+    if(!m.steps.length){ toast('⚠️ SOP butuh minimal satu langkah'); return; }
+  }
+  if(type==='menu'){
+    m.menu={name:document.getElementById('fMName').value, price:document.getElementById('fMPrice').value,
+      category:document.getElementById('fMCat').value, desc:document.getElementById('fMDesc').value,
+      ingredients:document.getElementById('fMIng').value, allergens:document.getElementById('fMAll').value,
+      selling:document.getElementById('fMSell').value, notes:document.getElementById('fMNotes').value};
+  }
+  if(type==='quiz'){
+    var qs=editQ.filter(function(q){return q.q.trim() && q.opts.filter(function(o){return o.trim()}).length>=2});
+    if(!qs.length){ toast('⚠️ Kuis butuh minimal satu soal lengkap'); return; }
+    m.questions=qs.map(function(q){return {q:q.q.trim(), opts:q.opts.map(function(o){return o.trim()}).filter(Boolean), a:Math.min(q.a, q.opts.filter(Boolean).length-1)}});
+    m.passing=parseInt(document.getElementById('fPassing').value)||DB.settings.passingDefault;
+  }
+  if(!id) DB.materials.push(m);
+  logAct(id?'edit_materi':'tambah_materi', m.title);
+  saveDB(); closeModal(); render(); toast('💾 Materi tersimpan');
+}
+
+/* ---------- VIEW: kelola kru (admin) ---------- */
+function vKelolaKru(u){
+  var h='<div class="topbar"><div><h2>Kelola Kru</h2><div class="sub">Akun, divisi, dan PIN kru</div></div>'+
+    '<button class="btn btn-ink" onclick="editKru(null)">+ Tambah Kru</button></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Nama</th><th>Jabatan</th><th>Divisi</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>'+
+    DB.users.slice().sort(function(a,b){return a.name.localeCompare(b.name)}).map(function(k){
+      return '<tr'+(k.active?'':' style="opacity:.5"')+'><td><b>'+esc(k.name)+'</b></td><td>'+esc(k.title||'-')+'</td>'+
+        '<td>'+divIcon(k.division)+' '+divName(k.division)+'</td>'+
+        '<td><span class="badge '+(k.role==='admin'?'b-ink':k.role==='manager'?'b-gold':'b-mut')+'">'+(k.role==='admin'?'Nahkoda':k.role==='manager'?'PIC Divisi':'Kru')+'</span></td>'+
+        '<td>'+(k.active?'<span class="badge b-ok">Aktif</span>':'<span class="badge b-bad">Nonaktif</span>')+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn btn-sm btn-ghost" onclick="editKru(\''+k.id+'\')">✏️</button> '+
+        (k.id!=='u_howandi'?'<button class="btn btn-sm '+(k.active?'btn-danger':'btn-ghost')+'" onclick="toggleKru(\''+k.id+'\')">'+(k.active?'Nonaktifkan':'Aktifkan')+'</button>':'')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+  return h;
+}
+function toggleKru(id){
+  var k=DB.users.find(function(x){return x.id===id});
+  k.active=!k.active; logAct(k.active?'aktifkan_kru':'nonaktifkan_kru', k.name); saveDB(); render();
+}
+function editKru(id){
+  var k = id ? DB.users.find(function(x){return x.id===id}) : {id:null, name:'', title:'', division:'service', role:'staff', pin:'1234', active:true};
+  var h='<div class="modal-head"><h3>'+(id?'Edit Kru':'Tambah Kru Baru')+'</h3><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="form-grid"><div class="field"><label>Nama Lengkap</label><input id="kName" value="'+esc(k.name)+'"></div>'+
+    '<div class="field"><label>Jabatan</label><input id="kTitle" value="'+esc(k.title||'')+'" placeholder="Waiter / Cook / Barista..."></div></div>';
+  h+='<div class="form-grid"><div class="field"><label>Divisi</label><select id="kDiv">'+
+    '<option value="all"'+(k.division==='all'?' selected':'')+'>🌐 Semua (manajemen)</option>'+
+    DIVISIONS.map(function(d){return '<option value="'+d.id+'"'+(k.division===d.id?' selected':'')+'>'+d.icon+' '+d.name+'</option>'}).join('')+'</select></div>'+
+    '<div class="field"><label>Peran</label><select id="kRole">'+
+    '<option value="staff"'+(k.role==='staff'?' selected':'')+'>Kru</option>'+
+    '<option value="manager"'+(k.role==='manager'?' selected':'')+'>PIC Divisi (lihat progress tim)</option>'+
+    '<option value="admin"'+(k.role==='admin'?' selected':'')+'>Nahkoda / Admin (akses penuh)</option></select></div></div>';
+  h+='<div class="field"><label>PIN (4–6 digit)</label><input id="kPin" value="'+esc(k.pin)+'" maxlength="6" inputmode="numeric"></div>';
+  h+='<div class="form-grid"><button class="btn btn-ghost" onclick="closeModal()">Batal</button>'+
+    '<button class="btn btn-gold" onclick="saveKru(\''+(id||'')+'\')">💾 Simpan</button></div>';
+  modal(h);
+}
+function saveKru(id){
+  var name=document.getElementById('kName').value.trim();
+  var pin=document.getElementById('kPin').value.trim();
+  if(!name){ toast('⚠️ Nama wajib diisi'); return; }
+  if(!/^\d{4,6}$/.test(pin)){ toast('⚠️ PIN harus 4–6 digit angka'); return; }
+  var k = id ? DB.users.find(function(x){return x.id===id}) : {id:uid('u'), active:true};
+  k.name=name; k.title=document.getElementById('kTitle').value.trim();
+  k.division=document.getElementById('kDiv').value; k.role=document.getElementById('kRole').value; k.pin=pin;
+  if(!id) DB.users.push(k);
+  logAct(id?'edit_kru':'tambah_kru', name);
+  saveDB(); closeModal(); render(); toast('💾 Data kru tersimpan');
+}
+
+
+/* =====================================================
+   V2: STRUKTUR ORGANISASI, PROGRAM BULANAN, SYNC
+   ===================================================== */
+var PROG_CTX=null;
+var OPEN_SCOPE=true;
+var SYNC_TIMER=null;
+var SYNC_STATE='off';
+
+/* ---------- bulan helpers ---------- */
+function bulanLabel(mk){ var d=new Date(mk+'-01T00:00:00'); return d.toLocaleDateString('id-ID',{month:'long',year:'numeric'}); }
+function currentMonthKey(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function nextMonthKey(mk){ var d=new Date(mk+'-01T00:00:00'); d.setMonth(d.getMonth()+1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function lastDayOf(mk){ var d=new Date(mk+'-01T00:00:00'); var ld=new Date(d.getFullYear(), d.getMonth()+1, 0); return ld.getFullYear()+'-'+String(ld.getMonth()+1).padStart(2,'0')+'-'+String(ld.getDate()).padStart(2,'0'); }
+
+/* ---------- program helpers ---------- */
+function progMats(p){ return p.materialIds.map(function(id){return DB.materials.find(function(m){return m.id===id})}).filter(function(m){return m && m.published}); }
+function progMatsForUser(u,p){
+  return progMats(p).filter(function(m){
+    if(u.division==='all') return true;
+    return m.division.indexOf('all')>-1 || m.division.indexOf(u.division)>-1;
+  });
+}
+function progItemDone(u,progId,matId){ var pp=DB.progProg[u.id]; var r=pp&&pp[progId]&&pp[progId][matId]; return !!(r&&r.done); }
+function markProgDone(userId,progId,matId,score){
+  if(!DB.progProg[userId]) DB.progProg[userId]={};
+  if(!DB.progProg[userId][progId]) DB.progProg[userId][progId]={};
+  var r={done:true, at:Date.now()}; if(score!=null) r.score=score;
+  DB.progProg[userId][progId][matId]=r; saveDB();
+}
+function programUserStats(u,p){
+  var mats=progMatsForUser(u,p);
+  var done=mats.filter(function(m){return progItemDone(u,p.id,m.id)}).length;
+  return {total:mats.length, done:done, pct: mats.length?Math.round(done/mats.length*100):100};
+}
+function programAvg(p){
+  var kru=DB.users.filter(function(k){return k.active && k.role!=='admin'});
+  var vals=[]; kru.forEach(function(k){ var s=programUserStats(k,p); if(s.total>0) vals.push(s.pct); });
+  return vals.length? Math.round(vals.reduce(function(a,b){return a+b},0)/vals.length) : 0;
+}
+
+/* ---------- VIEW: program bulanan (semua kru) ---------- */
+function vProgram(u){
+  var progs=DB.programs.slice().sort(function(a,b){return b.bulan.localeCompare(a.bulan)});
+  var h='<div class="topbar"><div><h2>📅 Program Bulanan</h2><div class="sub">Training baru & refresher tiap bulan, standar dijaga terus, bukan sekali jalan</div></div></div>';
+  if(!progs.length) return h+'<div class="empty"><div class="big">🗓️</div>Belum ada program bulanan. '+(isAdmin(u)?'Buat di menu Kelola Program.':'Tunggu pengumuman dari manajemen ya!')+'</div>';
+  progs.forEach(function(p){
+    var mats=progMatsForUser(u,p);
+    var st=programUserStats(u,p);
+    var isCur=p.bulan===currentMonthKey();
+    var over=new Date(p.deadline+'T23:59:59')<new Date();
+    h+='<div class="card" style="margin-bottom:16px'+(isCur?';border:1.5px solid var(--gold2)':'')+'">';
+    h+='<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><div><h3 style="margin-bottom:2px">'+esc(p.title)+'</h3><div style="font-size:12px;color:var(--muted)">'+bulanLabel(p.bulan)+', deadline '+esc(p.deadline)+'</div></div>';
+    h+= st.total===0 ? '<span class="badge b-mut">Tidak ada item divisimu</span>'
+      : st.pct===100 ? '<span class="badge b-ok">✓ Tuntas</span>'
+      : over ? '<span class="badge b-bad">⏰ Lewat deadline, segera selesaikan</span>'
+      : isCur ? '<span class="badge b-gold">Berjalan</span>' : '<span class="badge b-mut">Arsip</span>';
+    h+='</div>';
+    if(p.note) h+='<div style="font-size:13px;color:var(--muted);margin-bottom:10px">'+esc(p.note)+'</div>';
+    if(st.total>0) h+='<div class="progress" style="margin-bottom:12px"><div style="width:'+st.pct+'%"></div></div>';
+    mats.forEach(function(m){
+      var d=progItemDone(u,p.id,m.id);
+      var refresher=isDone(u,m)&&!d;
+      h+='<div class="prog-item"><div><div class="t">'+TYPES[m.type].icon+' '+esc(m.title)+'</div>'+
+        '<div style="margin-top:3px"><span class="badge '+TYPES[m.type].badge+'">'+TYPES[m.type].label+'</span>'+
+        (refresher?' <span class="badge b-info">🔁 Refresher</span>':'')+'</div></div>';
+      h+= d ? '<span class="badge b-ok">✓ Selesai</span>'
+            : '<button class="btn btn-sm btn-gold" onclick="openMaterial(\''+m.id+'\',\''+p.id+'\')">Kerjakan</button>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  return h;
+}
+
+/* ---------- VIEW: kelola program (admin) ---------- */
+function vKelolaProgram(u){
+  var progs=DB.programs.slice().sort(function(a,b){return b.bulan.localeCompare(a.bulan)});
+  var h='<div class="topbar"><div><h2>🗓️ Kelola Program</h2><div class="sub">Susun training bulanan: materi baru + refresher lama. Kru wajib kerjakan ulang item program walau dulu sudah lulus.</div></div>'+
+    '<button class="btn btn-ink" onclick="editProgram(null)">+ Buat Program</button></div>';
+  if(!progs.length) return h+'<div class="empty"><div class="big">🗓️</div>Belum ada program. Klik "+ Buat Program" untuk memulai siklus bulanan.</div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Bulan</th><th>Program</th><th>Item</th><th>Deadline</th><th>Kepatuhan Kru</th><th></th></tr></thead><tbody>'+
+    progs.map(function(p){
+      var avg=programAvg(p); var isCur=p.bulan===currentMonthKey();
+      return '<tr><td style="white-space:nowrap"><b>'+bulanLabel(p.bulan)+'</b>'+(isCur?' <span class="badge b-gold">Aktif</span>':'')+'</td>'+
+        '<td style="font-weight:600">'+esc(p.title)+'</td><td>'+p.materialIds.length+' materi</td><td>'+esc(p.deadline)+'</td>'+
+        '<td style="min-width:120px"><div class="progress"><div style="width:'+avg+'%"></div></div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+avg+'% rata-rata</div></td>'+
+        '<td style="white-space:nowrap"><button class="btn btn-sm btn-ghost" onclick="programCompliance(\''+p.id+'\')">👥</button> '+
+        '<button class="btn btn-sm btn-ghost" onclick="dupProgram(\''+p.id+'\')" title="Duplikat ke bulan berikutnya">📄→</button> '+
+        '<button class="btn btn-sm btn-ghost" onclick="editProgram(\''+p.id+'\')">✏️</button> '+
+        '<button class="btn btn-sm btn-danger" onclick="delProgram(\''+p.id+'\')">🗑️</button></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  h+='<div class="card" style="margin-top:16px"><h3>💡 Cara pakai siklus bulanan</h3><div style="font-size:13.5px;line-height:1.7;color:var(--muted)">Setiap akhir bulan, klik <b>📄→ Duplikat</b> pada program berjalan untuk membuat kerangka bulan berikutnya, lalu edit: ganti 1–2 materi refresher & tambahkan materi/menu/kuis baru. Item program dihitung terpisah dari progress biasa, kru harus mengerjakan ulang item refresher, jadi standar tidak luntur. Pantau kepatuhan dari kolom di atas atau tombol 👥.</div></div>';
+  return h;
+}
+function editProgram(id){
+  var p = id ? DB.programs.find(function(x){return x.id===id})
+    : {id:null, bulan:currentMonthKey(), title:'', deadline:lastDayOf(currentMonthKey()), note:'', materialIds:[]};
+  var h='<div class="modal-head"><h3>'+(id?'Edit':'Buat')+' Program Bulanan</h3><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="form-grid"><div class="field"><label>Bulan</label><input id="pBulan" type="month" value="'+esc(p.bulan)+'" onchange="var t=document.getElementById(\'pTitle\'); if(t && !t.dataset.touched) t.value=\'Program \'+bulanLabel(this.value)"></div>'+
+    '<div class="field"><label>Deadline</label><input id="pDeadline" type="date" value="'+esc(p.deadline)+'"></div></div>';
+  h+='<div class="field"><label>Nama Program</label><input id="pTitle" value="'+esc(p.title||('Program '+bulanLabel(p.bulan)))+'" oninput="this.dataset.touched=1"></div>';
+  h+='<div class="field"><label>Catatan / Fokus Bulan Ini</label><textarea id="pNote" rows="2" placeholder="cth: Fokus product knowledge menu baru + refresher SOP service">'+esc(p.note||'')+'</textarea></div>';
+  h+='<div class="field"><label>Pilih Materi (baru maupun lama, yang lama otomatis jadi refresher)</label>'+
+    DB.materials.filter(function(m){return m.published}).sort(function(a,b){return a.type.localeCompare(b.type)||a.title.localeCompare(b.title)}).map(function(m){
+      return '<label class="sop-step" style="cursor:pointer"><input type="checkbox" class="pMat" value="'+m.id+'" '+(p.materialIds.indexOf(m.id)>-1?'checked':'')+'>'+
+        '<div class="tx">'+TYPES[m.type].icon+' <b>'+esc(m.title)+'</b><div style="font-size:11px;color:var(--muted);margin-top:2px">'+TYPES[m.type].label+', '+m.division.map(divName).join(', ')+'</div></div></label>';
+    }).join('')+'</div>';
+  h+='<div class="form-grid"><button class="btn btn-ghost" onclick="closeModal()">Batal</button>'+
+    '<button class="btn btn-gold" onclick="saveProgram(\''+(id||'')+'\')">💾 Simpan Program</button></div>';
+  modal(h, true);
+}
+function saveProgram(id){
+  var bulan=document.getElementById('pBulan').value;
+  var title=document.getElementById('pTitle').value.trim();
+  var deadline=document.getElementById('pDeadline').value;
+  if(!bulan||!title||!deadline){ toast('⚠️ Bulan, nama, dan deadline wajib diisi'); return; }
+  var ids=[]; document.querySelectorAll('.pMat:checked').forEach(function(c){ids.push(c.value)});
+  if(!ids.length){ toast('⚠️ Pilih minimal satu materi'); return; }
+  var p = id ? DB.programs.find(function(x){return x.id===id}) : {id:uid('p'), createdAt:Date.now()};
+  p.bulan=bulan; p.title=title; p.deadline=deadline;
+  p.note=document.getElementById('pNote').value; p.materialIds=ids;
+  if(!id) DB.programs.push(p);
+  logAct(id?'edit_program':'buat_program', title+' ('+bulan+')');
+  saveDB(); closeModal(); render(); toast('💾 Program tersimpan');
+}
+function delProgram(id){
+  var p=DB.programs.find(function(x){return x.id===id});
+  if(!confirm('Hapus program "'+p.title+'"? Catatan pengerjaan program ini ikut terhapus.')) return;
+  DB.programs=DB.programs.filter(function(x){return x.id!==id});
+  Object.keys(DB.progProg).forEach(function(uid){ delete DB.progProg[uid][id]; });
+  logAct('hapus_program', p.title); saveDB(); render(); toast('Program dihapus');
+}
+function dupProgram(id){
+  var p=DB.programs.find(function(x){return x.id===id});
+  var nb=nextMonthKey(p.bulan);
+  if(DB.programs.some(function(x){return x.bulan===nb})){ toast('⚠️ Program '+bulanLabel(nb)+' sudah ada'); return; }
+  DB.programs.push({id:uid('p'), bulan:nb, title:'Program '+bulanLabel(nb), deadline:lastDayOf(nb),
+    note:p.note, materialIds:p.materialIds.slice(), createdAt:Date.now()});
+  logAct('duplikat_program', p.title+' → '+bulanLabel(nb));
+  saveDB(); render(); toast('📄 Program '+bulanLabel(nb)+' dibuat, silakan edit isinya');
+}
+function programCompliance(id){
+  var p=DB.programs.find(function(x){return x.id===id});
+  var kru=DB.users.filter(function(k){return k.active}).sort(function(a,b){return a.name.localeCompare(b.name)});
+  var h='<div class="modal-head"><div><h3>👥 Kepatuhan: '+esc(p.title)+'</h3><div style="font-size:12px;color:var(--muted)">Deadline '+esc(p.deadline)+'</div></div><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="table-wrap"><table><thead><tr><th>Kru</th><th>Divisi</th><th>Item</th><th>Progress</th></tr></thead><tbody>'+
+    kru.map(function(k){
+      var s=programUserStats(k,p);
+      if(!s.total) return '';
+      return '<tr><td><b>'+esc(k.name)+'</b></td><td>'+divIcon(k.division)+' '+divName(k.division)+'</td><td>'+s.done+'/'+s.total+'</td>'+
+        '<td style="min-width:120px"><div class="progress"><div style="width:'+s.pct+'%"></div></div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+s.pct+'%'+(s.pct===100?' ✓':'')+'</div></td></tr>';
+    }).join('')+'</tbody></table></div>';
+  modal(h, true);
+}
+
+/* ---------- VIEW: struktur organisasi (admin) ---------- */
+function vStruktur(u){
+  var adm=isAdmin(u);
+  var h='<div class="topbar"><div><h2>🪢 Struktur Organisasi</h2><div class="sub">'+(adm?'Susun divisi & jalur komando, materi training otomatis mengikuti divisi yang dibuat di sini':'Kenali jalur komando kapal & PIC divisimu')+'</div></div>'+
+    (adm?'<button class="btn btn-ink" onclick="editDivisi(null)">+ Tambah Divisi</button>':'')+'</div>';
+  var admins=DB.users.filter(function(k){return k.active && (k.role==='admin' || k.division==='all')});
+  h+='<div class="card" style="background:linear-gradient(135deg,var(--ink),var(--ink3));color:var(--cream);border:none;margin-bottom:0">'+
+    '<h3 style="color:var(--gold)">⚓ Nahkoda & Manajemen Pusat</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    admins.map(function(k){return '<span class="badge" style="background:rgba(200,150,31,.15);color:var(--gold);padding:6px 12px">'+esc(k.name)+', '+esc(k.title||'')+'</span>'}).join('')+'</div></div>';
+  h+='<div class="org-line"></div>';
+  h+='<div class="grid g3">';
+  DIVISIONS.forEach(function(d){
+    var pics=DB.users.filter(function(k){return k.active && k.role==='manager' && k.division===d.id});
+    var kru=DB.users.filter(function(k){return k.active && k.role==='staff' && k.division===d.id});
+    var matCount=DB.materials.filter(function(m){return m.published && (m.division.indexOf('all')>-1 || m.division.indexOf(d.id)>-1)}).length;
+    h+='<div class="org-col"><div class="oh"><div class="nm">'+d.icon+' '+esc(d.name)+'</div>'+
+      (adm?'<div style="display:flex;gap:5px"><button class="btn btn-sm" style="color:var(--gold)" onclick="editDivisi(\''+d.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="color:#e08a8a" onclick="delDivisi(\''+d.id+'\')">🗑️</button></div>':'')+'</div>';
+    h+='<div style="padding:8px 14px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--cream2)">'+(pics.length+kru.length)+' orang, '+matCount+' materi training</div>';
+    if(!pics.length && !kru.length) h+='<div style="padding:14px;font-size:12.5px;color:var(--muted)">Belum ada kru. Tetapkan lewat Kelola Kru.</div>';
+    pics.forEach(function(k){
+      var s=userStats(k);
+      h+='<div class="org-person org-pic"><div><b>'+esc(k.name)+'</b><div style="font-size:11px;color:var(--gold2);font-weight:700">PIC, '+esc(k.title||'')+'</div></div><span class="badge '+(s.certified?'b-ok':'b-warn')+'">'+s.mandPct+'%</span></div>';
+    });
+    kru.forEach(function(k){
+      var s=userStats(k);
+      h+='<div class="org-person"><div>'+esc(k.name)+'<div style="font-size:11px;color:var(--muted)">'+esc(k.title||'')+'</div></div><span class="badge '+(s.certified?'b-ok':'b-mut')+'">'+s.mandPct+'%</span></div>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  if(adm) h+='<div class="card" style="margin-top:16px"><h3>💡 Catatan</h3><div style="font-size:13px;color:var(--muted);line-height:1.7">Divisi yang lo buat di sini langsung muncul sebagai pilihan target di Kelola Materi, Kelola Program, dan Kelola Kru. Tetapkan satu PIC per divisi (ubah peran kru jadi "PIC Divisi" di Kelola Kru) supaya dia bisa memantau progress timnya sendiri. Divisi hanya bisa dihapus jika sudah tidak ada kru maupun materi yang menempel padanya.</div></div>';
+  return h;
+}
+function editDivisi(id){
+  var d = id ? DB.divisions.find(function(x){return x.id===id}) : {id:null, name:'', icon:'🧭'};
+  var h='<div class="modal-head"><h3>'+(id?'Edit':'Tambah')+' Divisi</h3><button class="modal-x" onclick="closeModal()">✕</button></div>';
+  h+='<div class="form-grid"><div class="field"><label>Ikon (emoji)</label><input id="dIcon" value="'+esc(d.icon)+'" maxlength="4"></div>'+
+    '<div class="field"><label>Nama Divisi</label><input id="dName" value="'+esc(d.name)+'" placeholder="cth: Security & Parkir"></div></div>';
+  h+='<div class="form-grid"><button class="btn btn-ghost" onclick="closeModal()">Batal</button>'+
+    '<button class="btn btn-gold" onclick="saveDivisi(\''+(id||'')+'\')">💾 Simpan</button></div>';
+  modal(h);
+}
+function saveDivisi(id){
+  var name=document.getElementById('dName').value.trim();
+  var icon=document.getElementById('dIcon').value.trim()||'🧭';
+  if(!name){ toast('⚠️ Nama divisi wajib diisi'); return; }
+  if(id){ var d=DB.divisions.find(function(x){return x.id===id}); d.name=name; d.icon=icon; }
+  else DB.divisions.push({id:uid('d'), name:name, icon:icon});
+  DIVISIONS=DB.divisions;
+  logAct(id?'edit_divisi':'tambah_divisi', name);
+  saveDB(); closeModal(); render(); toast('💾 Divisi tersimpan');
+}
+function delDivisi(id){
+  var d=DB.divisions.find(function(x){return x.id===id});
+  var usersIn=DB.users.filter(function(k){return k.division===id}).length;
+  var matsIn=DB.materials.filter(function(m){return m.division.indexOf(id)>-1}).length;
+  if(usersIn||matsIn){ toast('⚠️ Tidak bisa dihapus: masih ada '+usersIn+' kru & '+matsIn+' materi di divisi ini. Pindahkan dulu.'); return; }
+  if(!confirm('Hapus divisi "'+d.name+'"?')) return;
+  DB.divisions=DB.divisions.filter(function(x){return x.id!==id});
+  DIVISIONS=DB.divisions;
+  logAct('hapus_divisi', d.name); saveDB(); render(); toast('Divisi dihapus');
+}
+
+/* ---------- SYNC ENGINE (Google Apps Script backend) ---------- */
+function setSyncBadge(state){
+  SYNC_STATE=state;
+  var d=document.getElementById('syncDot'); if(d) d.className='sync-dot '+state;
+  var t=document.getElementById('syncTxt'); if(t) t.textContent={ok:'tersinkron',pending:'menunggu…',error:'gagal',off:'off'}[state]||state;
+  var s=document.getElementById('syncStatusLine');
+  if(s) s.innerHTML='<span class="sync-dot '+state+'"></span> '+({ok:'Tersinkron dengan server',pending:'Perubahan menunggu dikirim…',error:'Gagal terhubung, cek URL/kunci/koneksi',off:'Belum terhubung'}[state]||state);
+}
+function scheduleSync(){
+  if(!DB.settings || !DB.settings.syncUrl || !DB.settings.syncAuto) return;
+  setSyncBadge('pending');
+  clearTimeout(SYNC_TIMER);
+  SYNC_TIMER=setTimeout(function(){ pushDB(false); }, 3000);
+}
+function pushDB(manual){
+  var url=DB.settings.syncUrl;
+  if(!url){ if(manual) toast('⚠️ Isi URL server dulu di pengaturan'); return; }
+  setSyncBadge('pending');
+  try{
+    fetch(url, {method:'POST', body: JSON.stringify({action:'push', key:DB.settings.syncKey||'', db:DB})})
+      .then(function(r){return r.json()})
+      .then(function(res){
+        if(res && res.ok){ setSyncBadge('ok'); if(manual) toast('☁️ Data terkirim ke server'); }
+        else { setSyncBadge('error'); if(manual) toast('❌ Server menolak: '+(res&&res.error?res.error:'cek kunci')); }
+      })
+      .catch(function(){ setSyncBadge('error'); if(manual) toast('❌ Gagal kirim, cek koneksi/URL'); });
+  }catch(e){ setSyncBadge('error'); }
+}
+function pullDB(silent){
+  var url=DB.settings.syncUrl;
+  if(!url){ if(!silent) toast('⚠️ Isi URL server dulu di pengaturan'); return Promise.resolve(); }
+  try{
+    return fetch(url+(url.indexOf('?')>-1?'&':'?')+'action=pull&key='+encodeURIComponent(DB.settings.syncKey||''))
+      .then(function(r){return r.json()})
+      .then(function(res){
+        if(res && res.ok && res.db){
+          if((res.db.updatedAt||0) > (DB.updatedAt||0)){
+            var keep={u:DB.settings.syncUrl, k:DB.settings.syncKey, a:DB.settings.syncAuto};
+            DB=res.db; migrateDB();
+            DB.settings.syncUrl=keep.u; DB.settings.syncKey=keep.k; DB.settings.syncAuto=keep.a;
+            DIVISIONS=DB.divisions;
+            saveDB(true);
+            if(currentUser()) render(); else renderLoginUsers();
+            if(!silent) toast('☁️ Data terbaru diambil dari server');
+          } else if(!silent) toast('✓ Data lokal sudah paling baru');
+          setSyncBadge('ok');
+        } else if(res && res.ok){
+          if(!silent) toast('Server masih kosong, klik "Kirim ke Server" dulu dari device utama');
+          setSyncBadge('ok');
+        } else { setSyncBadge('error'); if(!silent) toast('❌ Server menolak: '+(res&&res.error?res.error:'cek kunci')); }
+      })
+      .catch(function(){ setSyncBadge('error'); if(!silent) toast('❌ Gagal ambil data, cek koneksi/URL'); });
+  }catch(e){ setSyncBadge('error'); return Promise.resolve(); }
+}
+function testSync(){
+  var url=document.getElementById('sUrl').value.trim();
+  var key=document.getElementById('sKey').value.trim();
+  if(!url){ toast('⚠️ Isi URL dulu'); return; }
+  toast('⏳ Menguji koneksi…');
+  try{
+    fetch(url+(url.indexOf('?')>-1?'&':'?')+'key='+encodeURIComponent(key))
+      .then(function(r){return r.json()})
+      .then(function(res){ toast(res&&res.ok?'✅ Terhubung! Server aktif.':'❌ Server merespon tapi kunci salah'); })
+      .catch(function(){ toast('❌ Tidak terhubung, cek URL & deployment'); });
+  }catch(e){ toast('❌ Tidak terhubung'); }
+}
+function saveSyncSettings(){
+  DB.settings.syncUrl=document.getElementById('sUrl').value.trim();
+  DB.settings.syncKey=document.getElementById('sKey').value.trim();
+  DB.settings.syncAuto=document.getElementById('sAuto').checked;
+  saveDB(true);
+  logAct('sync_setting','Pengaturan sinkronisasi diperbarui');
+  toast('💾 Pengaturan tersimpan'); render();
+}
+function vSync(u){
+  var s=DB.settings;
+  var h='<div class="topbar"><div><h2>☁️ Sinkronisasi & Backup</h2><div class="sub">Hubungkan ke Google Sheet supaya semua device kru membaca-menulis satu data yang sama</div></div></div>';
+  h+='<div class="card" style="margin-bottom:16px"><h3>Status</h3>'+
+    '<div id="syncStatusLine" style="font-size:14px;font-weight:600;margin-bottom:6px"><span class="sync-dot '+SYNC_STATE+'"></span> '+
+    ({ok:'Tersinkron dengan server',pending:'Perubahan menunggu dikirim…',error:'Gagal terhubung, cek URL/kunci/koneksi',off:'Belum terhubung'}[SYNC_STATE]||SYNC_STATE)+'</div>'+
+    '<div style="font-size:12px;color:var(--muted)">Perubahan lokal terakhir: '+fmtDT(DB.updatedAt)+'</div></div>';
+  h+='<div class="card" style="margin-bottom:16px"><h3>Pengaturan Server</h3>'+
+    '<div class="field"><label>URL Web App (Google Apps Script, akhiran /exec)</label><input id="sUrl" value="'+esc(s.syncUrl)+'" placeholder="https://script.google.com/macros/s/…/exec"></div>'+
+    '<div class="field"><label>Kunci Rahasia (harus sama dengan SECRET di Code.gs)</label><input id="sKey" value="'+esc(s.syncKey)+'" placeholder="cth: LAKSAMANA-2026-RAHASIA"></div>'+
+    '<label style="display:flex;gap:9px;align-items:center;font-size:13.5px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="sAuto" '+(s.syncAuto?'checked':'')+' style="width:17px;height:17px;accent-color:var(--gold2)"> Auto-sync: kirim otomatis beberapa detik setelah setiap perubahan, ambil otomatis saat app dibuka</label>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-gold" onclick="saveSyncSettings()">💾 Simpan Pengaturan</button>'+
+    '<button class="btn btn-ghost" onclick="testSync()">🔌 Test Koneksi</button>'+
+    '<button class="btn btn-ink" onclick="pushDB(true)">⬆️ Kirim ke Server</button>'+
+    '<button class="btn btn-ink" onclick="pullDB(false)">⬇️ Ambil dari Server</button></div></div>';
+  h+='<div class="card" style="margin-bottom:16px"><h3>📦 Backup Manual</h3>'+
+    '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">Unduh seluruh data (kru, materi, progress, program) sebagai file JSON, bisa lo otak-atik, arsipkan, atau pindahkan ke device lain.</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost" onclick="exportJSON()">⬇️ Unduh Backup (.json)</button>'+
+    '<button class="btn btn-ghost" onclick="importJSON()">⬆️ Pulihkan dari Backup</button></div></div>';
+  var steps=[
+    'Buka <b>sheets.new</b> di browser → buat Google Sheet baru, beri nama "Akademi Laksamana DB".',
+    'Di Sheet itu, buka menu <b>Extensions → Apps Script</b>.',
+    'Hapus semua isi editor, lalu tempel seluruh isi file <b>Code.gs</b> yang gue sertakan.',
+    'Ganti nilai <b>SECRET</b> di baris paling atas dengan kunci rahasia kalian sendiri, lalu simpan (ikon 💾).',
+    'Klik <b>Deploy → New deployment</b> → pilih tipe <b>Web app</b>.',
+    '<b>Execute as: Me</b>, <b>Who has access: Anyone</b> → klik Deploy → izinkan akses akun Google lo.',
+    'Salin <b>Web app URL</b> (berakhiran /exec) → tempel ke kolom URL di atas, isi kunci yang sama → Simpan Pengaturan.',
+    'Dari device utama (yang datanya paling lengkap), klik <b>⬆️ Kirim ke Server</b> sekali. Di device lain: isi URL & kunci yang sama → <b>⬇️ Ambil dari Server</b>. Selesai, selanjutnya auto-sync jalan sendiri.'
+  ];
+  h+='<div class="card"><h3>🛠️ Panduan Setup Backend (± 5 menit, sekali saja)</h3>'+
+    steps.map(function(st,i){return '<div class="guide-step"><div class="n">'+(i+1)+'</div><div>'+st+'</div></div>'}).join('')+
+    '<div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.6">Catatan: sistem tetap jalan penuh saat offline (data tersimpan di device) dan tersinkron begitu online lagi. Prinsipnya <i>last-write-wins</i>, kalau dua admin mengedit materi bersamaan di device berbeda, perubahan terakhir yang menang. Di Google Sheet juga otomatis dibuat tab <b>"Rekap Progress"</b> yang bisa lo baca & olah langsung tanpa buka app, tab <b>"DB"</b> jangan diedit manual.</div></div>';
+  return h;
+}
+function exportJSON(){
+  var data=JSON.stringify(DB, null, 1);
+  try{
+    var blob=new Blob([data],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='akademi_laksamana_backup_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('📦 Backup diunduh');
+  }catch(e){
+    modal('<div class="modal-head"><h3>Backup JSON</h3><button class="modal-x" onclick="closeModal()">✕</button></div><div class="field"><textarea rows="14" onclick="this.select()">'+esc(data)+'</textarea></div><div style="font-size:12px;color:var(--muted)">Salin semua teks di atas dan simpan sebagai file .json</div>', true);
+  }
+}
+function importJSON(){
+  modal('<div class="modal-head"><h3>Pulihkan dari Backup</h3><button class="modal-x" onclick="closeModal()">✕</button></div>'+
+    '<div class="field"><label>Tempel isi file backup .json di sini</label><textarea id="impTxt" rows="12" placeholder="{ ... }"></textarea></div>'+
+    '<div style="font-size:12.5px;color:var(--bad);margin-bottom:12px">⚠️ Ini akan MENGGANTI seluruh data di device ini dengan isi backup.</div>'+
+    '<button class="btn btn-gold btn-block" onclick="doImportJSON()">Pulihkan Data</button>', true);
+}
+function doImportJSON(){
+  try{
+    var d=JSON.parse(document.getElementById('impTxt').value);
+    if(!d.users || !d.materials) throw new Error('format tidak dikenal');
+    DB=d; migrateDB(); DIVISIONS=DB.divisions; saveDB(true);
+    logAct('restore','Data dipulihkan dari backup JSON');
+    closeModal(); render(); toast('✅ Data berhasil dipulihkan');
+  }catch(e){ toast('❌ File backup tidak valid: '+e.message); }
+}
+
+
+
+/* ---------- VIEW: perpustakaan (semua divisi) ---------- */
+var perpusFilter={q:'', div:'all', type:'all'};
+function setPerpus(k,v){ perpusFilter[k]=v; render(); }
+function perpusSearch(v){ perpusFilter.q=v; renderPerpusGrid(); }
+function vPerpus(u){
+  var h='<div class="topbar"><div><h2>📖 Perpustakaan Laksamana</h2><div class="sub">Semua materi training lintas divisi, belajar apa pun, kapan pun. Materi di luar divisimu terbuka dalam Mode Baca.</div></div></div>';
+  h+='<div class="field" style="max-width:420px"><input placeholder="🔍 Cari judul materi…" value="'+esc(perpusFilter.q)+'" oninput="perpusSearch(this.value)"></div>';
+  h+='<div class="chip-row"><button class="chip'+(perpusFilter.div==='all'?' active':'')+'" onclick="setPerpus(\'div\',\'all\')">🌐 Semua Divisi</button>'+
+    DIVISIONS.map(function(d){
+      return '<button class="chip'+(perpusFilter.div===d.id?' active':'')+'" onclick="setPerpus(\'div\',\''+d.id+'\')">'+d.icon+' '+esc(d.name)+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="chip-row"><button class="chip'+(perpusFilter.type==='all'?' active':'')+'" onclick="setPerpus(\'type\',\'all\')">Semua Tipe</button>'+
+    Object.keys(TYPES).map(function(k){
+      return '<button class="chip'+(perpusFilter.type===k?' active':'')+'" onclick="setPerpus(\'type\',\''+k+'\')">'+TYPES[k].icon+' '+TYPES[k].label+'</button>';
+    }).join('')+'</div>';
+  h+='<div id="perpusGrid"></div>';
+  setTimeout(renderPerpusGrid,0);
+  return h;
+}
+function renderPerpusGrid(){
+  var el=document.getElementById('perpusGrid'); if(!el) return;
+  var u=currentUser();
+  var q=perpusFilter.q.toLowerCase();
+  var mine=matsForUser(u).map(function(m){return m.id});
+  var list=DB.materials.filter(function(m){
+    if(!m.published) return false;
+    if(perpusFilter.type!=='all' && m.type!==perpusFilter.type) return false;
+    if(perpusFilter.div!=='all' && m.division.indexOf('all')===-1 && m.division.indexOf(perpusFilter.div)===-1) return false;
+    if(q && m.title.toLowerCase().indexOf(q)===-1) return false;
+    return true;
+  }).sort(function(a,b){return b.createdAt-a.createdAt});
+  if(!list.length){ el.innerHTML='<div class="empty"><div class="big">🌊</div>Tidak ada materi yang cocok dengan pencarian.</div>'; return; }
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:10px">'+list.length+' materi ditemukan</div>'+
+    '<div class="grid g3">'+list.map(function(m){
+      var t=TYPES[m.type]; var inScope=mine.indexOf(m.id)>-1; var done=inScope&&isDone(u,m);
+      return '<div class="mat-card" onclick="openMaterial(\''+m.id+'\')">'+
+        (done?'<span class="mat-done badge b-ok">✓ Selesai</span>':(!inScope?'<span class="mat-done badge b-info">📖 Mode Baca</span>':''))+
+        '<div class="ty">'+t.icon+'</div><div class="ti">'+esc(m.title)+'</div>'+
+        '<div class="me"><span class="badge '+t.badge+'">'+t.label+'</span>'+
+        (m.mandatory&&inScope?'<span class="badge b-bad">Wajib</span>':'')+
+        '<span class="badge b-mut">'+m.division.map(divIcon).join(' ')+'</span></div></div>';
+    }).join('')+'</div>';
+}
+
+/* ---------- init (SSO) ----------
+   Identitas dari Office. Head guard di <head> sudah memblokir yang tak berhak,
+   jadi di sini kita cukup resolve kru lalu langsung masuk (tanpa login/PIN lokal). */
+function bootAkademi(){
+  var office=readLmSession();
+  if(!office){ location.replace('../'); return; }     // jaring pengaman kedua
+  var u=resolveAkademiUser(office);
+  try{ localStorage.setItem(SESSION_KEY, u.id); }catch(e){}
+  logAct('login', u.name+' naik kapal');
+  VIEW='dashboard'; VIEW_ARG=null;
+  showApp();
+}
+loadDB();
+if(DB.settings.syncUrl && DB.settings.syncAuto){
+  // Tarik data terbaru dulu supaya resolver cocok ke crew list terkini, lalu masuk.
+  pullDB(true).then(bootAkademi).catch(bootAkademi);
+}else{
+  bootAkademi();
+}
+</script>
+</body>
+</html>
