@@ -7,6 +7,10 @@
     <meta name="description" content="Portal internal Laksamana Muda, pusat aplikasi operasional kantor.">
     <meta name="theme-color" content="#A9791F">
 
+    <!-- Favicon: logo Laksamana (ganti ikon globe default) -->
+    <link rel="icon" type="image/png" href="./assets/logo.png">
+    <link rel="apple-touch-icon" href="./assets/logo.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -312,6 +316,8 @@
     // URL Web App Apps Script (verifikasi PIN di server, kembalikan identitas +
     // daftar modul). Kosongkan untuk mode seed lokal (jalan tanpa Sheet).
     const OFFICE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwTm9jZ0vs9yHUuft6N62cn2GxQ9pq2NfqyhrtBfzjVsW0zlJt7a3a5iyXZcvU36Rpa-A/exec";
+    // Level 2: identitas dari Laravel (MySQL, same-origin). Fallback ke Apps Script bila tak terjangkau.
+    const OFFICE_API_URL = "/api/office";
 
     const SESSION_KEY   = "lm_session";
     const SESSION_HOURS = 24;
@@ -371,22 +377,10 @@
             scope:['Materi','Kuis','Sertifikat']
         },
         {
-            key:'manajemen', href:'sso:manajemen', icon:'briefcase', access:['manajemen'],
-            title:'Manajemen', tag:'General Management',
-            desc:'Panel utama manajemen untuk pantau seluruh event, transaksi, klien, dan evaluasi performa pegawai.',
-            scope:['Event','Finance','Evaluasi']
-        },
-        {
             key:'event_marketing', href:'sso:event_marketing', icon:'megaphone', access:['event_marketing'],
             title:'Event Marketing', tag:'Event & Planning',
             desc:'Kelola jalannya acara, kanban planning, jadwal tamu, dan meeting klien.',
             scope:['Planning','Acara','Appointment']
-        },
-        {
-            key:'finance', href:'sso:finance', icon:'dollar', access:['finance'],
-            title:'Finance', tag:'Keuangan & Invoice',
-            desc:'Verifikasi bukti pembayaran, kelola transaksi, dan generate laporan keuangan PDF/Excel.',
-            scope:['Transaksi','Laporan']
         }
     ];
 
@@ -420,13 +414,21 @@
     // Kembalikan objek user bila cocok, null bila salah, atau lempar bila server
     // tak terjangkau (agar pemanggil bisa jatuh ke seed lokal).
     async function verifyRemote(name, pin){
-        const res = await fetch(OFFICE_WEBAPP_URL, {
+        // Utama: Laravel (MySQL). Kalau tak terjangkau -> fallback Apps Script (GSheet).
+        try {
+            const res = await fetch(OFFICE_API_URL, {
+                method:'POST', headers:{ 'Content-Type':'application/json' },
+                body: JSON.stringify({ action:'login', name, pin })
+            });
+            if(res.ok){ const d = await res.json(); return d && d.ok ? d.user : null; }
+        } catch(e){ /* Laravel down -> fallback */ }
+        const res2 = await fetch(OFFICE_WEBAPP_URL, {
             method:'POST',
             headers:{ 'Content-Type':'text/plain;charset=utf-8' },
             body: JSON.stringify({ action:'login', name, pin })
         });
-        if(!res.ok) throw new Error('http_'+res.status);
-        const data = await res.json();
+        if(!res2.ok) throw new Error('http_'+res2.status);
+        const data = await res2.json();
         return data && data.ok ? data.user : null;
     }
     function verifySeed(name, pin){
@@ -470,8 +472,9 @@
     // callerPin) agar server memverifikasi ulang bahwa pemanggil memang admin/owner.
     async function adminCall(action, extra){
         if(!adminCreds) throw new Error('need_pin');
-        const res = await fetch(OFFICE_WEBAPP_URL, {
-            method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+        // Kelola User baca/tulis ke Laravel (MySQL) — sumber kebenaran Level 2.
+        const res = await fetch(OFFICE_API_URL, {
+            method:'POST', headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify(Object.assign({
                 action, callerName: adminCreds.name, callerPin: adminCreds.pin
             }, extra || {}))
@@ -636,9 +639,10 @@
             const delay = (0.16 + i * 0.08).toFixed(2);
             
             const isSso = b.href.startsWith('sso:');
-            // Ganti domain ini dengan BACKSTAGE_DOMAIN Laravel Anda yang sebenarnya
-            const targetUrl = isSso ? `https://office.laksamanamuda.id/sso/office?token=${encodeURIComponent(session.ssoToken||'')}` : b.href;
-            const targetAttr = isSso ? ' target="_blank"' : '';
+            // Kirim `to` = modul yang diklik agar Laravel mengarahkan ke dashboard yang benar
+            // (mis. Manajemen klik Finance -> buka Finance, bukan Manajemen).
+            const targetUrl = isSso ? `https://backstage.laksamanamuda.id/sso/office?token=${encodeURIComponent(session.ssoToken||'')}&to=${encodeURIComponent(b.key)}` : b.href;
+            const targetAttr = '';
 
             return `<a href="${targetUrl}"${targetAttr} class="tile rise" style="animation-delay:${delay}s" aria-label="Buka modul ${b.title}">
                 <div class="head"><div class="ico">${svgIcon(b.icon)}</div>${arrow}</div>
